@@ -65,7 +65,7 @@ class SplashScreenState extends State<SplashScreen> {
     Navigator.push(
                   context,
                   PageRouteBuilder(
-                      transitionDuration: Duration(seconds: 5),
+                      transitionDuration: Duration(seconds: 4),
                       pageBuilder: (_, __, ___) => Login()));
 
   }

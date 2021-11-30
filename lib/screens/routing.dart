@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tambah_limit/screens/dashboard.dart';
 import 'package:tambah_limit/screens/login.dart';
 import 'package:tambah_limit/screens/splashscreen.dart';
 
@@ -9,6 +10,9 @@ MaterialPageRoute routing(int mode, int id, List<String> pages, RouteSettings se
       break;
     case 'login':
       return MaterialPageRoute(builder: (context)=> Login(result: settings.arguments));
+      break;
+    case 'dashboard':
+      return MaterialPageRoute(builder: (context)=> Dashboard());
       break;
     default:
       return MaterialPageRoute(builder: (_) {

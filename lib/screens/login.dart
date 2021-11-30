@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'package:http/http.dart' show Client;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tambah_limit/models/resultModel.dart';
+import 'package:tambah_limit/models/userModel.dart';
 import 'package:tambah_limit/resources/userAPI.dart';
 import 'package:tambah_limit/settings/configuration.dart';
 import 'package:tambah_limit/tools/function.dart';
@@ -154,11 +156,27 @@ class LoginState extends State<Login> {
 
     Alert(context: context, loading: true, disableBackButton: true);
 
-    Result result = await userAPI.login(context, parameter: 'json={"user_code":${usernameController.text},"user_pass":${passwordController.text},"token":"tokencoba"}');
+    // Result result = await userAPI.login(context, parameter: 'json={"user_code":"${usernameController.text}","user_pass":"${passwordController.text}","token":"tokencoba"}');
+    // User user = await userAPI.login(context, parameter: 'json={"user_code":"${usernameController.text}","user_pass":"${passwordController.text}","token":"tokencoba"}');
+
+    String getLogin = await userAPI.login(context, parameter: 'json={"user_code":"${usernameController.text}","user_pass":"${passwordController.text}","token":"tokencoba"}');
 
     Navigator.of(context).pop();
 
-    printHelp(result.success);
+    if(getLogin == "OK"){
+      Navigator.popAndPushNamed(
+          context,
+          "dashboard"
+      );
+    } else {
+      Alert(
+        context: context,
+        title: "Alert",
+        content: Text(getLogin),
+        cancel: false,
+        type: "warning"
+      );
+    }
 
     setState(() {
       loginLoading = false;

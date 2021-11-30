@@ -1,3 +1,4 @@
+import 'package:http/http.dart' show Client;
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:tambah_limit/settings/configuration.dart';
@@ -14,6 +15,20 @@ printHelp(final print) {
   debugPrint("---------------------------------");
 }
 
+Future<String> ConnectionTest(String url, BuildContext context) async {
+  Client client = Client();
+  String testResult = "ERROR";
+
+  final response = await client.get(url);
+
+  if(response.statusCode == 200){
+    testResult = "OK";
+  }
+
+  return testResult;
+
+}
+
 String APIUrl(String url, {String parameter = "", bool print = false, BuildContext context}) {
   Configuration config;
   if (context != null) {
@@ -22,10 +37,10 @@ String APIUrl(String url, {String parameter = "", bool print = false, BuildConte
     config = config;
   }
 
-  String link = config.baseUrl + "/" + url + (parameter == "" ? "" : "&" + parameter);
+  // String link = config.baseUrl + "/" + url + (parameter == "" ? "" : "?" + parameter);
   if(print)
-    debugPrint(link);
-  return link;
+    debugPrint("change url api "+url);
+  return url;
 }
 
 void Alert({

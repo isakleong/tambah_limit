@@ -12,8 +12,8 @@ class Result {
   factory Result.fromJson(Map<String, dynamic> parsedJson){
     return Result(
       success: parsedJson["success"] ?? 0,
-      message: parsedJson["message"] ?? "",
-      data: parsedJson["data"] ?? "",
+      message: parsedJson["Id"] ?? "",
+      data: parsedJson["MaxLimit"] ?? "",
     );
   }
 }
