@@ -1,0 +1,11 @@
+-success
+https://www.2dimensions.com/a/pollux/files/flare/success-check
+
+-error
+https://www.2dimensions.com/a/blaxkies/files/flare/status-es
+
+-warning
+https://www.2dimensions.com/a/daniprogeek/files/flare/warning
+
+-play/pause
+https://www.2dimensions.com/a/pollux/files/flare/playpause/preview
