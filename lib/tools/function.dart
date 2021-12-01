@@ -1,4 +1,4 @@
-import 'package:http/http.dart' show Client;
+import 'package:http/http.dart' show Client, Request, Response;
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:tambah_limit/settings/configuration.dart';
@@ -6,7 +6,6 @@ import 'dart:io';
 import 'package:tambah_limit/widgets/TextView.dart';
 import 'package:tambah_limit/widgets/EditText.dart';
 import 'package:tambah_limit/widgets/button.dart';
-
 
 
 printHelp(final print) {
@@ -18,15 +17,65 @@ printHelp(final print) {
 Future<String> ConnectionTest(String url, BuildContext context) async {
   Client client = Client();
   String testResult = "ERROR";
+  // final response = await client.head(url).timeout(
+  //   Duration(seconds: 3),
+  //     onTimeout: () {
+  //       // time has run out, do what you wanted to do
+  //       return Response("Timeout", 500);
+  //     },
+  // );
 
-  final response = await client.get(url);
+  final request = new Request('HEAD', Uri.parse(url))..followRedirects = false;
+  final response = await client.send(request).timeout(
+    Duration(seconds: 3),
+      onTimeout: () {
+        // time has run out, do what you wanted to do
+        return null;
+      },
+  );
+
+  printHelp("cek debug "+url.toString()+"-----"+response.statusCode.toString());
 
   if(response.statusCode == 200){
     testResult = "OK";
+  } else {
+    testResult = "ERROR";
   }
 
   return testResult;
 
+  // HttpClient httpClient = new HttpClient();
+  // await httpClient.headUrl(Uri.parse(url))
+  //   .then((HttpClientRequest request) {
+  //     // Optionally set up headers...
+  //     // Optionally write to the request object...
+  //     // Then call close.
+  //     request..followRedirects = false;
+  //     return request.close();
+  //   })
+  //   .then((HttpClientResponse response) {
+  //     // Process the response.
+
+  //     printHelp("cek debug "+url.toString()+"-----"+response.statusCode.toString());
+      
+  //     if(response.statusCode == 200){
+  //       testResult = "OK";
+  //     } else {
+  //       testResult = "ERROR";
+  //     }
+
+  //     return testResult;
+
+  //   });
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
 }
 
 String APIUrl(String url, {String parameter = "", bool print = false, BuildContext context}) {

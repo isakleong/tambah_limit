@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:tambah_limit/screens/routing.dart';
 import 'package:tambah_limit/settings/configuration.dart';
+import 'package:tambah_limit/tools/function.dart';
 
 void main() async {
+  HttpOverrides.global = MyHttpOverrides();
   runApp(
     Configuration(
       child: MaterialApp (

@@ -20,6 +20,7 @@ class EditText extends StatelessWidget{
   TextAlign textAlign;
   double width, spaceBetweenLine;
   Color borderColor;
+  TextCapitalization textCapitalization;
 
   EditText({
     this.controller, 
@@ -53,6 +54,7 @@ class EditText extends StatelessWidget{
     this.spaceBetweenLine = 0,
     this.function,
     this.borderColor,
+    this.textCapitalization = TextCapitalization.none
   });
 
   @override
@@ -87,6 +89,7 @@ class EditText extends StatelessWidget{
       enabled: enabled,
       focusNode: focusNode,
       textInputAction: this.textInputAction,
+      textCapitalization: textCapitalization
     );
   } 
   

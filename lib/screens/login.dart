@@ -83,6 +83,7 @@ class LoginState extends State<Login> {
                             focusNode: usernameFocus,
                             validate: usernameValid,
                             hintText: "Username",
+                            textCapitalization: TextCapitalization.characters,
                             onSubmitted: (value) {
                               _fieldFocusChange(context, usernameFocus, passwordFocus);
                             },
