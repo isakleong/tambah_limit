@@ -41,6 +41,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   Result result;
   
   String _lastSelected = 'TAB: 0';
+  List<Color> backgroundActiveColor = [ config.grayColor, config.grayColor, config.grayColor ];
   String dashboardTitle = "Blok Pelanggan";
   int currentIndex = 0;
 
@@ -54,11 +55,13 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   final customerIdController = TextEditingController();
   final FocusNode customerIdFocus = FocusNode();
 
+  final btnTitle = [ "Tambah Limit", "Tambah Limit Corporate", "Riwayat Permintaan Limit" ];
+
   void _selectedTab(int index) {
     setState(() {
       if(index == 0){
         dashboardTitle = "Blok Pelanggan";
-      } else if(index == 1){
+      } else if(index == 1) {
         dashboardTitle = "Ubah Password";
       }
       _lastSelected = 'TAB: $index';
@@ -68,7 +71,15 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   void _selectedFab(int index) {
     setState(() {
+      if(index == 0) {
+        dashboardTitle = "Tambah Limit";
+      } else if(index == 1) {
+        dashboardTitle = "Tambah Limit Corporate";
+      } else if(index == 2) {
+        dashboardTitle = "Riwayat Permintaan Limit";
+      }
       _lastSelected = 'FAB: $index';
+      currentIndex = index+2;
     });
   }
 
@@ -135,7 +146,10 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         ),
       ),
       // ProfilePage(model: config.user, mode: 3)
-      Profile()
+      Profile(),
+      AddLimit(),
+      AddLimitCorporate(),
+      HistoryLimitRequest()
     ].where((c) => c != null).toList();
 
     return Scaffold(
@@ -147,14 +161,13 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       body: WillPopScope(
         onWillPop: willPopScope,
         child: Container(
-          color: config.bodyBackgroundColor,
           child: menuList[currentIndex]
         ),
       ),
       bottomNavigationBar: FABBottomAppBar(
         centerItemText: '',
         color: config.grayColor,
-        selectedColor: Colors.red,
+        selectedColor: config.darkerBlueColor,
         notchedShape: CircularNotchedRectangle(),
         onTabSelected: _selectedTab,
         items: [
@@ -169,7 +182,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   showBlockInfoDetail(Configuration config) {
-    final _formKey = GlobalKey<FormState>();
+    final _ChangeBlockedStatusFormKey = GlobalKey<FormState>();
 
     List<Widget> tempWidgetList = [];
 
@@ -217,7 +230,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       tempWidgetList.add(
         Container(
           child: Form(
-            key: _formKey,
+            key: _ChangeBlockedStatusFormKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -404,13 +417,14 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         return CenterAbout(
           position: Offset(offset.dx, offset.dy - btnTitle.length * 35.0),
           child: FabWithIcons(
+            // backgroundColorActive: backgroundActiveColor,
             btnTitle: btnTitle,
             onIconTapped: _selectedFab,
           ),
         );
       },
       child: FloatingActionButton(
-        onPressed: () { },
+        onPressed: () { printHelp("coba ya"); },
         tooltip: 'Increment',
         child: Icon(Icons.add),
         elevation: 2.0,

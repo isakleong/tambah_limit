@@ -55,11 +55,9 @@ class FabWithIconsState extends State<FabWithIcons> with TickerProviderStateMixi
           children: <Widget>[
             Container(
               child: Button(
-                backgroundColor: config.darkOpacityBlueColor,
+                // backgroundColor: config.darkOpacityBlueColor,
                 child: TextView(widget.btnTitle[index], 7, color: Colors.white),
-                onTap: () {
-                  
-                },
+                onTap: () => _onTapped(index),
               ),
             ),
           ],
