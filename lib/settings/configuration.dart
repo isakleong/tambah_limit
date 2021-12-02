@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tambah_limit/models/customerModel.dart';
 
 class Configuration extends InheritedWidget {
   Configuration({

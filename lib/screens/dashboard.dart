@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:http/http.dart' show Client;
 
 import 'package:flutter/cupertino.dart';
@@ -26,7 +27,7 @@ import 'package:tambah_limit/widgets/bottomBarLayout.dart';
 
 import 'package:tambah_limit/widgets/button.dart';
 
-
+enum CustomerBlockedType { NotBlocked, BlockedShip, BlockedInvoice, BlockedAll }  
 
 class Dashboard extends StatefulWidget {
   @override
@@ -35,12 +36,20 @@ class Dashboard extends StatefulWidget {
 
 class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
+  CustomerBlockedType customerBlockedType = CustomerBlockedType.NotBlocked;
+
+  Result result;
+  
   String _lastSelected = 'TAB: 0';
   String dashboardTitle = "Blok Pelanggan";
   int currentIndex = 0;
 
+  String blockedTypeSelected = "";
+  int selectedRadio = -1;
+
   bool customerIdValid = false;
   bool searchLoading = false;
+  bool updateLoading = false;
 
   final customerIdController = TextEditingController();
   final FocusNode customerIdFocus = FocusNode();
@@ -65,8 +74,15 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-
     List<Widget> blockInfoDetailWidgetList = showBlockInfoDetail(config);
+
+    if(result != null){
+      // final resultObject = jsonDecode(result.data.toString());
+      // var blockedType = resultObject[0]["blocked"];
+
+      // resultObject[0]["blocked"] == 3 ? blockedTypeSelected = "Blocked All" : resultObject[0]["blocked"] == 0 ? blockedTypeSelected = "Not Blocked" : ""; -- kalau diblock, pas running awal, value ndk muncul, sedangkan kalau diunblock, pindah focus, value keganti
+      // selectedRadio = resultObject[0]["blocked"];
+    }
 
     final List<Widget> menuList = [
       RefreshIndicator(
@@ -81,6 +97,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   key: Key("CustomerId"),
                   controller: customerIdController,
                   focusNode: customerIdFocus,
+                  validate: customerIdValid,
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.done,
                   textCapitalization: TextCapitalization.characters,
@@ -96,11 +113,22 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                 child: Button(
                   loading: searchLoading,
                   backgroundColor: config.darkOpacityBlueColor,
-                  child: TextView("Cari", 3, color: Colors.white),
+                  child: TextView("CARI", 3, color: Colors.white),
                   onTap: () {
-                    submitValidation();
+                    getBlockInfo();
                   },
                 ),
+              ),
+              blockInfoDetailWidgetList.length == 0
+              ? 
+              Container()
+              :
+              ListView(
+                scrollDirection: Axis.vertical,
+                padding: EdgeInsets.all(0),
+                physics: ScrollPhysics(),
+                shrinkWrap: true,
+                children: blockInfoDetailWidgetList,
               ),
             ],
           ),
@@ -141,12 +169,232 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   showBlockInfoDetail(Configuration config) {
+    final _formKey = GlobalKey<FormState>();
+
     List<Widget> tempWidgetList = [];
 
+    if(result != null){
+      final resultObject = jsonDecode(result.data.toString());
+      var blockedType;
+      
+      // printHelp(resultObject[0]["blocked"]);
+      // resultObject[0]["Name"];
+
+      // String blockedTypeSelected = "coba";
+      // var blockedType = resultObject[0]["blocked"];
+
+      if(selectedRadio == -1){
+        blockedType = resultObject[0]["blocked"];
+        // blockedType == 3 ? blockedTypeSelected = "Blocked All" : blockedType == 0 ? blockedTypeSelected = "Not Blocked" : blockedType == 1 ? blockedTypeSelected = "Blocked Ship" : blockedType == 2 ? "Blocked Invoice" : ""; //kalau diunblock value awal bisa muncul, namun waktu onchange radio, value gk keganti. kalau diblock, running awal, value ndk muncul
+        if(blockedType == 3) {
+          blockedTypeSelected = "Blocked All";
+          selectedRadio = 3;
+        } else if(blockedType == 2) {
+          blockedTypeSelected = "Blocked Invoice HEHEHE";
+          selectedRadio = 2;
+        } else if(blockedType == 1) {
+          blockedTypeSelected = "Blocked Ship";
+          selectedRadio = 1;
+        } else {
+          blockedTypeSelected = "Not Blocked";
+          selectedRadio = 0;
+        }
+      } else {
+        blockedType = selectedRadio;
+        // blockedType == 3 ? blockedTypeSelected = "Blocked All" : blockedType == 0 ? blockedTypeSelected = "Not Blocked" : blockedType == 1 ? blockedTypeSelected = "Blocked Ship" : "Blocked Invoice"; //kalau diunblock value awal bisa muncul, namun waktu onchange radio, value gk keganti. kalau diblock, running awal, value ndk muncul
+        if(blockedType == 3) {
+          blockedTypeSelected = "Blocked All";
+        } else if(blockedType == 2) {
+          blockedTypeSelected = "Blocked Invoice";
+        } else if(blockedType == 1) {
+          blockedTypeSelected = "Blocked Ship";
+        } else {
+          blockedTypeSelected = "Not Blocked";
+        }
+      }
+      
+
+      tempWidgetList.add(
+        Container(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  child: TextFormField(
+                    enabled: false,
+                    decoration: new InputDecoration(
+                      hintStyle: TextStyle(
+                        color: Colors.black
+                      ),
+                      labelStyle: TextStyle(
+                        color: Colors.black
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelText: "Kode Pelanggan",
+                      hintText: resultObject[0]["No_"],
+                      icon: Icon(Icons.bookmark),
+                      disabledBorder: OutlineInputBorder(
+                          borderRadius: new BorderRadius.circular(5.0,),
+                          borderSide: BorderSide(color: Colors.black54, width: 1.5,),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  child: TextFormField(
+                    enabled: false,
+                    decoration: new InputDecoration(
+                      hintStyle: TextStyle(
+                        color: Colors.black
+                      ),
+                      labelStyle: TextStyle(
+                        color: Colors.black
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelText: "Nama Pelanggan",
+                      hintText: resultObject[0]["Name"],
+                      icon: Icon(Icons.people),
+                      disabledBorder: OutlineInputBorder(
+                          borderRadius: new BorderRadius.circular(5.0,),
+                          borderSide: BorderSide(color: Colors.black54, width: 1.5,),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  child: TextFormField(
+                    style: TextStyle(color: Colors.red),
+                    enabled: false,
+                    decoration: new InputDecoration(
+                      hintStyle: TextStyle(
+                        color: Colors.black
+                      ),
+                      labelStyle: TextStyle(
+                        color: Colors.black
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelText: "Alamat Pelanggan",
+                      hintText: resultObject[0]["Address"],
+                      icon: Icon(Icons.location_on),
+                      disabledBorder: OutlineInputBorder(
+                          borderRadius: new BorderRadius.circular(5.0,),
+                          borderSide: BorderSide(color: Colors.black54, width: 1.5,),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  child: TextFormField(
+                    onTap: () {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      showDialog<void>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            content: StatefulBuilder(
+                              builder: (BuildContext context, StateSetter setState) {
+                                return Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: List<Widget>.generate(4, (int index) {
+                                    var typeTitle = "";
+                                    if(index == 0){
+                                      typeTitle = "Not Blocked";
+                                    } else if(index == 1){
+                                      typeTitle = "Blocked Ship";
+                                    } else if(index == 2){
+                                      typeTitle = "Blocked Invoice";
+                                    } else if(index == 3){
+                                      typeTitle = "Blocked All";
+                                    }
+                                    return ListTile(
+                                      title: Text('${typeTitle}'),
+                                      leading: Radio(
+                                        value: index,
+                                        groupValue: selectedRadio,
+                                        onChanged: (int value) {
+                                          setState((){
+                                            selectedRadio = value;
+                                            blockedTypeSelected = typeTitle;
+                                            Navigator.of(context, rootNavigator: true).pop();
+                                          } );
+                                        },
+                                      ),
+                                    );
+                                  }),
+                                );
+                              },
+                            ),
+                          );
+                        }
+                      );
+                    },
+                    decoration: new InputDecoration(
+                      hintStyle: TextStyle(
+                        color: Colors.black
+                      ),
+                      labelStyle: TextStyle(
+                        color: Colors.black
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelText: "Status Block",
+                      hintText: blockedTypeSelected, //tanya ce elisa
+                      icon: Icon(Icons.block),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: new BorderRadius.circular(5.0,),
+                          borderSide: BorderSide(color: Colors.black54, width: 1.5,),
+                      ),
+                    ),
+                  ),
+                ),
+                Center(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                    child: Button(
+                      key: Key("submit"),
+                      backgroundColor: config.darkOrangeColor,
+                      child: TextView("UBAH", 3, caps: true,),
+                      onTap: (){
+                        blockedType != resultObject[0]["blocked"]
+                        ?
+                        Alert(
+                          context: context,
+                          title: "Alert",
+                          content: Text("Apakah Anda yakin ingin menyimpan data?"),
+                          cancel: true,
+                          type: "warning",
+                          defaultAction: () {
+                            updateBlock();
+                          }
+                        )
+                        :
+                        Alert(
+                          context: context,
+                          title: "Alert",
+                          content: Text("Mohon untuk melakukan perubahan data terlebih dahulu"),
+                          cancel: false,
+                          type: "warning"
+                        );
+                      },
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        )
+      );
+    }
+
+    return tempWidgetList;
   }
-
-
-
 
   Widget _buildFab(BuildContext context) {
     final btnTitle = [ "Tambah Limit", "Tambah Limit Corporate", "Riwayat Permintaan Limit" ];
@@ -170,10 +418,9 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     );
   }
 
-  void getBlockInfo() async {
-    FocusScope.of(context).requestFocus(FocusNode());
+  void updateBlock() async {
     setState(() {
-      searchLoading = true;
+      updateLoading = true;
     });
 
     Alert(context: context, loading: true, disableBackButton: true);
@@ -182,40 +429,91 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     final SharedPreferences sharedPreferences = await _sharedPreferences;
     String user_code = sharedPreferences.getString('user_code');
 
-    Customer getBlockInfo = await customerAPI.getBlockInfo(context, parameter: 'json={"kode_customer":"${customerIdController.text}","user_code":"${user_code}","token":"tokencoba"}');
+    //http://192.168.10.213/dbrudie-2-0-0/updateBlock.php?json={ "user_code" : "isak", "kode_customer" : "01A01010001" , "block_lama" : 3, "block_baru" : 0}
+
+    final resultObject = jsonDecode(result.data.toString());
+    var block_lama = resultObject[0]["blocked"];
+    var block_baru = selectedRadio;
+
+    Result result_ = await customerAPI.updateBlock(context, parameter: 'json={"kode_customer":"${customerIdController.text}","user_code":"${user_code}","block_lama":${block_lama},"block_baru":${block_baru}}');
 
     Navigator.of(context).pop();
 
-    if(getBlockInfo.Id != ""){
+    if(result.success == 1){
       Alert(
         context: context,
         title: "Alert",
-        content: Text(getBlockInfo.Id),
+        content: Text(result_.message),
         cancel: false,
-        type: "warning"
+        type: "success"
       );
-    } else {
+    } else{
       Alert(
         context: context,
         title: "Alert",
-        content: Text("ERROR BRO"),
+        content: Text(result_.message),
         cancel: false,
         type: "warning"
       );
     }
-
     setState(() {
-      searchLoading = false;
+      updateLoading = false;
     });
+
   }
 
-  void submitValidation() {
+  void getBlockInfo() async {
     setState(() {
       customerIdController.text.isEmpty ? customerIdValid = true : customerIdValid = false;
     });
 
     if(!customerIdValid){
-      getBlockInfo();
+      FocusScope.of(context).requestFocus(FocusNode());
+      setState(() {
+        searchLoading = true;
+      });
+
+      Alert(context: context, loading: true, disableBackButton: true);
+
+      SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+      final SharedPreferences sharedPreferences = await _sharedPreferences;
+      String user_code = sharedPreferences.getString('user_code');
+
+      Result result_ = await customerAPI.getBlockInfo(context, parameter: 'json={"kode_customer":"${customerIdController.text}","user_code":"${user_code}"}');
+
+      Navigator.of(context).pop();
+
+      if(result_.success == 1){
+        // final products = jsonDecode(result.data.toString());
+        // products[0]["Name"]
+
+        setState(() {
+          result = result_;
+          selectedRadio = -1;
+        });
+
+        // showBlockInfoDetail(config);
+      } else {
+        Alert(
+          context: context,
+          title: "Alert",
+          content: Text(result_.message),
+          cancel: false,
+          type: "warning"
+        );
+        setState(() {
+          result = null;
+        });
+      }
+
+      setState(() {
+        searchLoading = false;
+      });
+
+    } else {
+      setState(() {
+        result = null;
+      });
     }
   }
 

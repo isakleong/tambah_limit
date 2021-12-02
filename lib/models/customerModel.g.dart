@@ -8,16 +8,16 @@ part of 'customerModel.dart';
 
 Customer _$CustomerFromJson(Map<String, dynamic> json) {
   return Customer(
-    Id: json['Id'] as String,
+    No_: json['No_'] as String,
     Name: json['Name'] as String,
     Address: json['Address'] as String,
-    Blocked: json['Blocked'] as int,
+    blocked: json['blocked'] as int,
   );
 }
 
 Map<String, dynamic> _$CustomerToJson(Customer instance) => <String, dynamic>{
-      'Id': instance.Id,
+      'No_': instance.No_,
       'Name': instance.Name,
       'Address': instance.Address,
-      'Blocked': instance.Blocked,
+      'blocked': instance.blocked,
     };
