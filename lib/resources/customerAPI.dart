@@ -104,8 +104,11 @@ class CustomerAPI {
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
     http://192.168.10.213/dbrudie-2-0-0/getLimit.php?json={ "user_code" : "isak", "kode_customer" : "01A01010001" }
-    String url_address_1 = config.baseUrl + "/" + "getLimit.php" + (parameter == "" ? "" : "?" + parameter);
-    String url_address_2 = config.baseUrlAlt + "/" + "getLimit.php" + (parameter == "" ? "" : "?" + parameter);
+    // String url_address_1 = config.baseUrl + "/" + "getLimit.php" + (parameter == "" ? "" : "?" + parameter);
+    // String url_address_2 = config.baseUrlAlt + "/" + "getLimit.php" + (parameter == "" ? "" : "?" + parameter);
+
+    String url_address_1 = config.baseUrl + "/" + "tesIP.php";
+    String url_address_2 = config.baseUrlAlt + "/" + "tesIP.php";
 
     try {
 		  final conn_1 = await ConnectionTest(url_address_1, context);
@@ -133,6 +136,8 @@ class CustomerAPI {
     if(isUrlAddress_2){
       url = url_address_2;
     }
+
+    url = config.baseUrl + "/" + "getLimit.php" + (parameter == "" ? "" : "?" + parameter);
 
     if(url != "") {
 

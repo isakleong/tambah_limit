@@ -28,8 +28,6 @@ class AddLimit extends StatefulWidget {
 
 class AddLimitState extends State<AddLimit> {
 
-  final _AddLimitFormKey = GlobalKey<FormState>();
-
   Result result;
 
   bool customerIdValid = false;
@@ -40,209 +38,94 @@ class AddLimitState extends State<AddLimit> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> customerLimitWidgetList = showCustomerLimitInfo(config);
+    // List<Widget> customerLimitWidgetList = showCustomerLimitInfo(config);
 
-    return Container(
-      child: Column(
-        children: [
-          Container(
-            margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-            child: EditText(
-              useIcon: true,
-              key: Key("CustomerId"),
-              controller: customerIdController,
-              focusNode: customerIdFocus,
-              validate: customerIdValid,
-              keyboardType: TextInputType.text,
-              textInputAction: TextInputAction.done,
-              textCapitalization: TextCapitalization.characters,
-              hintText: "Kode Pelanggan",
-              onSubmitted: (value) {
-                customerIdFocus.unfocus();
-              },
-            ),
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      appBar: AppBar(
+        title: TextView("Tambah Limit", 1),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.popAndPushNamed(context, "dashboard"),
+        ),
+      ),
+      body: SafeArea(
+        child: Container(
+          margin: EdgeInsets.symmetric(vertical: 40, horizontal: 15),
+          child: EditText(
+            key: Key("CustomerId"),
+            controller: customerIdController,
+            keyboardType: TextInputType.text,
+            textInputAction: TextInputAction.next,
+            focusNode: customerIdFocus,
+            validate: customerIdValid,
+            hintText: "Kode Pelanggan",
+            textCapitalization: TextCapitalization.characters,
           ),
-          Container(
-            margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-            width: MediaQuery.of(context).size.width,
-            child: Button(
-              loading: searchLoading,
-              backgroundColor: config.darkOpacityBlueColor,
-              child: TextView("CARI", 3, color: Colors.white),
-              onTap: () {
-                showCustomerLimitInfo(config);
-              },
-            ),
-          ),
-        ],
+        ),
+      ),
+      bottomNavigationBar:Container(
+        margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+        child: Button(
+          backgroundColor: config.darkOpacityBlueColor,
+          child: TextView("LANJUTKAN", 3, color: Colors.white),
+          onTap: () {
+            getLimit();
+          },
+        ),
       ),
     );
-  }
 
-  showCustomerLimitInfo(Configuration config) {
-    final _AddLimitFormKey = GlobalKey<FormState>();
-
-    List<Widget> tempWidgetList = [];
-
-    if(result != null){
-      final resultObject = jsonDecode(result.data.toString());
-
-      var blockedType = resultObject[0]["blocked"];
-      var blockedTypeSelected;
-      // blockedType == 3 ? blockedTypeSelected = "Blocked All" : blockedType == 0 ? blockedTypeSelected = "Not Blocked" : blockedType == 1 ? blockedTypeSelected = "Blocked Ship" : blockedType == 2 ? "Blocked Invoice" : ""; //kalau diunblock value awal bisa muncul, namun waktu onchange radio, value gk keganti. kalau diblock, running awal, value ndk muncul
-      if(blockedType == 3) {
-        blockedTypeSelected = "Blocked All";
-      } else if(blockedType == 2) {
-        blockedTypeSelected = "Blocked Invoice HEHEHE";
-      } else if(blockedType == 1) {
-        blockedTypeSelected = "Blocked Ship";
-      } else {
-        blockedTypeSelected = "Not Blocked";
-      }
-
-      tempWidgetList.add(
-        Container(
-          child: Form(
-            key: _AddLimitFormKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                  child: TextFormField(
-                    enabled: false,
-                    decoration: new InputDecoration(
-                      hintStyle: TextStyle(
-                        color: Colors.black
-                      ),
-                      labelStyle: TextStyle(
-                        color: Colors.black
-                      ),
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      labelText: "Kode Pelanggan",
-                      hintText: resultObject[0]["No_"],
-                      icon: Icon(Icons.bookmark),
-                      disabledBorder: OutlineInputBorder(
-                          borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: Colors.black54, width: 1.5,),
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                  child: TextFormField(
-                    enabled: false,
-                    decoration: new InputDecoration(
-                      hintStyle: TextStyle(
-                        color: Colors.black
-                      ),
-                      labelStyle: TextStyle(
-                        color: Colors.black
-                      ),
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      labelText: "Nama Pelanggan",
-                      hintText: resultObject[0]["Name"],
-                      icon: Icon(Icons.people),
-                      disabledBorder: OutlineInputBorder(
-                          borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: Colors.black54, width: 1.5,),
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                  child: TextFormField(
-                    style: TextStyle(color: Colors.red),
-                    enabled: false,
-                    decoration: new InputDecoration(
-                      hintStyle: TextStyle(
-                        color: Colors.black
-                      ),
-                      labelStyle: TextStyle(
-                        color: Colors.black
-                      ),
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      labelText: "Alamat Pelanggan",
-                      hintText: resultObject[0]["Address"],
-                      icon: Icon(Icons.location_on),
-                      disabledBorder: OutlineInputBorder(
-                          borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: Colors.black54, width: 1.5,),
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                  child: TextFormField(
-                    style: TextStyle(color: Colors.red),
-                    enabled: false,
-                    decoration: new InputDecoration(
-                      hintStyle: TextStyle(
-                        color: Colors.black
-                      ),
-                      labelStyle: TextStyle(
-                        color: Colors.black
-                      ),
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      labelText: "Status",
-                      hintText: resultObject[0]["disc"] + "|" +blockedTypeSelected,
-                      icon: Icon(Icons.list_alt),
-                      disabledBorder: OutlineInputBorder(
-                          borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: Colors.black54, width: 1.5,),
-                      ),
-                    ),
-                  ),
-                ),
-                
-
-
-                Center(
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                    child: Button(
-                      key: Key("submit"),
-                      backgroundColor: config.darkOrangeColor,
-                      child: TextView("UBAH", 3, caps: true,),
-                      onTap: (){
-                        // blockedType != resultObject[0]["blocked"]
-                        // ?
-                        // Alert(
-                        //   context: context,
-                        //   title: "Alert",
-                        //   content: Text("Apakah Anda yakin ingin menyimpan data?"),
-                        //   cancel: true,
-                        //   type: "warning",
-                        //   defaultAction: () {
-                        //     // updateBlock();
-                        //   }
-                        // )
-                        // :
-                        // Alert(
-                        //   context: context,
-                        //   title: "Alert",
-                        //   content: Text("Mohon untuk melakukan perubahan data terlebih dahulu"),
-                        //   cancel: false,
-                        //   type: "warning"
-                        // );
-                      },
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        )
-      );
-
-    }
-    
-
+    // return Container(
+    //   child: Column(
+    //     children: [
+    //       Container(
+    //         margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+    //         child: EditText(
+    //           useIcon: true,
+    //           key: Key("CustomerId"),
+    //           controller: customerIdController,
+    //           focusNode: customerIdFocus,
+    //           validate: customerIdValid,
+    //           keyboardType: TextInputType.text,
+    //           textInputAction: TextInputAction.done,
+    //           textCapitalization: TextCapitalization.characters,
+    //           hintText: "Kode Pelanggan",
+    //           onSubmitted: (value) {
+    //             customerIdFocus.unfocus();
+    //           },
+    //         ),
+    //       ),
+    //       Container(
+    //         margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+    //         width: MediaQuery.of(context).size.width,
+    //         child: Button(
+    //           loading: searchLoading,
+    //           backgroundColor: config.darkOpacityBlueColor,
+    //           child: TextView("CARI", 3, color: Colors.white),
+    //           onTap: () {
+    //             getLimit();
+    //           },
+    //         ),
+    //       ),
+    //       customerLimitWidgetList.length == 0
+    //       ? 
+    //       Container()
+    //       :
+    //       Container(),
+          
+    //       // Expanded(
+    //       //   child: ListView(
+    //       //     scrollDirection: Axis.vertical,
+    //       //     padding: EdgeInsets.all(0),
+    //       //     physics: ScrollPhysics(),
+    //       //     shrinkWrap: true,
+    //       //     children: customerLimitWidgetList,
+    //       //   ),
+    //       // ),
+    //     ],
+    //   ),
+    // );
   }
 
 
@@ -277,6 +160,12 @@ class AddLimitState extends State<AddLimit> {
         setState(() {
           result = result_;
         });
+
+        Navigator.pushNamed(
+          context,
+          "addLimitDetail",
+          arguments: result
+        );
 
         // showBlockInfoDetail(config);
       } else {

@@ -9,7 +9,7 @@ class Configuration extends InheritedWidget {
 
   String buildVersion = "1.0";
 
-  String ip_public = "203.142.77.243";
+  String ip_public = "192.168.10.213";
   String ip_public_alt = "103.76.27.124";
   String ip_port = "80" ;
   String server_name = "dbrudie-2-0-0";

@@ -36,6 +36,8 @@ class Dashboard extends StatefulWidget {
 
 class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
+  final _ChangeBlockedStatusFormKey = GlobalKey<FormState>();
+
   CustomerBlockedType customerBlockedType = CustomerBlockedType.NotBlocked;
 
   Result result;
@@ -72,14 +74,18 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   void _selectedFab(int index) {
     setState(() {
       if(index == 0) {
-        dashboardTitle = "Tambah Limit";
+        // dashboardTitle = "Tambah Limit";
+        Navigator.popAndPushNamed(
+            context,
+            "addLimit"
+        );
       } else if(index == 1) {
         dashboardTitle = "Tambah Limit Corporate";
       } else if(index == 2) {
         dashboardTitle = "Riwayat Permintaan Limit";
       }
       _lastSelected = 'FAB: $index';
-      currentIndex = index+2;
+      // currentIndex = index+2;
     });
   }
 
@@ -147,9 +153,9 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       ),
       // ProfilePage(model: config.user, mode: 3)
       Profile(),
-      AddLimit(),
-      AddLimitCorporate(),
-      HistoryLimitRequest()
+      // AddLimit(),
+      // AddLimitCorporate(),
+      // HistoryLimitRequest()
     ].where((c) => c != null).toList();
 
     return Scaffold(
@@ -182,7 +188,6 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   showBlockInfoDetail(Configuration config) {
-    final _ChangeBlockedStatusFormKey = GlobalKey<FormState>();
 
     List<Widget> tempWidgetList = [];
 
@@ -203,7 +208,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           blockedTypeSelected = "Blocked All";
           selectedRadio = 3;
         } else if(blockedType == 2) {
-          blockedTypeSelected = "Blocked Invoice HEHEHE";
+          blockedTypeSelected = "Blocked Invoice";
           selectedRadio = 2;
         } else if(blockedType == 1) {
           blockedTypeSelected = "Blocked Ship";
@@ -241,10 +246,10 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                     enabled: false,
                     decoration: new InputDecoration(
                       hintStyle: TextStyle(
-                        color: Colors.black
+                        color: config.grayNonActiveColor
                       ),
                       labelStyle: TextStyle(
-                        color: Colors.black
+                        color: config.grayNonActiveColor
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Kode Pelanggan",
@@ -252,7 +257,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                       icon: Icon(Icons.bookmark),
                       disabledBorder: OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: Colors.black54, width: 1.5,),
+                          borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
                       ),
                     ),
                   ),
@@ -263,10 +268,10 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                     enabled: false,
                     decoration: new InputDecoration(
                       hintStyle: TextStyle(
-                        color: Colors.black
+                        color: config.grayNonActiveColor
                       ),
                       labelStyle: TextStyle(
-                        color: Colors.black
+                        color: config.grayNonActiveColor
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Nama Pelanggan",
@@ -274,7 +279,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                       icon: Icon(Icons.people),
                       disabledBorder: OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: Colors.black54, width: 1.5,),
+                          borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
                       ),
                     ),
                   ),
@@ -282,14 +287,13 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
                   child: TextFormField(
-                    style: TextStyle(color: Colors.red),
                     enabled: false,
                     decoration: new InputDecoration(
                       hintStyle: TextStyle(
-                        color: Colors.black
+                        color: config.grayNonActiveColor
                       ),
                       labelStyle: TextStyle(
-                        color: Colors.black
+                        color: config.grayNonActiveColor
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Alamat Pelanggan",
@@ -297,7 +301,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                       icon: Icon(Icons.location_on),
                       disabledBorder: OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: Colors.black54, width: 1.5,),
+                          borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
                       ),
                     ),
                   ),
@@ -372,7 +376,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                     padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                     child: Button(
                       key: Key("submit"),
-                      backgroundColor: config.darkOrangeColor,
+                      backgroundColor: config.darkOpacityBlueColor,
                       child: TextView("UBAH", 3, caps: true,),
                       onTap: (){
                         blockedType != resultObject[0]["blocked"]
