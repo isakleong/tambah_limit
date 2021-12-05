@@ -1,5 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+// import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:bottom_bar_with_sheet/bottom_bar_with_sheet.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:http/http.dart' show Client;
 
 import 'package:flutter/cupertino.dart';
@@ -36,6 +41,8 @@ class Dashboard extends StatefulWidget {
 
 class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
+  DateTime currentBackPressTime;
+
   final _ChangeBlockedStatusFormKey = GlobalKey<FormState>();
 
   CustomerBlockedType customerBlockedType = CustomerBlockedType.NotBlocked;
@@ -56,6 +63,8 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   final customerIdController = TextEditingController();
   final FocusNode customerIdFocus = FocusNode();
+
+  final _bottomBarController = BottomBarWithSheetController(initialIndex: 0);
 
   final btnTitle = [ "Tambah Limit", "Tambah Limit Corporate", "Riwayat Permintaan Limit" ];
 
@@ -87,6 +96,22 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       _lastSelected = 'FAB: $index';
       // currentIndex = index+2;
     });
+  }
+
+  @override
+  void initState() {
+    _bottomBarController.itemsStream.listen((i) {
+      setState(() {
+        currentIndex = i;
+        if(i == 0){
+          dashboardTitle = "Blok Pelanggan";
+        } else if(i == 1) {
+          dashboardTitle = "Ubah Password";
+        }  
+      });
+    });
+    super.initState();
+    
   }
 
   @override
@@ -164,26 +189,127 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         title: TextView(dashboardTitle, 1),
         automaticallyImplyLeading: false,
       ),
-      body: WillPopScope(
-        onWillPop: willPopScope,
-        child: Container(
-          child: menuList[currentIndex]
+      body: Container(
+        child: menuList[currentIndex]
+      ),
+      bottomNavigationBar: BottomBarWithSheet(
+        controller: _bottomBarController,
+        bottomBarTheme: BottomBarTheme(
+          mainButtonPosition: MainButtonPosition.middle,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: Offset(0, 3), // changes position of shadow
+              ),
+            ],
+          ),
+          heightOpened: 350,
+          itemIconColor: config.grayColor,
+          selectedItemIconColor: config.darkOpacityBlueColor,
+          itemTextStyle: TextStyle(
+            color: config.grayColor,
+            fontSize: 12,
+            fontFamily: "WorkSans"
+          ),
+          selectedItemTextStyle: TextStyle(
+            color: config.darkOpacityBlueColor,
+            fontSize: 14,
+            fontFamily: "WorkSans"
+          ),
         ),
-      ),
-      bottomNavigationBar: FABBottomAppBar(
-        centerItemText: '',
-        color: config.grayColor,
-        selectedColor: config.darkerBlueColor,
-        notchedShape: CircularNotchedRectangle(),
-        onTabSelected: _selectedTab,
+        mainActionButtonTheme: MainActionButtonTheme(
+          size: 60,
+          color: config.darkOpacityBlueColor,
+          icon: Icon(
+            Icons.add,
+            color: Colors.white,
+            size: 32,
+          ),
+        ),
+        onSelectItem: (index) {
+          printHelp("get index "+index.toString());
+          setState(() {
+            if(index == 0){
+              dashboardTitle = "Blok Pelanggan";
+            } else if(index == 1) {
+              dashboardTitle = "Ubah Password";
+            }  
+          });
+          
+        },
+        sheetChild: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Container(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [                
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                  child: Button(
+                    loading: searchLoading,
+                    backgroundColor: config.darkOpacityBlueColor,
+                    child: TextView("Tambah Limit", 3, color: Colors.white),
+                    onTap: () {
+                      Navigator.popAndPushNamed(
+                          context,
+                          "addLimit"
+                      );
+                    },
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                  child: Button(
+                    loading: searchLoading,
+                    backgroundColor: config.darkOpacityBlueColor,
+                    child: TextView("Tambah Limit Corporate", 3, color: Colors.white),
+                    onTap: () {
+                      
+                    },
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                  child: Button(
+                    loading: searchLoading,
+                    backgroundColor: config.darkOpacityBlueColor,
+                    child: TextView("Riwayat Permintaan Limit", 3, color: Colors.white),
+                    onTap: () {
+                      
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
         items: [
-          FABBottomAppBarItem(iconData: Icons.not_interested, text: 'Status Block'),
-          FABBottomAppBarItem(iconData: Icons.password, text: 'Ubah Password'),
+          BottomBarWithSheetItem(icon: Icons.not_interested, label: "Status Blocked"),
+          BottomBarWithSheetItem(icon: Icons.password, label: "Ubah Password"),
         ],
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: _buildFab(
-          context), // This trailing comma makes auto-formatting nicer for build methods.
+      )
+      
+      
+      // FABBottomAppBar(
+      //   centerItemText: '',
+      //   color: config.grayColor,
+      //   selectedColor: config.darkerBlueColor,
+      //   notchedShape: CircularNotchedRectangle(),
+      //   onTabSelected: _selectedTab,
+      //   items: [
+      //     FABBottomAppBarItem(iconData: Icons.not_interested, text: 'Status Block'),
+      //     FABBottomAppBarItem(iconData: Icons.password, text: 'Ubah Password'),
+      //   ],
+      // ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // floatingActionButton: _buildFab(
+      //     context), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
@@ -535,25 +661,21 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     }
   }
 
-  Future<bool> willPopScope() async{
-    // if (mCurrentIndex != 0) {
-    //   setState(() {
-    //     mCurrentIndex = 0;
-    //   });
-    // } else {
-    //   if (isExit == false) {
-    //     isExit = true;
-    //     _scaffoldKey.currentState.showSnackBar(
-    //       SnackBar(
-    //         duration: Duration(seconds:1),
-    //         content: Text(message["exitApps"]),
-    //       )
-    //     );
-    //   } else if (isExit) {
-    //     SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-    //   }
-    // }
-    // return false;
+  Future<bool> willPopScope() async {
+    DateTime now = DateTime.now();
+    if (currentBackPressTime == null || 
+        now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Tekan sekali lagi untuk keluar dari aplikasi", textAlign: TextAlign.center),
+      ));
+      return Future.value(false);
+    }
+    // Navigator.popAndPushNamed(
+    //       context,
+    //       "login"
+    //   );
+    return Future.value(true);
   }
 
   Future<Null> refresh() async {

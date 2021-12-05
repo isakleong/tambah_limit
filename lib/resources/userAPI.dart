@@ -86,7 +86,7 @@ class UserAPI {
         if(user.Id != ""){
           isLoginSuccess = "OK";
 
-          await saveToLocalStorage(context, user.Id);
+          await saveToLocalStorage(context, user);
 
         } 
 
@@ -111,12 +111,151 @@ class UserAPI {
 
   }
 
-  saveToLocalStorage(final context, String data) async {
+  Future<String> changePassword(final context, {String parameter=""}) async {
+    String isChangePasswordSuccess = "";
+    User user;
+    String url = "";
+
+    bool isUrlAddress_1 = false, isUrlAddress_2 = false;
+    String url_address_1 = config.baseUrl + "/" + "updatePassword.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_2 = config.baseUrlAlt + "/" + "updatePassword.php" + (parameter == "" ? "" : "?" + parameter);
+
+    try {
+		  final conn_1 = await ConnectionTest(url_address_1, context);
+      if(conn_1 == "OK"){
+        isUrlAddress_1 = true;
+      }
+	  } on SocketException {
+      isUrlAddress_1 = false;
+      isChangePasswordSuccess = "Gagal terhubung dengan server";
+      // throw Exception('No Internet connection');
+    }
+
+    if(isUrlAddress_1) {
+      url = url_address_1;
+    } else {
+      try {
+        final conn_2 = await ConnectionTest(url_address_2, context);
+        if(conn_2 == "OK"){
+          isUrlAddress_2 = true;
+        }
+      } on SocketException {
+        isUrlAddress_2 = false;
+        isChangePasswordSuccess = "Gagal terhubung dengan server";
+        // throw Exception('No Internet connection');
+      }
+    }
+    if(isUrlAddress_2){
+      url = url_address_2;
+    }
+
+    if(url != "") {
+      String coba = config.baseUrlAlt + "/" + "changePassword.php" + (parameter == "" ? "" : "?" + parameter);
+
+      final response = await client.get(url);
+
+      printHelp("status code "+response.statusCode.toString());
+
+      printHelp(APIUrl("getchangePasswordUser.php", context: context, parameter:parameter));
+
+      printHelp("cek body "+response.body);
+
+      if(response.body.toString() == "success") {
+        isChangePasswordSuccess = "OK";
+      
+      } else {
+        isChangePasswordSuccess = "Gagal terhubung dengan server";
+      }
+
+    } else {
+      isChangePasswordSuccess = "Gagal terhubung dengan server";
+    }
+
+    return isChangePasswordSuccess;
+
+  }
+
+  Future<String> getPassword(final context, {String parameter=""}) async {
+    String isGetPasswordSuccess = "";
+    User user;
+    String url = "";
+
+    bool isUrlAddress_1 = false, isUrlAddress_2 = false;
+    String url_address_1 = config.baseUrl + "/" + "getPass.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_2 = config.baseUrlAlt + "/" + "getPass.php" + (parameter == "" ? "" : "?" + parameter);
+
+    try {
+		  final conn_1 = await ConnectionTest(url_address_1, context);
+      if(conn_1 == "OK"){
+        isUrlAddress_1 = true;
+      }
+	  } on SocketException {
+      isUrlAddress_1 = false;
+      isGetPasswordSuccess = "Gagal terhubung dengan server";
+      // throw Exception('No Internet connection');
+    }
+
+    if(isUrlAddress_1) {
+      url = url_address_1;
+    } else {
+      try {
+        final conn_2 = await ConnectionTest(url_address_2, context);
+        if(conn_2 == "OK"){
+          isUrlAddress_2 = true;
+        }
+      } on SocketException {
+        isUrlAddress_2 = false;
+        isGetPasswordSuccess = "Gagal terhubung dengan server";
+        // throw Exception('No Internet connection');
+      }
+    }
+    if(isUrlAddress_2){
+      url = url_address_2;
+    }
+
+     if(url != "") {
+      printHelp("GET CONN URL "+url);
+
+      String coba = config.baseUrlAlt + "/" + "getPass.php" + (parameter == "" ? "" : "?" + parameter);
+
+      final response = await client.get(url);
+
+      printHelp("status code "+response.statusCode.toString());
+
+      printHelp(APIUrl("getPass.php", context: context, parameter:parameter));
+
+      printHelp("cek body "+response.body);
+      var parsedJson = jsonDecode(response.body);
+      if(response.body.toString() != "false") {
+        user = User.fromJson(parsedJson[0]);
+        printHelp("CEK LENGTH "+parsedJson.toString());
+
+        if(user.Id != ""){
+          isGetPasswordSuccess = "OK";
+
+          await saveToLocalStorage(context, user);
+
+        } 
+
+      } else {
+        isGetPasswordSuccess = "Password Lama Salah";
+      }
+
+    } else {
+      isGetPasswordSuccess = "Gagal terhubung dengan server";
+    }
+
+    return isGetPasswordSuccess;
+
+  }
+
+  saveToLocalStorage(final context, User user) async {
     Configuration config = Configuration.of(context);
 
     final SharedPreferences sharedPreferences = await _sharedPreferences;
     // await sharedPreferences.setString("userInfo", json.encode(user.toJson()));
-    await sharedPreferences.setString("user_code", data);
+    await sharedPreferences.setString("user_code", user.Id);
+    await sharedPreferences.setInt("max_limit", int.parse(user.MaxLimit));
   }
 
 }

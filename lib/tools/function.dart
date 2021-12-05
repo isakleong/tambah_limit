@@ -180,7 +180,7 @@ void Alert({
               defaultAction != null && cancel ?
               Button(
                 key: Key("cancel"),
-                child: TextView("Tidak", 2, size: 10, caps: true,),
+                child: TextView("Tidak", 2, size: 10, caps: true, color: Colors.white),
                 fill: false,
                 onTap: () {
                   Navigator.of(context).pop();
@@ -189,7 +189,6 @@ void Alert({
               Button(
                 key: Key("ok"),
                 child: TextView("Ya", 2, size: 10, caps: true, color: Colors.white),
-                backgroundColor: config.primaryColor,
                 fill: true,
                 onTap: () {
                   Navigator.of(context).pop();

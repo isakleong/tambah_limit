@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "203334701925",
+    "project_id": "tambahlimitnotif",
+    "storage_bucket": "tambahlimitnotif.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:203334701925:android:dfe388b29039343d8a078c",
+        "android_client_info": {
+          "package_name": "com.example.tambah_limit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "203334701925-ognr88migdrh1ur8s5foq2d8r7msublk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzov7MUlKmbTj4_Jkjg9ODyXI5Kb2XOxY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "203334701925-ognr88migdrh1ur8s5foq2d8r7msublk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

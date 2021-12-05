@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' show Client;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tambah_limit/models/resultModel.dart';
 import 'package:tambah_limit/models/userModel.dart';
 import 'package:tambah_limit/resources/userAPI.dart';
@@ -23,6 +26,7 @@ class Login extends StatefulWidget {
 
 
 class LoginState extends State<Login> {
+  static const platform = const MethodChannel("connectionTest");
 
   bool unlockPassword = true;
   bool loginLoading = false;
@@ -40,8 +44,41 @@ class LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
+
+    // //get fcm token
+    // String token = await FirebaseMessaging.instance.getToken();
+
+    // //fcm handler
+    // FirebaseMessaging.onMessage.listen((RemoteMessage event) {
+    //     print("message recieved");
+    //     print(event.notification.body);
+    //     showDialog(
+    //       context: context,
+    //       builder: (BuildContext context) {
+    //         return AlertDialog(
+    //           title: Text("Notification"),
+    //           content: Text(event.notification.body),
+    //           actions: [
+    //             TextButton(
+    //               child: Text("Ok"),
+    //               onPressed: () {
+    //                 Navigator.of(context).pop();
+    //               },
+    //             )
+    //           ],
+    //         );
+    //       });
+      
+    // });
+    // FirebaseMessaging.onMessageOpenedApp.listen((message) {
+    //   print('Message clicked!');
+    // });
   }
 
+  // Future<void> _messageHandler(RemoteMessage message) async {
+  //   print('background message ${message.notification.body}');
+  // }
+  
   @override
   Widget build(BuildContext context) {
     Configuration config = Configuration.of(context);
@@ -131,7 +168,8 @@ class LoginState extends State<Login> {
                             backgroundColor: config.darkOpacityBlueColor,
                             child: TextView("MASUK", 3, color: Colors.white),
                             onTap: () {
-                              submitValidation();
+                              // submitValidation();
+                              Printy();
                             },
                           ),
                         ),
@@ -160,7 +198,10 @@ class LoginState extends State<Login> {
     // Result result = await userAPI.login(context, parameter: 'json={"user_code":"${usernameController.text}","user_pass":"${passwordController.text}","token":"tokencoba"}');
     // User user = await userAPI.login(context, parameter: 'json={"user_code":"${usernameController.text}","user_pass":"${passwordController.text}","token":"tokencoba"}');
 
-    String getLogin = await userAPI.login(context, parameter: 'json={"user_code":"${usernameController.text}","user_pass":"${passwordController.text}","token":"tokencoba"}');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String fcmToken = prefs.getString("fcmToken");
+
+    String getLogin = await userAPI.login(context, parameter: 'json={"user_code":"${usernameController.text}","user_pass":"${passwordController.text}","token":"${fcmToken}"}');
 
     Navigator.of(context).pop();
 
@@ -216,6 +257,17 @@ class LoginState extends State<Login> {
     //   //coba async login
     // }
 
+  }
+
+  void Printy() async {
+    String value;
+    try{
+      value = await platform.invokeMethod("printy");
+      print(value);
+    } catch (e){
+      print(e);
+    }
+    print(value);
   }
 
 

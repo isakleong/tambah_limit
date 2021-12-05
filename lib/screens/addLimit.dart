@@ -40,38 +40,47 @@ class AddLimitState extends State<AddLimit> {
   Widget build(BuildContext context) {
     // List<Widget> customerLimitWidgetList = showCustomerLimitInfo(config);
 
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        title: TextView("Tambah Limit", 1),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.popAndPushNamed(context, "dashboard"),
-        ),
-      ),
-      body: SafeArea(
-        child: Container(
-          margin: EdgeInsets.symmetric(vertical: 40, horizontal: 15),
-          child: EditText(
-            key: Key("CustomerId"),
-            controller: customerIdController,
-            keyboardType: TextInputType.text,
-            textInputAction: TextInputAction.next,
-            focusNode: customerIdFocus,
-            validate: customerIdValid,
-            hintText: "Kode Pelanggan",
-            textCapitalization: TextCapitalization.characters,
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.popAndPushNamed(
+            context,
+            "dashboard"
+        );
+        return false;
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        appBar: AppBar(
+          title: TextView("Tambah Limit", 1),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.popAndPushNamed(context, "dashboard"),
           ),
         ),
-      ),
-      bottomNavigationBar:Container(
-        margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-        child: Button(
-          backgroundColor: config.darkOpacityBlueColor,
-          child: TextView("LANJUTKAN", 3, color: Colors.white),
-          onTap: () {
-            getLimit();
-          },
+        body: SafeArea(
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: 40, horizontal: 15),
+            child: EditText(
+              key: Key("CustomerId"),
+              controller: customerIdController,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.done,
+              focusNode: customerIdFocus,
+              validate: customerIdValid,
+              hintText: "Kode Pelanggan",
+              textCapitalization: TextCapitalization.characters,
+            ),
+          ),
+        ),
+        bottomNavigationBar:Container(
+          margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+          child: Button(
+            backgroundColor: config.darkOpacityBlueColor,
+            child: TextView("LANJUTKAN", 3, color: Colors.white),
+            onTap: () {
+              getLimit();
+            },
+          ),
         ),
       ),
     );
