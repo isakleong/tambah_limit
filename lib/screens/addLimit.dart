@@ -42,20 +42,17 @@ class AddLimitState extends State<AddLimit> {
 
     return WillPopScope(
       onWillPop: () async {
-        Navigator.popAndPushNamed(
-            context,
-            "dashboard"
-        );
+        Navigator.pop(context);
         return false;
       },
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
           title: TextView("Tambah Limit", 1),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.popAndPushNamed(context, "dashboard"),
-          ),
+          // leading: IconButton(
+          //   icon: Icon(Icons.arrow_back, color: Colors.white),
+          //   onPressed: () => Navigator.pop(context),
+          // ),
         ),
         body: SafeArea(
           child: Container(

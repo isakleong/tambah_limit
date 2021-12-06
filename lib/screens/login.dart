@@ -206,7 +206,7 @@ class LoginState extends State<Login> {
     // Navigator.of(context).pop();
 
     if(getLogin == "OK"){
-      Navigator.popAndPushNamed(
+      Navigator.pushReplacementNamed(
           context,
           "dashboard"
       );

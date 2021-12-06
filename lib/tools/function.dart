@@ -34,7 +34,7 @@ Future<String> ConnectionTest(String url, BuildContext context) async {
       },
   );
 
-  printHelp("cek debug "+url.toString()+"-----"+response.statusCode.toString());
+  // printHelp("cek debug "+url.toString()+"-----"+response.statusCode.toString());
 
   if(response.statusCode == 200){
     testResult = "OK";

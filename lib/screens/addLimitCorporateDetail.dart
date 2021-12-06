@@ -1,8 +1,12 @@
 import 'dart:convert';
 
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tambah_limit/models/resultModel.dart';
+import 'package:tambah_limit/resources/customerAPI.dart';
 import 'package:tambah_limit/settings/configuration.dart';
 import 'package:tambah_limit/tools/function.dart';
 import 'package:tambah_limit/widgets/TextView.dart';
@@ -21,7 +25,11 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
   Result result;
   var resultObject;
 
+  bool changeLimitLoading = false;
+
   final limitRequestController = TextEditingController();
+
+  final currencyFormatter = NumberFormat('#,##0', 'ID');
 
   @override
   void initState() {
@@ -155,7 +163,7 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Limit Saat Ini",
                       hintText: currencyFormatter.format(int.parse(resultObject[0]["old_limit"])),
-                      icon: Icon(Icons.money),
+                      icon: TextView("Rp ", 4, color: config.grayNonActiveColor),
                       disabledBorder: OutlineInputBorder(
                         borderRadius: new BorderRadius.circular(
                           5.0,
@@ -171,6 +179,14 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
                   child: TextFormField(
+                    inputFormatters: <TextInputFormatter>[
+                      CurrencyTextInputFormatter(
+                        locale: 'IDR',
+                        decimalDigits: 0,
+                        symbol: '',
+                      ),
+                    ],
+                    keyboardType: TextInputType.number,
                     enabled: true,
                     controller: limitRequestController,
                     decoration: new InputDecoration(
@@ -178,7 +194,7 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
                       labelStyle: TextStyle(color: config.grayColor),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Limit Yang Diajukan",
-                      icon: Icon(Icons.money, color: config.grayColor),
+                      icon: TextView("Rp ", 4),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: new BorderRadius.circular(
                           5.0,
@@ -197,6 +213,7 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
                     padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                     child: Button(
                       key: Key("submit"),
+                      loading: changeLimitLoading,
                       backgroundColor: config.darkOpacityBlueColor,
                       child: TextView(
                         "UBAH",
@@ -226,7 +243,7 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
         context: context,
         title: "Alert",
         content: Text(
-            "Kode Customer Gabungan tidak boleh kosong"),
+            "Kode Customer Gabungan harus diisi"),
         cancel: false,
         type: "warning",
       );
@@ -236,41 +253,139 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
           context: context,
           title: "Alert",
           content: Text(result.message),
-          cancel: true,
+          cancel: false,
           type: "warning",
-          defaultAction: () {
-            // updateBlock();
-          }
         );
       } else {
 
-        if(limitRequestController.text != resultObject[0]["old_limit"]) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        int limit_dmd_lama = prefs.getInt("limit_dmd");
+        int max_limit = prefs.getInt("max_limit");
+
+        if(limitRequestController.text.isEmpty){
           Alert(
             context: context,
             title: "Alert",
-            content: Text(
-                "Apakah Anda yakin ingin menyimpan data?"),
-            cancel: true,
-            type: "warning",
-            defaultAction: () {
-              // updateBlock();
-            }
+            content: Text("Limit Baru harus diisi"),
+            cancel: false,
+            type: "warning"
           );
         } else {
-          Alert(
-            context: context,
-            title: "Alert",
-            content: Text(
-                "Mohon untuk melakukan perubahan data terlebih dahulu"),
-            cancel: false,
-            type: "warning");
-        }
+          if(!(int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > max_limit)){
+            Alert(
+              context: context,
+              title: "Alert",
+              content: Text("Limit melebihi kapasitas. Kirim permintaan?"),
+              cancel: true,
+              type: "warning",
+              defaultAction: (){
+                addRequestLimit();
+              }
+            );
+          } else {
+            Alert(
+              context: context,
+              title: "Alert",
+              content: Text(
+                  "Ubah Limit Customer Gabungan?"),
+              cancel: true,
+              type: "warning",
+              defaultAction: (){
+                changeLimit();
+              }
+            );
 
+          }
+        }
 
       }
     }
 
     
+
+  }
+
+  void changeLimit() async {
+    FocusScope.of(context).requestFocus(FocusNode());
+    setState(() {
+      changeLimitLoading = true;
+    });
+
+    Alert(context: context, loading: true, disableBackButton: true);
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String getChangeLimit = await customerAPI.changeLimitGabungan(context, parameter: 'json={"kode_customerc":"${resultObject[0]['corporate_code']}","user_code":"${prefs.getString('user_code')}","corporate_name":"${resultObject[0]['corporate_name']}","old_limit":"${resultObject[0]['old_limit']}","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}"}');
+
+    Navigator.of(context).pop();
+
+    if(getChangeLimit == "OK"){
+      Alert(
+        context: context,
+        title: "Alert",
+        content: Text("Ubah limit sukses"),
+        cancel: false,
+        type: "warning"
+      );
+
+      setState(() {
+        resultObject[0]["old_limit"]=limitRequestController.text;
+      });
+    } else {
+      Alert(
+        context: context,
+        title: "Alert",
+        content: Text(getChangeLimit),
+        cancel: false,
+        type: "warning"
+      );
+    }
+
+    setState(() {
+      changeLimitLoading = false;
+    });
+
+  }
+
+  void addRequestLimit() async {
+    FocusScope.of(context).requestFocus(FocusNode());
+    setState(() {
+      changeLimitLoading = true;
+    });
+
+    Alert(context: context, loading: true, disableBackButton: true);
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    //var obj = {"kode_customerc": $$('#corporate_code').val(),"corporate_name":$$('#corporate_name').val(), "limit_baru": limit_baru.replace(/\./g,''), "user_code": localStorage.getItem('user_code'), "old_limit": localStorage.getItem('old_limitc')};
+
+    String getRequestLimit = await customerAPI.addRequestLimitGabungan(context, parameter: 'json={"kode_customerc":"${resultObject[0]['corporate_code']}","user_code":"${prefs.getString('user_code')}","corporate_name":"${resultObject[0]['corporate_name']}","old_limit":"${resultObject[0]['old_limit']}","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}"}');
+
+    Navigator.of(context).pop();
+
+    if(getRequestLimit == "OK"){
+      Alert(
+        context: context,
+        title: "Alert",
+        content: Text("Permintaan sudah dikirim"),
+        cancel: false,
+        type: "warning"
+      );
+    } else {
+      Alert(
+        context: context,
+        title: "Alert",
+        content: Text(getRequestLimit),
+        cancel: false,
+        type: "warning"
+      );
+    }
+
+    setState(() {
+      changeLimitLoading = false;
+    });
+
+
 
   }
 

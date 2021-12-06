@@ -1394,7 +1394,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
               Alert(
                 context: context,
                 title: "Alert",
-                content: Text("Limit melebihi kapasitas. Kirim Permintaan?"),
+                content: Text("Limit melebihi kapasitas. Kirim permintaan?"),
                 cancel: true,
                 type: "warning",
                 defaultAction: (){
@@ -1441,7 +1441,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
       Alert(
         context: context,
         title: "Alert",
-        content: Text("Permintaan sudah dikirim"),
+        content: Text("Ubah limit sukses"),
         cancel: false,
         type: "warning"
       );
@@ -1449,7 +1449,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
       Alert(
         context: context,
         title: "Alert",
-        content: Text("Limit tidak boleh melebihi "+currencyFormatter.format(int.parse(limitRequestController.text))),
+        content: Text(getChangeLimit),
         cancel: false,
         type: "warning"
       );

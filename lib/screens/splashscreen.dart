@@ -108,7 +108,7 @@ class SplashScreenState extends State<SplashScreen> {
     //   "login"
     // );
 
-    Navigator.push(
+    Navigator.pushReplacement(
                   context,
                   PageRouteBuilder(
                       transitionDuration: Duration(seconds: 4),

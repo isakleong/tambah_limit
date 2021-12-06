@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:bottom_bar_with_sheet/bottom_bar_with_sheet.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' show Client;
 
 import 'package:flutter/cupertino.dart';
@@ -40,6 +40,8 @@ class Dashboard extends StatefulWidget {
 }
 
 class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>(debugLabel: "snackBar");
 
   DateTime currentBackPressTime;
 
@@ -107,9 +109,10 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           dashboardTitle = "Blok Pelanggan";
         } else if(i == 1) {
           dashboardTitle = "Ubah Password";
-        }  
+        }
       });
     });
+    
     super.initState();
     
   }
@@ -184,6 +187,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     ].where((c) => c != null).toList();
 
     return Scaffold(
+      key: _scaffoldKey,
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: TextView(dashboardTitle, 1),
@@ -192,11 +196,15 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           
         ],
       ),
-      body: Container(
-        child: menuList[currentIndex]
+      body: WillPopScope(
+        onWillPop: willPopScope,
+        child: Container(
+          child: menuList[currentIndex]
+        ),
       ),
       bottomNavigationBar: BottomBarWithSheet(
         controller: _bottomBarController,
+        autoClose: false,
         bottomBarTheme: BottomBarTheme(
           mainButtonPosition: MainButtonPosition.middle,
           decoration: BoxDecoration(
@@ -259,7 +267,8 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                     backgroundColor: config.darkOpacityBlueColor,
                     child: TextView("Tambah Limit", 3, color: Colors.white),
                     onTap: () {
-                      Navigator.popAndPushNamed(
+                      _bottomBarController.toggleSheet();
+                      Navigator.pushNamed(
                           context,
                           "addLimit"
                       );
@@ -273,7 +282,8 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                     backgroundColor: config.darkOpacityBlueColor,
                     child: TextView("Tambah Limit Corporate", 3, color: Colors.white),
                     onTap: () {
-                      Navigator.popAndPushNamed(
+                      _bottomBarController.toggleSheet();
+                      Navigator.pushNamed(
                           context,
                           "addLimitCorporate"
                       );
@@ -287,7 +297,8 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                     backgroundColor: config.darkOpacityBlueColor,
                     child: TextView("Riwayat Permintaan Limit", 3, color: Colors.white),
                     onTap: () {
-                      Navigator.popAndPushNamed(
+                      _bottomBarController.toggleSheet();
+                      Navigator.pushNamed(
                           context,
                           "historyLimitRequest"
                       );
@@ -678,14 +689,34 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Tekan sekali lagi untuk keluar dari aplikasi", textAlign: TextAlign.center),
       ));
-      return Future.value(false);
+      // return Future.value(false);
+    } else {
+      SystemChannels.platform.invokeMethod('SystemNavigator.pop');
     }
     // Navigator.popAndPushNamed(
     //       context,
     //       "login"
     //   );
-    return Future.value(true);
+    return Future.value(false);
   }
+
+  // Future<bool> willPopScope() async{
+  //   if (isExit == false) {
+  //     isExit = true;
+  //     // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //     //   content: Text("Tekan sekali lagi untuk keluar dari aplikasi", textAlign: TextAlign.center),
+  //     // ));
+  //     _scaffoldKey.currentState.showSnackBar(
+  //         SnackBar(
+  //           duration: Duration(seconds:1),
+  //           content: Text("Tekan sekali lagi untuk keluar dari aplikasi"),
+  //         )
+  //       );
+  //   } else if (isExit) {
+  //     SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+  //   }
+  //   return false;
+  // }
 
   Future<Null> refresh() async {
     // setState(() {

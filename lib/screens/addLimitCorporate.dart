@@ -40,20 +40,17 @@ class AddLimitCorporateState extends State<AddLimitCorporate> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        Navigator.popAndPushNamed(
-            context,
-            "dashboard"
-        );
+        // Navigator.popAndPushNamed(
+        //     context,
+        //     "dashboard"
+        // );
+        Navigator.pop(context);
         return false;
       },
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
           title: TextView("Tambah Limit Corporate", 1),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.popAndPushNamed(context, "dashboard"),
-          ),
         ),
         body: SafeArea(
           child: Container(
