@@ -58,6 +58,8 @@ class AddLimitDetailState extends State<AddLimitDetail> {
   @override
   void initState() {
     super.initState();
+    limitRequestController.text = "0";
+
     result = widget.model;
     final _resultObject = jsonDecode(result.data.toString());
     final _newValue = _resultObject[0]["limit_dmd"].toString();
@@ -99,7 +101,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
                new SliverAppBar(
-                 title: Text('Tambah Limit'),
+                 title: Text('Tambah Limit Detail'),
                  pinned: true,
                  floating: true,
                  bottom: TabBar(
@@ -214,7 +216,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                       ),
                         
                                                       Container(
-                                                        child: TextView("Rentang Cat 2 (49 - 70)", 3, color: Colors.black),
+                                                        child: TextView("Rentang Cat 2 (${resultObject[3]["top_cat"]+1} - 70)", 3, color: Colors.black),
                                                       ),
                                                       SizedBox(height: 30),
                                                       Row(
@@ -232,7 +234,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                       ),
                         
                                                       Container(
-                                                        child: TextView("Rentang Cat 3 (71 - 75)", 3, color: Colors.black),
+                                                        child: TextView("Rentang Cat 3 (71 - 90)", 3, color: Colors.black),
                                                       ),
                                                       SizedBox(height: 30),
                                                       Row(
@@ -250,7 +252,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                       ),
                         
                                                       Container(
-                                                        child: TextView("Rentang Cat 4 (> 75)", 3, color: Colors.black),
+                                                        child: TextView("Rentang Cat 4 (> 90)", 3, color: Colors.black),
                                                       ),
                                                       SizedBox(height: 30),
                                                       Row(
@@ -334,7 +336,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                       ),
                         
                                                       Container(
-                                                        child: TextView("Rentang BB 2 (49 - 70)", 3, color: Colors.black),
+                                                        child: TextView("Rentang BB 2 (${resultObject[3]["top_cat"]+1} - 70)", 3, color: Colors.black),
                                                       ),
                                                       SizedBox(height: 30),
                                                       Row(
@@ -352,7 +354,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                       ),
                         
                                                       Container(
-                                                        child: TextView("Rentang BB 3 (71 - 75)", 3, color: Colors.black),
+                                                        child: TextView("Rentang BB 3 (71 - 90)", 3, color: Colors.black),
                                                       ),
                                                       SizedBox(height: 30),
                                                       Row(
@@ -370,7 +372,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                       ),
                         
                                                       Container(
-                                                        child: TextView("Rentang BB 4 (> 75)", 3, color: Colors.black),
+                                                        child: TextView("Rentang BB 4 (> 90)", 3, color: Colors.black),
                                                       ),
                                                       SizedBox(height: 30),
                                                       Row(
@@ -453,7 +455,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                       ),
                         
                                                       Container(
-                                                        child: TextView("Rentang Mebel 2 (49 - 70)", 3, color: Colors.black),
+                                                        child: TextView("Rentang Mebel 2 (${resultObject[5]["top_mebel"]+1} - 70)", 3, color: Colors.black),
                                                       ),
                                                       SizedBox(height: 30),
                                                       Row(
@@ -471,7 +473,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                       ),
                         
                                                       Container(
-                                                        child: TextView("Rentang Mebel 3 (71 - 75)", 3, color: Colors.black),
+                                                        child: TextView("Rentang Mebel 3 (71 - 90)", 3, color: Colors.black),
                                                       ),
                                                       SizedBox(height: 30),
                                                       Row(
@@ -489,7 +491,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                       ),
                         
                                                       Container(
-                                                        child: TextView("Rentang Mebel 4 (> 75)", 3, color: Colors.black),
+                                                        child: TextView("Rentang Mebel 4 (> 90)", 3, color: Colors.black),
                                                       ),
                                                       SizedBox(height: 30),
                                                       Row(
@@ -580,7 +582,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                       DataTable(
                                                         columns: [
                                                           DataColumn(
-                                                            label: TextView("Document No ${resultObject[12].length.toString()}", 4,)
+                                                            label: TextView("Document No", 4,)
                                                           ),
                                                           DataColumn(
                                                             label: TextView("Sisa", 4)
@@ -656,7 +658,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                           DataTable(
                                                             columns: [
                                                               DataColumn(
-                                                                label: TextView("Document No ${resultObject[13].length.toString()}", 4,)
+                                                                label: TextView("Document No", 4,)
                                                               ),
                                                               DataColumn(
                                                                 label: TextView("Sisa", 4)
@@ -733,7 +735,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                       DataTable(
                                                         columns: [
                                                           DataColumn(
-                                                            label: TextView("Document No ${resultObject[14].length.toString()}", 4,)
+                                                            label: TextView("Document No", 4,)
                                                           ),
                                                           DataColumn(
                                                             label: TextView("Sisa", 4)
@@ -1201,7 +1203,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Nama Pelanggan",
                       hintText: resultObject[0]["Name"],
-                      icon: Icon(Icons.people),
+                      icon: Icon(Icons.person),
                       disabledBorder: OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
                           borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
@@ -1312,7 +1314,6 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Limit Yang Diajukan",
-                      hintText: "0",
                       icon: TextView("Rp ",5),
                       enabledBorder: OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
@@ -1369,7 +1370,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
     printHelp("get limit dmd lama "+limit_dmd_lama.toString());
     printHelp("get max  limit "+max_limit.toString());
 
-    if((limitDMDController.text.isEmpty && limitRequestController.text.isEmpty) || 
+    if((limitDMDController.text.isEmpty || limitRequestController.text.isEmpty) || 
       (limitRequestController.text.isEmpty && int.parse(limitDMDController.text) == limit_dmd_lama )){
       Alert(
         context: context,
@@ -1432,7 +1433,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
     // var obj = {"kode_customer": $$('#kode_cust').val(),"nama_cust":$$('#nama_cust').val(), "limit_baru": limit_baru, "user_code": localStorage.getItem('user_code'), "old_limit": localStorage.getItem('old_limit'), "piutang": piutang, "limit_dmd_lama": limit_dmd_lama, "limit_dmd_baru": limit_dmd_baru};
     // currencyFormatter.format(int.parse(resultObject[0]["Limit"]))
 
-    String getChangeLimit = await customerAPI.changeLimit(context, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"${prefs.getString('user_code')}","nama_cust":"${resultObject[0]['Name']}","limit_baru":"${limitRequestController.text}","old_limit":"${resultObject[0]['Limit']}","piutang":"${resultObject[0]['piutang']}","limit_dmd_lama":"${prefs.getInt('limit_dmd')},"limit_dmd_baru":"${limitDMDController.text}",  "  }');
+    String getChangeLimit = await customerAPI.changeLimit(context, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"${prefs.getString('user_code')}","nama_cust":"${resultObject[0]['Name']}","limit_baru":"${limitRequestController.text}","old_limit":"${resultObject[0]['Limit']}","piutang":${resultObject[10]['piutang']},"limit_dmd_lama":"${prefs.getInt('limit_dmd')}","limit_dmd_baru":"${limitDMDController.text}"}');
 
     Navigator.of(context).pop();
 
@@ -1454,6 +1455,9 @@ class AddLimitDetailState extends State<AddLimitDetail> {
       );
     }
 
+    setState(() {
+      changeLimitLoading = false;
+    });
 
   }
 
@@ -1483,7 +1487,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
       Alert(
         context: context,
         title: "Alert",
-        content: Text("Limit tidak boleh melebihi "+currencyFormatter.format(int.parse(limitRequestController.text))),
+        content: Text(getRequestLimit),
         cancel: false,
         type: "warning"
       );

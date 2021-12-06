@@ -168,8 +168,8 @@ class LoginState extends State<Login> {
                             backgroundColor: config.darkOpacityBlueColor,
                             child: TextView("MASUK", 3, color: Colors.white),
                             onTap: () {
-                              // submitValidation();
-                              Printy();
+                              submitValidation();
+                              // Printy();
                             },
                           ),
                         ),
@@ -193,7 +193,7 @@ class LoginState extends State<Login> {
       loginLoading = true;
     });
 
-    Alert(context: context, loading: true, disableBackButton: true);
+    // Alert(context: context, loading: true, disableBackButton: true);
 
     // Result result = await userAPI.login(context, parameter: 'json={"user_code":"${usernameController.text}","user_pass":"${passwordController.text}","token":"tokencoba"}');
     // User user = await userAPI.login(context, parameter: 'json={"user_code":"${usernameController.text}","user_pass":"${passwordController.text}","token":"tokencoba"}');
@@ -203,7 +203,7 @@ class LoginState extends State<Login> {
 
     String getLogin = await userAPI.login(context, parameter: 'json={"user_code":"${usernameController.text}","user_pass":"${passwordController.text}","token":"${fcmToken}"}');
 
-    Navigator.of(context).pop();
+    // Navigator.of(context).pop();
 
     if(getLogin == "OK"){
       Navigator.popAndPushNamed(

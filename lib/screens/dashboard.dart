@@ -129,7 +129,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     final List<Widget> menuList = [
       RefreshIndicator(
         onRefresh: refresh,
-        child: Container(
+        child: SingleChildScrollView(
           child: Column(
             children: [
               Container(
@@ -184,10 +184,13 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     ].where((c) => c != null).toList();
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: TextView(dashboardTitle, 1),
         automaticallyImplyLeading: false,
+        actions: [
+          
+        ],
       ),
       body: Container(
         child: menuList[currentIndex]
@@ -270,7 +273,10 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                     backgroundColor: config.darkOpacityBlueColor,
                     child: TextView("Tambah Limit Corporate", 3, color: Colors.white),
                     onTap: () {
-                      
+                      Navigator.popAndPushNamed(
+                          context,
+                          "addLimitCorporate"
+                      );
                     },
                   ),
                 ),
@@ -281,7 +287,10 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                     backgroundColor: config.darkOpacityBlueColor,
                     child: TextView("Riwayat Permintaan Limit", 3, color: Colors.white),
                     onTap: () {
-                      
+                      Navigator.popAndPushNamed(
+                          context,
+                          "historyLimitRequest"
+                      );
                     },
                   ),
                 ),
@@ -402,7 +411,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Nama Pelanggan",
                       hintText: resultObject[0]["Name"],
-                      icon: Icon(Icons.people),
+                      icon: Icon(Icons.person),
                       disabledBorder: OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
                           borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
@@ -488,10 +497,10 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Status Block",
                       hintText: blockedTypeSelected, //tanya ce elisa
-                      icon: Icon(Icons.block),
+                      icon: Icon(Icons.block, color: config.grayColor),
                       enabledBorder: OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: Colors.black54, width: 1.5,),
+                          borderSide: BorderSide(color: config.grayColor, width: 1.5,),
                       ),
                     ),
                   ),

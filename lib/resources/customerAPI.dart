@@ -84,8 +84,8 @@ class CustomerAPI {
         result = new Result(success: 1, message: "OK", data: response.body.toString());
 
       } else {
-        getBlockInfoSuccess = "Kode customer tidak ditemukan";
-        result = new Result(success: 0, message: "Kode customer tidak ditemukan");
+        getBlockInfoSuccess = "Data Customer tidak ditemukan";
+        result = new Result(success: 0, message: "Data Customer tidak ditemukan");
       }
 
     } else {
@@ -155,7 +155,79 @@ class CustomerAPI {
         result = new Result(success: 1, message: "OK", data: response.body.toString());
 
       } else {
-        result = new Result(success: 0, message: "Kode customer tidak ditemukan");
+        result = new Result(success: 0, message: "Data Customer tidak ditemukan");
+      }
+
+    } else {
+      result = new Result(success: -1, message: "Gagal terhubung dengan server");
+    }
+
+    return result;
+  }
+
+  Future<Result> getLimitGabungan(final context, {String parameter=""}) async {
+    Result result;
+    String url = "";
+    Customer customer;
+
+    bool isUrlAddress_1 = false, isUrlAddress_2 = false;
+    http://192.168.10.213/dbrudie-2-0-0/getLimit.php?json={ "user_code" : "isak", "kode_customer" : "01A01010001" }
+    // String url_address_1 = config.baseUrl + "/" + "getLimit.php" + (parameter == "" ? "" : "?" + parameter);
+    // String url_address_2 = config.baseUrlAlt + "/" + "getLimit.php" + (parameter == "" ? "" : "?" + parameter);
+
+    String url_address_1 = config.baseUrl + "/" + "tesIP.php";
+    String url_address_2 = config.baseUrlAlt + "/" + "tesIP.php";
+
+    try {
+		  final conn_1 = await ConnectionTest(url_address_1, context);
+      if(conn_1 == "OK"){
+        isUrlAddress_1 = true;
+      }
+	  } on SocketException {
+      isUrlAddress_1 = false;
+      result = new Result(success: -1, message: "Gagal terhubung dengan server");
+    }
+
+    if(isUrlAddress_1) {
+      url = url_address_1;
+    } else {
+      try {
+        final conn_2 = await ConnectionTest(url_address_2, context);
+        if(conn_2 == "OK"){
+          isUrlAddress_2 = true;
+        }
+      } on SocketException {
+        isUrlAddress_2 = false;
+        result = new Result(success: -1, message: "Gagal terhubung dengan server");
+      }
+    }
+    if(isUrlAddress_2){
+      url = url_address_2;
+    }
+
+    url = config.baseUrl + "/" + "getLimitGabungan.php" + (parameter == "" ? "" : "?" + parameter);
+
+    if(url != "") {
+
+      final response = await client.get(url);
+
+      printHelp("status code "+response.statusCode.toString());
+      printHelp("cek body "+response.body);
+
+      if(response.body.toString() != "false" && response.body.toString() != "otoritas") {
+        var parsedJson = jsonDecode(response.body);
+
+        customer = Customer.fromJson(parsedJson[0]);
+
+        var resultObject = jsonEncode(response.body);
+        result = new Result(success: 1, message: "OK", data: response.body.toString());
+
+      } else {
+        if(response.body.toString() == "false") {
+          result = new Result(success: 0, message: "Data Customer Gabungan tidak ditemukan");
+        } else if(response.body.toString() == "otoritas") {
+          result = new Result(success: 0, message: "Maaf, Anda tidak mempunyai otoritas untuk merubah limit pada pelanggan gabungan ini");
+        }  
       }
 
     } else {
@@ -335,9 +407,10 @@ class CustomerAPI {
 
       if(response.body.toString() == "success") {
         isChangeLimitSuccess = "OK";
-      
+      } else if(response.body.toString() == "false") {
+        isChangeLimitSuccess = "Limit tidak boleh dibawah NOL";
       } else {
-        isChangeLimitSuccess = "Gagal terhubung dengan server";
+        isChangeLimitSuccess = "Limit tidak boleh melebihi " + response.body.toString();
       }
 
     } else {

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:tambah_limit/screens/addLimit.dart';
+import 'package:tambah_limit/screens/addLimitCorporate.dart';
+import 'package:tambah_limit/screens/addLimitCorporateDetail.dart';
 import 'package:tambah_limit/screens/addLimitDetail.dart';
 import 'package:tambah_limit/screens/dashboard.dart';
+import 'package:tambah_limit/screens/historyLimitRequest.dart';
 import 'package:tambah_limit/screens/login.dart';
 import 'package:tambah_limit/screens/splashscreen.dart';
 
@@ -19,8 +22,17 @@ MaterialPageRoute routing(int mode, int id, List<String> pages, RouteSettings se
     case 'addLimit':
       return MaterialPageRoute(builder: (context)=> AddLimit());
       break;
+    case 'addLimitCorporate':
+      return MaterialPageRoute(builder: (context)=> AddLimitCorporate());
+      break;
+    case 'historyLimitRequest':
+      return MaterialPageRoute(builder: (context)=> HistoryLimitRequest());
+      break;
     case 'addLimitDetail':
       return MaterialPageRoute(builder: (context)=> AddLimitDetail(model: settings.arguments));
+      break;
+    case 'addLimitCorporateDetail':
+      return MaterialPageRoute(builder: (context)=> AddLimitCorporateDetail(model: settings.arguments));
       break;
     default:
       return MaterialPageRoute(builder: (_) {
