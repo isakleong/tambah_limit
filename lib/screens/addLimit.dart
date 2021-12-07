@@ -170,7 +170,7 @@ class AddLimitState extends State<AddLimit> {
         Navigator.pushNamed(
           context,
           "addLimitDetail",
-          arguments: result
+          arguments: result,
         );
 
         // showBlockInfoDetail(config);

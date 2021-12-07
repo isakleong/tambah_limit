@@ -146,6 +146,8 @@ class CustomerAPI {
       printHelp("status code "+response.statusCode.toString());
       printHelp("cek body "+response.body);
 
+      printHelp(url);
+
       var parsedJson = jsonDecode(response.body);
 
       if(response.body.toString() != "false") {

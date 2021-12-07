@@ -15,10 +15,10 @@ LimitHistory _$LimitHistoryFromJson(Map<String, dynamic> json) {
     status: json['status'] as int,
     request_date: json['request_date'] == null
         ? null
-        : DateTime.parse(json['request_date'] as String),
+        : DateTime.parse(json['request_date']['date'] as String),
     confirm_date: json['confirm_date'] == null
         ? null
-        : DateTime.parse(json['confirm_date'] as String),
+        : DateTime.parse(json['confirm_date']['date'] as String),
     user_code: json['user_code'] as String,
   );
 }

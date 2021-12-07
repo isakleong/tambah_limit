@@ -5,6 +5,7 @@ import 'package:tambah_limit/screens/addLimitCorporateDetail.dart';
 import 'package:tambah_limit/screens/addLimitDetail.dart';
 import 'package:tambah_limit/screens/dashboard.dart';
 import 'package:tambah_limit/screens/historyLimitRequest.dart';
+import 'package:tambah_limit/screens/historyLimitRequestDetail.dart';
 import 'package:tambah_limit/screens/login.dart';
 import 'package:tambah_limit/screens/splashscreen.dart';
 
@@ -28,8 +29,17 @@ MaterialPageRoute routing(int mode, int id, List<String> pages, RouteSettings se
     case 'historyLimitRequest':
       return MaterialPageRoute(builder: (context)=> HistoryLimitRequest());
       break;
+    case 'historyLimitRequestDetail':
+      return MaterialPageRoute(builder: (context)=> HistoryLimitRequestDetail(model: settings.arguments));
+      break;
+    case 'getHistoryLimitDetail':
+      return MaterialPageRoute(builder: (context)=> AddLimitDetail(model: settings.arguments, callMode: "historyLimitDetail"));
+      break;
+    case 'getHistoryLimitGabunganDetail':
+      return MaterialPageRoute(builder: (context)=> AddLimitDetail(model: settings.arguments, callMode: "historyLimitGabunganDetail"));
+      break;
     case 'addLimitDetail':
-      return MaterialPageRoute(builder: (context)=> AddLimitDetail(model: settings.arguments));
+      return MaterialPageRoute(builder: (context)=> AddLimitDetail(model: settings.arguments, callMode: "addLimitDetail"));
       break;
     case 'addLimitCorporateDetail':
       return MaterialPageRoute(builder: (context)=> AddLimitCorporateDetail(model: settings.arguments));

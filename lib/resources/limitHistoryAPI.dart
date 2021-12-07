@@ -82,7 +82,7 @@ class LimitHistoryAPI {
 
   }
 
-  Future<List<LimitHistory>> getLimitRequestHistoryList(final context, {String parameter = ""}) async {
+  Future<List<LimitHistory>> getLimitRequestHistoryList(final context, int type, {String parameter = ""}) async {
     
     Result result;
     List<LimitHistory> limitHistoryList =[];
@@ -91,9 +91,19 @@ class LimitHistoryAPI {
     String getLimitRequestHistorySuccess = "";
     String url = "";
 
+    String url_address_1 = "", url_address_2 = "";
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    String url_address_1 = config.baseUrl + "/" + "getLimitReqHist.php" + (parameter == "" ? "" : "?" + parameter);
-    String url_address_2 = config.baseUrlAlt + "/" + "getLimitReqHist.php" + (parameter == "" ? "" : "?" + parameter);
+
+    if(type == 1) {
+      url_address_1 = config.baseUrl + "/" + "getLimitReqHist.php" + (parameter == "" ? "" : "?" + parameter);
+      url_address_2 = config.baseUrlAlt + "/" + "getLimitReqHist.php" + (parameter == "" ? "" : "?" + parameter);
+    } else if(type == 2) {
+      url_address_1 = config.baseUrl + "/" + "getLimitDoneHist.php" + (parameter == "" ? "" : "?" + parameter);
+      url_address_2 = config.baseUrlAlt + "/" + "getLimitDoneHist.php" + (parameter == "" ? "" : "?" + parameter);
+    } else if(type == 3) {
+      url_address_1 = config.baseUrl + "/" + "getLimitRejectHist.php" + (parameter == "" ? "" : "?" + parameter);
+      url_address_2 = config.baseUrlAlt + "/" + "getLimitRejectHist.php" + (parameter == "" ? "" : "?" + parameter);
+    }
 
     try {
 		  final conn_1 = await ConnectionTest(url_address_1, context);
@@ -134,15 +144,26 @@ class LimitHistoryAPI {
       var parsedJson = jsonDecode(response.body);
 
       if(response.body.toString() != "false") {
-        limitHistory = LimitHistory.fromJson(parsedJson[0]);
+        printHelp("masuk sini 1");
+        // limitHistory = LimitHistory.fromJson(response.body);
 
-        if(limitHistory.customer_code != ""){
-          getLimitRequestHistorySuccess = "OK";
-        }
+        // if(limitHistory.customer_code != ""){
+        //   printHelp("masuk sini 2 "+limitHistory.customer_code);
+        //   getLimitRequestHistorySuccess = "OK";
+        // }
 
-        result = new Result(success: 1, message: "OK", data: response.body.toString());
+        result = new Result(success: 1, message: "OK", data: parsedJson);
 
+        // final parsedJson = jsonDecode(response.body);
         // result = Result.fromJson(parsedJson);
+        result.data.map((item) {
+            limitHistoryList.add(LimitHistory.fromJson(item));
+          }).toList();
+
+        // var resultObject = jsonDecode(result.data.toString());
+        // limitHistoryList.add(LimitHistory.fromJson(parsedJson))
+
+        printHelp("cek list length "+ limitHistoryList.length.toString());
 
         // if (result.success == 1) {
         //   if (result.data[0] != null) {

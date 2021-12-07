@@ -36,11 +36,16 @@ Future<String> ConnectionTest(String url, BuildContext context) async {
 
   // printHelp("cek debug "+url.toString()+"-----"+response.statusCode.toString());
 
-  if(response.statusCode == 200){
-    testResult = "OK";
-  } else {
+  try {
+    if(response.statusCode == 200){
+      testResult = "OK";
+    } else {
+      testResult = "ERROR";
+    }  
+  } catch (e) {
     testResult = "ERROR";
   }
+  
 
   return testResult;
 

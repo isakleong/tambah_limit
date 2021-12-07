@@ -39,6 +39,7 @@ dependencies:
   firebase_core: 1.6.0
   bottom_bar_with_sheet: ^2.0.1
   currency_text_input_formatter: ^2.1.5
+  shimmer: ^2.0.0
   # firebase_messaging: ^11.1.0
   # firebase_core: ^1.10.0
 
