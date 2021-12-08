@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:bottom_sheet/bottom_sheet.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,6 +31,7 @@ class AddLimitDetail extends StatefulWidget {
 
 class AddLimitDetailState extends State<AddLimitDetail> {
   Result result;
+  String callMode;
 
   final _AddLimitFormKey = GlobalKey<FormState>();
   final limitDMDController = TextEditingController();
@@ -36,6 +39,8 @@ class AddLimitDetailState extends State<AddLimitDetail> {
   var resultObject;
 
   String currentLimitDMD = "";
+
+  final _HistoryLimitFormKey = GlobalKey<FormState>();
 
   bool limitDMDValid = false;
   bool limitRequestValid = false;
@@ -62,10 +67,12 @@ class AddLimitDetailState extends State<AddLimitDetail> {
     limitRequestController.text = "0";
 
     result = widget.model;
+    callMode = widget.callMode;
+
     final _resultObject = jsonDecode(result.data.toString());
 
-    if(widget.callMode == "addLimitDetail") {
-      final _newValue = _resultObject[0]["limit_dmd"].toString();
+    if(widget.callMode == "historyLimitGabunganDetail") {
+      final _newValue = _resultObject[0]["old_limit"].toString();
         limitDMDController.value = TextEditingValue(
               text: _newValue,
               selection: TextSelection.fromPosition(
@@ -73,7 +80,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
               ),
             );
     } else {
-      final _newValue = _resultObject[0]["old_limit"].toString();
+      final _newValue = _resultObject[0]["limit_dmd"].toString();
         limitDMDController.value = TextEditingValue(
               text: _newValue,
               selection: TextSelection.fromPosition(
@@ -92,13 +99,9 @@ class AddLimitDetailState extends State<AddLimitDetail> {
   @override
   Widget build(BuildContext context) {
 
-    List<Widget> changeLimitWidgetList = showChangeLimit(config);
-    List<Widget> informationDetailWidgetList = showInformationDetail(config);
-
-    final currencyFormatter = NumberFormat('#,##0', 'ID');
-    final resultObject = jsonDecode(result.data.toString());
-
-    if(widget.callMode == "addLimitDetail"){
+    if(callMode == "historyLimitGabunganDetail"){
+      final resultObject = jsonDecode(result.data.toString());
+      
       return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
@@ -108,10 +111,168 @@ class AddLimitDetailState extends State<AddLimitDetail> {
             onPressed: () => Navigator.popAndPushNamed(context, "dashboard"),
           ),
         ),
-        body: Container(child: Text("hehe")),
+        body: Container(
+          child: Form(
+            key: _HistoryLimitFormKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  child: TextFormField(
+                    enabled: false,
+                    decoration: new InputDecoration(
+                      hintStyle: TextStyle(color: config.grayNonActiveColor),
+                      labelStyle: TextStyle(color: config.grayNonActiveColor),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelText: "Kode Corporate",
+                      hintText: resultObject[0]["corporate_code"],
+                      icon: Icon(Icons.bookmark),
+                      disabledBorder: OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(
+                          5.0,
+                        ),
+                        borderSide: BorderSide(
+                          color: config.grayNonActiveColor,
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  child: TextFormField(
+                    enabled: false,
+                    decoration: new InputDecoration(
+                      hintStyle: TextStyle(color: config.grayNonActiveColor),
+                      labelStyle: TextStyle(color: config.grayNonActiveColor),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelText: "Nama Corporate",
+                      hintText: resultObject[0]["corporate_name"],
+                      icon: Icon(Icons.person),
+                      disabledBorder: OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(
+                          5.0,
+                        ),
+                        borderSide: BorderSide(
+                          color: config.grayNonActiveColor,
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  child: TextFormField(
+                    enabled: false,
+                    decoration: new InputDecoration(
+                      hintStyle: TextStyle(color: config.grayNonActiveColor),
+                      labelStyle: TextStyle(color: config.grayNonActiveColor),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelText: "Induk Pelanggan",
+                      hintText: resultObject[0]["head_customer"],
+                      icon: Icon(Icons.group),
+                      disabledBorder: OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(
+                          5.0,
+                        ),
+                        borderSide: BorderSide(
+                          color: config.grayNonActiveColor,
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  child: TextFormField(
+                    enabled: false,
+                    decoration: new InputDecoration(
+                      hintStyle: TextStyle(color: config.grayNonActiveColor),
+                      labelStyle: TextStyle(color: config.grayNonActiveColor),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelText: "Limit Saat Ini",
+                      hintText: currencyFormatter.format(int.parse(resultObject[0]["old_limit"])),
+                      icon: TextView("Rp ", 4, color: config.grayNonActiveColor),
+                      disabledBorder: OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(
+                          5.0,
+                        ),
+                        borderSide: BorderSide(
+                          color: config.grayNonActiveColor,
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  child: TextFormField(
+                    inputFormatters: <TextInputFormatter>[
+                      CurrencyTextInputFormatter(
+                        locale: 'IDR',
+                        decimalDigits: 0,
+                        symbol: '',
+                      ),
+                    ],
+                    keyboardType: TextInputType.number,
+                    enabled: true,
+                    controller: limitRequestController,
+                    decoration: new InputDecoration(
+                      hintStyle: TextStyle(color: config.grayColor),
+                      labelStyle: TextStyle(color: config.grayColor),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelText: "Limit Yang Diajukan",
+                      icon: TextView("Rp ", 4),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(
+                          5.0,
+                        ),
+                        borderSide: BorderSide(
+                          color: config.grayColor,
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Center(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                    child: Button(
+                      key: Key("submit"),
+                      loading: changeLimitLoading,
+                      backgroundColor: config.darkOpacityBlueColor,
+                      child: TextView(
+                        "UBAH",
+                        3,
+                        caps: true,
+                      ),
+                      onTap: () {
+                        updateLimit();
+                      },
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
       );
 
     } else {
+      
+      List<Widget> changeLimitWidgetList = showChangeLimit(config);
+      List<Widget> informationDetailWidgetList = showInformationDetail(config);
+
+      final currencyFormatter = NumberFormat('#,##0', 'ID');
+      final resultObject = jsonDecode(result.data.toString());
 
       return DefaultTabController(
         length: 2,
@@ -133,7 +294,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                   pinned: true,
                   floating: true,
                   bottom: TabBar(
-                    indicatorColor: Colors.amber,
+                    indicatorColor: Colors.white,
                     indicatorWeight: 3,
                     tabs: [
                       Tab(icon: Icon(Icons.book_rounded), child: TextView("Ubah Limit", 3)),

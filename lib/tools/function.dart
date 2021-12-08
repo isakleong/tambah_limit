@@ -105,15 +105,10 @@ void Alert({
 
   Configuration config = new Configuration();
   
-  // kalau bukan mode loading
   if (loading == false) {
     if (actions == null) {
       actions = [];
     }
-
-    // if (willPopAction == null) {
-    //   willPopAction = () {};
-    // }
 
     if (defaultAction == null) {
       defaultAction = () {};
@@ -133,7 +128,7 @@ void Alert({
         width: iconWidth,
         height: iconHeight,
       );
-    } else {
+    } else if (type == "error") {
       icon = Container(
         child: FlareActor('assets/flare/error.flr', animation: "Play"),
         width: iconWidth,
@@ -185,7 +180,7 @@ void Alert({
               defaultAction != null && cancel ?
               Button(
                 key: Key("cancel"),
-                child: TextView("Tidak", 2, size: 10, caps: true, color: Colors.white),
+                child: TextView("Tidak", 2, size: 12, caps: false, color: Colors.white),
                 fill: false,
                 onTap: () {
                   Navigator.of(context).pop();
@@ -193,7 +188,7 @@ void Alert({
               ) : Container(),
               Button(
                 key: Key("ok"),
-                child: TextView("Ya", 2, size: 10, caps: true, color: Colors.white),
+                child: cancel ? TextView("Ya", 2, size: 12, caps: false, color: Colors.white) : type == "error" ? TextView("Coba Lagi", 2, size: 12, caps: false, color: Colors.white) : TextView("Ok", 2, size: 12, caps: false, color: Colors.white),
                 fill: true,
                 onTap: () {
                   Navigator.of(context).pop();
@@ -227,27 +222,11 @@ void Alert({
           onWillPop: disableBackButton ? () {
 
           }:null,
-          child:AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(7.5)),
+          child:Center(
+            child: CircularProgressIndicator(
+              backgroundColor: config.primaryColor,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: <Widget>[
-                    Center(
-                      child: CircularProgressIndicator(
-                        backgroundColor: Colors.green,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    ),
-                    Padding(padding: EdgeInsets.symmetric(horizontal: 15)),
-                    TextView("Loading", 5)
-                  ],
-                ),
-              ]
-            )
           )
         );
       }

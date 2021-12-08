@@ -22,14 +22,9 @@ class UserAPI {
     SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
     final SharedPreferences sharedPreferences = _sharedPreferences;
 
-    // http://192.168.10.213/dbrudie-2-0-0/getUser.php?json={ "user_code" : "isak", "user_pass" : "12345", "token" : "cobatoken" }
-
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
     String url_address_1 = config.baseUrl + "/" + "getUser.php" + (parameter == "" ? "" : "?" + parameter);
     String url_address_2 = config.baseUrlAlt + "/" + "getUser.php" + (parameter == "" ? "" : "?" + parameter);
-
-    // String url_address_1 = config.baseUrl + "/" + "tesIP.php";
-    // String url_address_2 = config.baseUrlAlt + "/" + "tesIP.php";
 
     try {
 		  final conn_1 = await ConnectionTest(url_address_1, context);
@@ -40,7 +35,6 @@ class UserAPI {
 	  } on SocketException {
       isUrlAddress_1 = false;
       isLoginSuccess = "Gagal terhubung dengan server";
-      // throw Exception('No Internet connection');
     }
 
     if(isUrlAddress_1) {
@@ -55,7 +49,6 @@ class UserAPI {
       } on SocketException {
         isUrlAddress_2 = false;
         isLoginSuccess = "Gagal terhubung dengan server";
-        // throw Exception('No Internet connection');
       }
     }
     if(isUrlAddress_2){
@@ -63,52 +56,30 @@ class UserAPI {
     }
 
     if(url != "") {
-      printHelp("GET CONN URL "+url);
+      try {
+        final response = await client.get(url);
 
-      // final response = await client.get(
-      //   APIUrl(url, context: context, parameter:parameter)
-      // );
+        var parsedJson = jsonDecode(response.body);
+        if(response.body.toString() != "false") {
+          user = User.fromJson(parsedJson[0]);
 
-      String coba = config.baseUrlAlt + "/" + "getUser.php" + (parameter == "" ? "" : "?" + parameter);
+          if(user.Id != ""){
+            isLoginSuccess = "OK";
+            await saveToLocalStorage(context, user);
+          } 
 
-      final response = await client.get(url);
-
-      printHelp("status code "+response.statusCode.toString());
-
-      printHelp(APIUrl("getUser.php", context: context, parameter:parameter));
-
-      printHelp("cek body "+response.body);
-      var parsedJson = jsonDecode(response.body);
-      if(response.body.toString() != "false") {
-        user = User.fromJson(parsedJson[0]);
-        printHelp("CEK LENGTH "+parsedJson.toString());
-
-        if(user.Id != ""){
-          isLoginSuccess = "OK";
-
-          await saveToLocalStorage(context, user);
-
-        } 
-
-      } else {
-        isLoginSuccess = "Username atau Password salah";
+        } else {
+          isLoginSuccess = "Username atau Password salah";
+        }
+      } catch (e) {
+        isLoginSuccess = "Gagal terhubung dengan server";
+        printHelp(e);
       }
-
-      // if(user.Id != ""){
-      //   isLoginSuccess = "OK";
-      // } else {
-      //   isLoginSuccess = "Username atau Password salah";
-      // }
-
-      // printHelp("test Id coba"+user.Id);
-      // printHelp("test MaxLimit coba"+user.MaxLimit);
-
     } else {
       isLoginSuccess = "Gagal terhubung dengan server";
     }
 
     return isLoginSuccess;
-
   }
 
   Future<String> changePassword(final context, {String parameter=""}) async {
@@ -128,7 +99,6 @@ class UserAPI {
 	  } on SocketException {
       isUrlAddress_1 = false;
       isChangePasswordSuccess = "Gagal terhubung dengan server";
-      // throw Exception('No Internet connection');
     }
 
     if(isUrlAddress_1) {
@@ -142,7 +112,6 @@ class UserAPI {
       } on SocketException {
         isUrlAddress_2 = false;
         isChangePasswordSuccess = "Gagal terhubung dengan server";
-        // throw Exception('No Internet connection');
       }
     }
     if(isUrlAddress_2){
@@ -150,21 +119,19 @@ class UserAPI {
     }
 
     if(url != "") {
-      String coba = config.baseUrlAlt + "/" + "changePassword.php" + (parameter == "" ? "" : "?" + parameter);
+      try {
+        final response = await client.get(url);
 
-      final response = await client.get(url);
+        if(response.body.toString() == "success") {
+          isChangePasswordSuccess = "OK";
+        
+        } else {
+          isChangePasswordSuccess = "Gagal terhubung dengan server";
+        }
 
-      printHelp("status code "+response.statusCode.toString());
-
-      printHelp(APIUrl("getchangePasswordUser.php", context: context, parameter:parameter));
-
-      printHelp("cek body "+response.body);
-
-      if(response.body.toString() == "success") {
-        isChangePasswordSuccess = "OK";
-      
-      } else {
+      } catch (e) {
         isChangePasswordSuccess = "Gagal terhubung dengan server";
+        printHelp(e);
       }
 
     } else {
@@ -172,7 +139,6 @@ class UserAPI {
     }
 
     return isChangePasswordSuccess;
-
   }
 
   Future<String> getPassword(final context, {String parameter=""}) async {
@@ -192,7 +158,6 @@ class UserAPI {
 	  } on SocketException {
       isUrlAddress_1 = false;
       isGetPasswordSuccess = "Gagal terhubung dengan server";
-      // throw Exception('No Internet connection');
     }
 
     if(isUrlAddress_1) {
@@ -206,54 +171,46 @@ class UserAPI {
       } on SocketException {
         isUrlAddress_2 = false;
         isGetPasswordSuccess = "Gagal terhubung dengan server";
-        // throw Exception('No Internet connection');
       }
     }
     if(isUrlAddress_2){
       url = url_address_2;
     }
 
-     if(url != "") {
-      printHelp("GET CONN URL "+url);
+    if(url != "") {
+      try {
+         final response = await client.get(url);
+         var parsedJson = jsonDecode(response.body);
 
-      String coba = config.baseUrlAlt + "/" + "getPass.php" + (parameter == "" ? "" : "?" + parameter);
+        if(response.body.toString() != "false") {
+          user = User.fromJson(parsedJson[0]);
+          printHelp("CEK LENGTH "+parsedJson.toString());
 
-      final response = await client.get(url);
+          if(user.Id != ""){
+            isGetPasswordSuccess = "OK";
+            await saveToLocalStorage(context, user);
+          } 
 
-      printHelp("status code "+response.statusCode.toString());
+        } else {
+          isGetPasswordSuccess = "Password Lama Salah";
+        }
 
-      printHelp(APIUrl("getPass.php", context: context, parameter:parameter));
-
-      printHelp("cek body "+response.body);
-      var parsedJson = jsonDecode(response.body);
-      if(response.body.toString() != "false") {
-        user = User.fromJson(parsedJson[0]);
-        printHelp("CEK LENGTH "+parsedJson.toString());
-
-        if(user.Id != ""){
-          isGetPasswordSuccess = "OK";
-
-          await saveToLocalStorage(context, user);
-
-        } 
-
-      } else {
-        isGetPasswordSuccess = "Password Lama Salah";
-      }
+       } catch (e) {
+         isGetPasswordSuccess = "Gagal terhubung dengan server";
+         printHelp(e)   ;
+       }
 
     } else {
       isGetPasswordSuccess = "Gagal terhubung dengan server";
     }
 
     return isGetPasswordSuccess;
-
   }
 
   saveToLocalStorage(final context, User user) async {
     Configuration config = Configuration.of(context);
 
     final SharedPreferences sharedPreferences = await _sharedPreferences;
-    // await sharedPreferences.setString("userInfo", json.encode(user.toJson()));
     await sharedPreferences.setString("user_code", user.Id);
     await sharedPreferences.setInt("max_limit", int.parse(user.MaxLimit));
   }

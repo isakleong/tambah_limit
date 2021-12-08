@@ -211,7 +211,9 @@ class CustomerAPI {
 
     if(url != "") {
 
-      final response = await client.get(url);
+      final response = await client.get(url).catchError((onError){
+        result = new Result(success: -1, message: "Gagal terhubung dengan server");
+      });
 
       printHelp("status code "+response.statusCode.toString());
       printHelp("cek body "+response.body);

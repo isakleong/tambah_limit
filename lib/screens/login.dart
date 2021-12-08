@@ -169,7 +169,6 @@ class LoginState extends State<Login> {
                             child: TextView("MASUK", 3, color: Colors.white),
                             onTap: () {
                               submitValidation();
-                              // Printy();
                             },
                           ),
                         ),
@@ -195,9 +194,6 @@ class LoginState extends State<Login> {
 
     // Alert(context: context, loading: true, disableBackButton: true);
 
-    // Result result = await userAPI.login(context, parameter: 'json={"user_code":"${usernameController.text}","user_pass":"${passwordController.text}","token":"tokencoba"}');
-    // User user = await userAPI.login(context, parameter: 'json={"user_code":"${usernameController.text}","user_pass":"${passwordController.text}","token":"tokencoba"}');
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String fcmToken = prefs.getString("fcmToken");
 
@@ -213,10 +209,10 @@ class LoginState extends State<Login> {
     } else {
       Alert(
         context: context,
-        title: "Alert",
+        title: "Oops,",
         content: Text(getLogin),
         cancel: false,
-        type: "warning"
+        type: "error"
       );
     }
 
@@ -227,7 +223,6 @@ class LoginState extends State<Login> {
   }
 
   void submitValidation() {
-
     setState(() {
       usernameController.text.isEmpty ? usernameValid = true : usernameValid = false;
       passwordController.text.isEmpty ? passwordValid = true : passwordValid = false;
@@ -236,27 +231,6 @@ class LoginState extends State<Login> {
     if(!usernameValid && !passwordValid){
       doLogin();
     }
-
-    // bool isFormValid = true;
-    // List<String> validations = [
-    //   "Username|empty|${usernameController.text}",
-    //   "Password|empty|${passwordController.text}",
-    // ];
-
-    // validations.map((item) {
-    //   if (isFormValid) {
-    //     bool status = formValidation(context, [item]);
-    //     if (status == false) {
-    //       isFormValid = false;
-    //     }
-    //   }
-    // }).toList();
-
-    // if (isFormValid) {
-    //   //login(status);
-    //   //coba async login
-    // }
-
   }
 
   void Printy() async {

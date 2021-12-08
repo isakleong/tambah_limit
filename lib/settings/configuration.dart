@@ -7,16 +7,15 @@ class Configuration extends InheritedWidget {
     Widget child,
   }) : super(key: key, child: child);
 
-  String buildVersion = "1.0";
-
   String ip_public = "203.142.77.243";
   String ip_public_alt = "103.76.27.124";
   String ip_port = "80" ;
-  String server_name = "dbrudie-2-0-0";
-  String apk_name = "Tambah Limit";
+  String serverName = "dbrudie-2-0-0";
+  String apkName = "Tambah Limit";
+  String apkVersion = "1.0";
 
-  String get baseUrl => "http://"+ip_public+":"+ip_port+"/"+server_name;
-  String get baseUrlAlt => "http://"+ip_public_alt+":"+ip_port+"/"+server_name;
+  String get baseUrl => "http://"+ip_public+":"+ip_port+"/"+serverName;
+  String get baseUrlAlt => "http://"+ip_public_alt+":"+ip_port+"/"+serverName;
 
   String initRoute = "";
 

@@ -42,8 +42,6 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
   List<LimitHistory> approvedLimitHistoryList = [];
   List<LimitHistory> rejectedLimitHistoryList = [];
 
-  
-
   @override
   void initState() {
     super.initState();
@@ -62,7 +60,6 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
     if(rejectedLimitHistoryListLoading){
       getRequestHistoryList(3);
     }
-    
   }
   
   @override
@@ -74,81 +71,86 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
 
     return DefaultTabController(
       length: 3,
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        body: NestedScrollView(
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return <Widget>[
-               new SliverAppBar(
-                 title: TextView('Riwayat Permintaan Limit', 1),
-                 pinned: true,
-                 floating: true,
-                 bottom: TabBar(
-                   indicatorColor: Colors.amber,
-                   indicatorWeight: 3,
-                   tabs: [
-                     Tab(icon: Icon(Icons.request_quote), child: TextView("Permintaan", 3)),
-                     Tab(icon: Icon(Icons.check), child: TextView("Disetujui", 3)),
-                     Tab(icon: Icon(Icons.close), child: TextView("Ditolak", 3)),
-                    ],
-                  ),
-               )
-            ];
-          },
-          body: TabBarView(
-            children: [
-              requestLimitHistoryListLoading
-              ?
-              loadingRequestHistory()
-              :
-              requestHistoryWidgetList.length != 0
-              ?
-              ListView(
-                scrollDirection: Axis.vertical,
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-                physics: ScrollPhysics(),
-                shrinkWrap: true,
-                children: requestHistoryWidgetList,
-              )
-              :
-              Container(),
+      child: Builder(builder: (BuildContext context) {
+        // print('Current Index: ${DefaultTabController.of(context).index}');
+        return Scaffold(
+          resizeToAvoidBottomInset: true,
+          body: NestedScrollView(
+            headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+              return <Widget>[
+                new SliverAppBar(
+                  title: TextView('Riwayat Permintaan Limit', 1),
+                  pinned: true,
+                  floating: true,
+                  bottom: TabBar(
+                    indicatorColor: Colors.white,
+                    indicatorWeight: 3,
+                    tabs: [
+                      Tab(icon: Icon(Icons.request_quote), child: TextView("Permintaan", 3)),
+                      Tab(icon: Icon(Icons.check), child: TextView("Disetujui", 3)),
+                      Tab(icon: Icon(Icons.close), child: TextView("Ditolak", 3)),
+                      ],
+                    ),
+                )
+              ];
+            },
+            body: TabBarView(
+              children: [
+                requestLimitHistoryListLoading
+                ?
+                loadingRequestHistory()
+                :
+                requestHistoryWidgetList.length != 0
+                ?
+                ListView(
+                  scrollDirection: Axis.vertical,
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                  physics: ScrollPhysics(),
+                  shrinkWrap: true,
+                  children: requestHistoryWidgetList,
+                )
+                :
+                Container(),
 
-              approvedLimitHistoryListLoading
-              ?
-              loadingRequestHistory()
-              :
-              approvedHistoryWidgetList.length != 0
-              ?
-              ListView(
-                scrollDirection: Axis.vertical,
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-                physics: ScrollPhysics(),
-                shrinkWrap: true,
-                children: approvedHistoryWidgetList,
-              )
-              :
-              Container(),
+                approvedLimitHistoryListLoading
+                ?
+                loadingRequestHistory()
+                :
+                approvedHistoryWidgetList.length != 0
+                ?
+                ListView(
+                  scrollDirection: Axis.vertical,
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                  physics: ScrollPhysics(),
+                  shrinkWrap: true,
+                  children: approvedHistoryWidgetList,
+                )
+                :
+                Container(),
 
-              
-              rejectedLimitHistoryListLoading
-              ?
-              loadingRequestHistory()
-              :
-              rejectedHistoryWidgetList.length != 0
-              ?
-              ListView(
-                scrollDirection: Axis.vertical,
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-                physics: ScrollPhysics(),
-                shrinkWrap: true,
-                children: rejectedHistoryWidgetList,
-              )
-              :
-              Container(),
-            ],
+                
+                rejectedLimitHistoryListLoading
+                ?
+                loadingRequestHistory()
+                :
+                rejectedHistoryWidgetList.length != 0
+                ?
+                ListView(
+                  scrollDirection: Axis.vertical,
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                  physics: ScrollPhysics(),
+                  shrinkWrap: true,
+                  children: rejectedHistoryWidgetList,
+                )
+                :
+                Container(),
+              ],
+            ),
           ),
-        ),
-      )
+        );
+      }),
+      
+      
     );
   }
 
@@ -256,13 +258,13 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
 
     for(int i = 0; i < requestLimitHistoryList.length; i++){
       tempWidgetList.add(
-        GestureDetector(
-          onTap: (){
-            goToHistoryLimitDetail(requestLimitHistoryList[i]);
-          },
-          child: Card(
-            margin: EdgeInsets.only(top: 20),
-            elevation: 3,
+        Card(
+          margin: EdgeInsets.only(top: 20),
+          elevation: 3,
+          child: InkWell(
+            onTap: () {
+              goToHistoryLimitDetail(requestLimitHistoryList[i]);
+            },
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: ListTile(
@@ -282,10 +284,13 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
 
   void goToHistoryLimitDetail(LimitHistory tempLimitHistory) async {
     Result result_;
+
     if(tempLimitHistory.customer_code.length == 12) {
+      Alert(context: context, loading: true, disableBackButton: true);
+
       result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${tempLimitHistory.customer_code}","user_code":"${tempLimitHistory.user_code}"}');
 
-      printHelp("get data "+ result_.success.toString());
+      Navigator.of(context).pop();
 
       Navigator.pushNamed(
         context,
@@ -294,9 +299,11 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
       );
 
     } else if(tempLimitHistory.customer_code.length == 11) {
+      Alert(context: context, loading: true, disableBackButton: true);
+
       result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${tempLimitHistory.customer_code}","user_code":"${tempLimitHistory.user_code}"}');
 
-      printHelp("get data "+ result_.success.toString());
+      Navigator.of(context).pop();
 
       Navigator.pushNamed(
         context,
@@ -321,10 +328,13 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
 
     for(int i = 0; i < approvedLimitHistoryList.length; i++){
       tempWidgetList.add(
-        InkWell(
-          child: Card(
-            margin: EdgeInsets.only(top: 20),
-            elevation: 3,
+        Card(
+          margin: EdgeInsets.only(top: 20),
+          elevation: 3,
+          child: InkWell(
+            onTap: (){
+              goToHistoryLimitDetail(requestLimitHistoryList[i]);
+            },
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: ListTile(
@@ -349,10 +359,13 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
 
     for(int i = 0; i < rejectedLimitHistoryList.length; i++){
       tempWidgetList.add(
-        InkWell(
-          child: Card(
-            margin: EdgeInsets.only(top: 20),
-            elevation: 3,
+        Card(
+          margin: EdgeInsets.only(top: 20),
+          elevation: 3,
+          child: InkWell(
+            onTap: (){
+              goToHistoryLimitDetail(requestLimitHistoryList[i]);
+            },
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: ListTile(
