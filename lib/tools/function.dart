@@ -100,7 +100,7 @@ String APIUrl(String url, {String parameter = "", bool print = false, BuildConte
 void Alert({
     context, String title, Widget content, List<Widget> actions, VoidCallback defaultAction,
     bool cancel = true, String type = "warning", bool showIcon = true, bool disableBackButton = false,
-    VoidCallback willPopAction, loading = false
+    VoidCallback willPopAction, loading = false, double value
   }) {
 
   Configuration config = new Configuration();
@@ -226,6 +226,7 @@ void Alert({
             child: CircularProgressIndicator(
               backgroundColor: config.primaryColor,
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              value: value,
             ),
           )
         );
