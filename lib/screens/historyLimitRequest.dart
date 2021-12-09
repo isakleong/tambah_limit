@@ -19,6 +19,7 @@ import 'package:tambah_limit/widgets/EditText.dart';
 import 'package:tambah_limit/widgets/TextView.dart';
 import 'package:tambah_limit/widgets/button.dart';
 
+Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstance();
 
 class HistoryLimitRequest extends StatefulWidget {
   final Result result;
@@ -263,7 +264,7 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
           elevation: 3,
           child: InkWell(
             onTap: () {
-              goToHistoryLimitDetail(requestLimitHistoryList[i]);
+              goToHistoryLimitDetail(requestLimitHistoryList[i], 1);
             },
             child: Padding(
               padding: const EdgeInsets.all(10),
@@ -282,34 +283,70 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
 
   }
 
-  void goToHistoryLimitDetail(LimitHistory tempLimitHistory) async {
+  void goToHistoryLimitDetail(LimitHistory tempLimitHistory, int type) async {
     Result result_;
 
-    if(tempLimitHistory.customer_code.length == 12) {
+    if(tempLimitHistory.customer_code.length > 11) {
       Alert(context: context, loading: true, disableBackButton: true);
 
       result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${tempLimitHistory.customer_code}","user_code":"${tempLimitHistory.user_code}"}');
 
+      final SharedPreferences sharedPreferences = await _sharedPreferences;
+      await sharedPreferences.setInt("request_limit", int.parse(tempLimitHistory.limit));
+
       Navigator.of(context).pop();
 
-      Navigator.pushNamed(
-        context,
-        "getHistoryLimitGabunganDetail",
-        arguments: result_
-      );
+      if(type == 1) {
+        Navigator.pushNamed(
+          context,
+          "getHistoryLimitGabunganDetail1",
+          arguments: result_,
+        );
+      } else if(type == 2) {
+        Navigator.pushNamed(
+          context,
+          "getHistoryLimitGabunganDetail2",
+          arguments: result_,
+        );
+      } else if(type == 3) {
+        Navigator.pushNamed(
+          context,
+          "getHistoryLimitGabunganDetail3",
+          arguments: result_,
+        );
+      }
+      
 
-    } else if(tempLimitHistory.customer_code.length == 11) {
+    } else {
       Alert(context: context, loading: true, disableBackButton: true);
 
       result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${tempLimitHistory.customer_code}","user_code":"${tempLimitHistory.user_code}"}');
 
+      final SharedPreferences sharedPreferences = await _sharedPreferences;
+      await sharedPreferences.setInt("request_limit", int.parse(tempLimitHistory.limit));
+      await sharedPreferences.setInt("id_request_limit", tempLimitHistory.id);
+
       Navigator.of(context).pop();
 
-      Navigator.pushNamed(
-        context,
-        "getHistoryLimitDetail",
-        arguments: result_
-      );
+      if(type == 1) {
+        Navigator.pushNamed(
+          context,
+          "getHistoryLimitDetail1",
+          arguments: result_
+        );
+      } else if(type == 2) {
+        Navigator.pushNamed(
+          context,
+          "getHistoryLimitDetail2",
+          arguments: result_
+        );
+      } else if(type == 3) {
+        Navigator.pushNamed(
+          context,
+          "getHistoryLimitDetail3",
+          arguments: result_
+        );
+      }
 
     }
 
@@ -333,7 +370,7 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
           elevation: 3,
           child: InkWell(
             onTap: (){
-              goToHistoryLimitDetail(requestLimitHistoryList[i]);
+              goToHistoryLimitDetail(approvedLimitHistoryList[i], 2);
             },
             child: Padding(
               padding: const EdgeInsets.all(10),
@@ -364,7 +401,7 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
           elevation: 3,
           child: InkWell(
             onTap: (){
-              goToHistoryLimitDetail(requestLimitHistoryList[i]);
+              goToHistoryLimitDetail(rejectedLimitHistoryList[i], 3);
             },
             child: Padding(
               padding: const EdgeInsets.all(10),

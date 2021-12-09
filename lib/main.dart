@@ -45,6 +45,7 @@ void main() async {
           // mode 1 = api
           // mode 2 = local storage
           // mode 3 = dari model
+          // customNavigator(context, "quizInfo/${item.id}/3", arguments: item);
           if (pages.length > 1) {
             id = int.tryParse(pages[1]);
           }

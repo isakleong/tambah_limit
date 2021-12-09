@@ -21,8 +21,9 @@ Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstance();
 class AddLimitDetail extends StatefulWidget {
   final Result model;
   final String callMode;
+  final int type;
 
-  AddLimitDetail({Key key, this.model, this.callMode}) : super(key: key);
+  AddLimitDetail({Key key, this.model, this.callMode, this.type}) : super(key: key);
 
   @override
   AddLimitDetailState createState() => AddLimitDetailState();
@@ -46,9 +47,15 @@ class AddLimitDetailState extends State<AddLimitDetail> {
   bool limitRequestValid = false;
   bool changeLimitLoading = false;
 
+  bool acceptLimitRequestLoading = false;
+  bool rejectLimitRequestLoading = false;
+
   final currencyFormatter = NumberFormat('#,##0', 'ID');
 
   final ScrollController _scrollController = ScrollController();
+
+  String user_code = "";
+  int request_limit = 0;
 
   Future<Null> getSharedPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -68,19 +75,49 @@ class AddLimitDetailState extends State<AddLimitDetail> {
 
     result = widget.model;
     callMode = widget.callMode;
+  }
+
+  @override
+  void didChangeDependencies() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    user_code = prefs.getString('user_code');
 
     final _resultObject = jsonDecode(result.data.toString());
 
-    if(widget.callMode == "historyLimitGabunganDetail") {
-      final _newValue = _resultObject[0]["old_limit"].toString();
+    if(widget.callMode.contains("historyLimitGabunganDetail")) {
+      final _newValue = currencyFormatter.format(_resultObject[0]["old_limit"]).toString();
         limitDMDController.value = TextEditingValue(
-              text: _newValue,
-              selection: TextSelection.fromPosition(
-                TextPosition(offset: _newValue.length),
-              ),
-            );
+          text: _newValue,
+          selection: TextSelection.fromPosition(
+            TextPosition(offset: _newValue.length),
+          ),
+        );
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        request_limit = prefs.getInt("request_limit");
+
+        limitRequestController.value = TextEditingValue(
+          text: currencyFormatter.format(request_limit).toString(),
+          selection: TextSelection.fromPosition(
+            TextPosition(offset: request_limit.toString().length),
+          ),
+        );
+
     } else {
-      final _newValue = _resultObject[0]["limit_dmd"].toString();
+      if(widget.callMode.contains("historyLimit")){
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        request_limit = prefs.getInt("request_limit");
+
+        limitRequestController.value = TextEditingValue(
+          text: currencyFormatter.format(request_limit).toString(),
+          selection: TextSelection.fromPosition(
+            TextPosition(offset: request_limit.toString().length),
+          ),
+        );
+      }
+
+      final _newValue = currencyFormatter.format(_resultObject[0]["limit_dmd"]).toString();
         limitDMDController.value = TextEditingValue(
               text: _newValue,
               selection: TextSelection.fromPosition(
@@ -99,18 +136,89 @@ class AddLimitDetailState extends State<AddLimitDetail> {
   @override
   Widget build(BuildContext context) {
 
-    if(callMode == "historyLimitGabunganDetail"){
+    if(callMode.contains("historyLimitGabunganDetail")){
       final resultObject = jsonDecode(result.data.toString());
       
       return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
-          title: TextView("Tambah Limit", 1),
+          title: widget.type == 1 ? TextView("Limit Yang Diminta", 1) : widget.type == 2 ? TextView("Limit Yang Disetujui", 1) : TextView("Limit Yang Ditolak", 1),
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.popAndPushNamed(context, "dashboard"),
           ),
         ),
+      //  bottomNavigationBar: widget.type != 1 && !(widget.callMode.contains("historyLimit")) ?
+      //   Center(
+      //     child: Container(
+      //       width: MediaQuery.of(context).size.width,
+      //       padding: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+      //       child: Button(
+      //         key: Key("submit"),
+      //         loading: changeLimitLoading,
+      //         backgroundColor: config.darkOpacityBlueColor,
+      //         child: TextView("UBAH", 3, caps: true,),
+      //         onTap: (){
+      //           updateLimit();
+      //           // Alert(
+      //           //   context: context,
+      //           //   title: "Alert",
+      //           //   content: Text(limitDMDController.text.toString()),
+      //           //   cancel: false,
+      //           //   type: "warning"
+      //           // );
+      //         },
+      //       ),
+      //     ),
+      //   )
+      //   :
+      //   widget.type == 1 && (user_code.toLowerCase() == "tanto" || user_code.toLowerCase() == "hermawan") ?
+      //   Row(
+      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //     children: [
+      //       Expanded(
+      //         child: Container(
+      //           width: MediaQuery.of(context).size.width,
+      //           padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+      //           child: Button(
+      //             key: Key("submit"),
+      //             loading: changeLimitLoading,
+      //             backgroundColor: config.darkOpacityBlueColor,
+      //             child: TextView(
+      //               "terima",
+      //               3,
+      //               caps: true,
+      //             ),
+      //             onTap: () {
+                    
+      //             },
+      //           ),
+      //         ),
+      //       ),
+
+      //       Expanded(
+      //         child: Container(
+      //           width: MediaQuery.of(context).size.width,
+      //           padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+      //           child: Button(
+      //             key: Key("submit"),
+      //             loading: changeLimitLoading,
+      //             backgroundColor: config.darkOpacityBlueColor,
+      //             child: TextView(
+      //               "tolak",
+      //               3,
+      //               caps: true,
+      //             ),
+      //             onTap: () {
+                    
+      //             },
+      //           ),
+      //         ),
+      //       ),
+      //     ],
+      //   )
+      //   :
+      //   Container(),
         body: Container(
           child: Form(
             key: _HistoryLimitFormKey,
@@ -213,6 +321,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
                   child: TextFormField(
+                    style: TextStyle(color: config.grayNonActiveColor),
                     inputFormatters: <TextInputFormatter>[
                       CurrencyTextInputFormatter(
                         locale: 'IDR',
@@ -221,45 +330,96 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                       ),
                     ],
                     keyboardType: TextInputType.number,
-                    enabled: true,
+                    enabled: false,
                     controller: limitRequestController,
                     decoration: new InputDecoration(
-                      hintStyle: TextStyle(color: config.grayColor),
-                      labelStyle: TextStyle(color: config.grayColor),
+                      hintStyle: TextStyle(
+                        color: widget.callMode.contains("historyLimit") ? config.grayNonActiveColor : Colors.black
+                      ),
+                      labelStyle: TextStyle(
+                        color: widget.callMode.contains("historyLimit") ? config.grayNonActiveColor : Colors.black
+                      ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Limit Yang Diajukan",
-                      icon: TextView("Rp ", 4),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: new BorderRadius.circular(
-                          5.0,
-                        ),
-                        borderSide: BorderSide(
-                          color: config.grayColor,
-                          width: 1.5,
-                        ),
+                      icon: TextView("Rp ", 4, color: config.grayNonActiveColor),
+                      disabledBorder: OutlineInputBorder(
+                          borderRadius: new BorderRadius.circular(5.0,),
+                          borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
                       ),
                     ),
                   ),
                 ),
+                widget.type != 1 && !(widget.callMode.contains("historyLimit")) ?
                 Center(
                   child: Container(
                     width: MediaQuery.of(context).size.width,
-                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                    padding: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
                     child: Button(
                       key: Key("submit"),
                       loading: changeLimitLoading,
                       backgroundColor: config.darkOpacityBlueColor,
-                      child: TextView(
-                        "UBAH",
-                        3,
-                        caps: true,
-                      ),
-                      onTap: () {
+                      child: TextView("UBAH", 3, caps: true,),
+                      onTap: (){
                         updateLimit();
+                        // Alert(
+                        //   context: context,
+                        //   title: "Alert",
+                        //   content: Text(limitDMDController.text.toString()),
+                        //   cancel: false,
+                        //   type: "warning"
+                        // );
                       },
                     ),
                   ),
                 )
+                :
+                widget.type == 1 && (user_code.toLowerCase() == "tanto" || user_code.toLowerCase() == "hermawan") ?
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                        child: Button(
+                          key: Key("submit"),
+                          loading: acceptLimitRequestLoading,
+                          backgroundColor: config.darkOpacityBlueColor,
+                          child: TextView(
+                            "terima gabungan",
+                            3,
+                            caps: true,
+                          ),
+                          onTap: () {
+                            // updateLimitRequest();
+                          },
+                        ),
+                      ),
+                    ),
+
+                    Expanded(
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                        child: Button(
+                          key: Key("submit"),
+                          loading: rejectLimitRequestLoading,
+                          backgroundColor: config.darkOpacityBlueColor,
+                          child: TextView(
+                            "tolak",
+                            3,
+                            caps: true,
+                          ),
+                          onTap: () {
+                            
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+                :
+                Container(),
               ],
             ),
           ),
@@ -286,11 +446,94 @@ class AddLimitDetailState extends State<AddLimitDetail> {
           //   ),
           //   bottom: 
           // ),
+          // bottomNavigationBar: widget.type != 1 && !(widget.callMode.contains("historyLimit")) ?
+          //   Center(
+          //     child: Container(
+          //       width: MediaQuery.of(context).size.width,
+          //       padding: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+          //       child: Button(
+          //         key: Key("submit"),
+          //         loading: changeLimitLoading,
+          //         backgroundColor: config.darkOpacityBlueColor,
+          //         child: TextView("UBAH", 3, caps: true,),
+          //         onTap: (){
+          //           updateLimit();
+          //           // Alert(
+          //           //   context: context,
+          //           //   title: "Alert",
+          //           //   content: Text(limitDMDController.text.toString()),
+          //           //   cancel: false,
+          //           //   type: "warning"
+          //           // );
+          //         },
+          //       ),
+          //     ),
+          //   )
+          //   :
+          //   widget.type == 1 && (user_code.toLowerCase() == "tanto" || user_code.toLowerCase() == "hermawan") ?
+          //   Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //     children: [
+          //       Expanded(
+          //         child: Container(
+          //           width: MediaQuery.of(context).size.width,
+          //           padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+          //           child: Button(
+          //             key: Key("submit"),
+          //             loading: changeLimitLoading,
+          //             backgroundColor: config.darkOpacityBlueColor,
+          //             child: TextView(
+          //               "terima",
+          //               3,
+          //               caps: true,
+          //             ),
+          //             onTap: () {
+                        
+          //             },
+          //           ),
+          //         ),
+          //       ),
+
+          //       Expanded(
+          //         child: Container(
+          //           width: MediaQuery.of(context).size.width,
+          //           padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+          //           child: Button(
+          //             key: Key("submit"),
+          //             loading: changeLimitLoading,
+          //             backgroundColor: config.darkOpacityBlueColor,
+          //             child: TextView(
+          //               "tolak",
+          //               3,
+          //               caps: true,
+          //             ),
+          //             onTap: () {
+                        
+          //             },
+          //           ),
+          //         ),
+          //       ),
+          //     ],
+          //   )
+          //   :
+          //   Container(),
           body: NestedScrollView(
             headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
               return <Widget>[
                 new SliverAppBar(
-                  title: Text('Tambah Limit Detail'),
+                  title: widget.callMode.contains("historyLimitDetail") && widget.type == 1
+                    ?
+                    TextView('Limit Yang Diminta', 1)
+                    :
+                    widget.callMode.contains("historyLimitDetail") && widget.type == 2
+                    ?
+                    TextView('Limit Yang Disetujui', 1)
+                    :
+                    widget.callMode.contains("historyLimitDetail") && widget.type == 3
+                    ?
+                    TextView('Limit Yang Ditolak', 1)
+                    :
+                    TextView('Tambah Limit Detail', 1),
                   pinned: true,
                   floating: true,
                   bottom: TabBar(
@@ -1449,23 +1692,28 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                   child: TextFormField(
-                    enabled: true,
+                    enabled: widget.callMode.contains("historyLimit") ? false : true,
                     controller: limitDMDController,
+                    style: TextStyle(color: widget.callMode.contains("historyLimit") ? config.grayNonActiveColor : Colors.black),
                     decoration: new InputDecoration(
                       hintStyle: TextStyle(
-                        color: Colors.black
+                        color: widget.callMode.contains("historyLimit") ? config.grayNonActiveColor : Colors.black
                       ),
                       labelStyle: TextStyle(
-                        color: Colors.black
+                        color: widget.callMode.contains("historyLimit") ? config.grayNonActiveColor : Colors.black
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Limit DMD",
                       // hintText: resultObject[0]["limit_dmd"].toString(),
-                      icon: TextView("Rp ",5),
-                      enabledBorder: OutlineInputBorder(
+                      icon: TextView("Rp ",5,color: widget.callMode.contains("historyLimit") ? config.grayNonActiveColor : config.grayColor),
+                      enabledBorder: !widget.callMode.contains("historyLimit") ? OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
                           borderSide: BorderSide(color: Colors.black54, width: 1.5,),
-                      ),
+                      ) : null,
+                      disabledBorder: widget.callMode.contains("historyLimit") ? OutlineInputBorder(
+                          borderRadius: new BorderRadius.circular(5.0,),
+                          borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
+                      ) : null,
                     ),
                   ),
                 ),
@@ -1494,27 +1742,32 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                   child: TextFormField(
-                    enabled: true,
+                    enabled: widget.callMode.contains("historyLimit") ? false : true,
                     controller: limitRequestController,
+                    style: TextStyle(color: widget.callMode.contains("historyLimit") ? config.grayNonActiveColor : Colors.black),
                     decoration: new InputDecoration(
                       hintStyle: TextStyle(
-                        color: Colors.black
+                        color: widget.callMode.contains("historyLimit") ? config.grayNonActiveColor : Colors.black
                       ),
                       labelStyle: TextStyle(
-                        color: Colors.black
+                        color: widget.callMode.contains("historyLimit") ? config.grayNonActiveColor : Colors.black
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Limit Yang Diajukan",
-                      icon: TextView("Rp ",5),
-                      enabledBorder: OutlineInputBorder(
+                      icon: TextView("Rp ",5,color: widget.callMode.contains("historyLimit") ? config.grayNonActiveColor : config.grayColor),
+                      enabledBorder: !widget.callMode.contains("historyLimit") ? OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
                           borderSide: BorderSide(color: Colors.black54, width: 1.5,),
-                      ),
+                      ) : null,
+                      disabledBorder: widget.callMode.contains("historyLimit") ? OutlineInputBorder(
+                          borderRadius: new BorderRadius.circular(5.0,),
+                          borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
+                      ) : null
                     ),
                   ),
                 ),
-        
-        
+
+                widget.type != 1 && !(widget.callMode.contains("historyLimit")) ?
                 Center(
                   child: Container(
                     width: MediaQuery.of(context).size.width,
@@ -1537,6 +1790,54 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                     ),
                   ),
                 )
+                :
+                widget.type == 1 && (user_code.toLowerCase() == "tanto" || user_code.toLowerCase() == "hermawan") ?
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                        child: Button(
+                          key: Key("submit"),
+                          loading: acceptLimitRequestLoading,
+                          backgroundColor: config.darkOpacityBlueColor,
+                          child: TextView(
+                            "terima normal",
+                            3,
+                            caps: true,
+                          ),
+                          onTap: () {
+                            updateLimitRequest();
+                          },
+                        ),
+                      ),
+                    ),
+
+                    Expanded(
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                        child: Button(
+                          key: Key("submit"),
+                          loading: rejectLimitRequestLoading,
+                          backgroundColor: config.darkOpacityBlueColor,
+                          child: TextView(
+                            "tolak",
+                            3,
+                            caps: true,
+                          ),
+                          onTap: () {
+                            
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+                :
+                Container(),
               ],
             ),
           ),
@@ -1548,6 +1849,70 @@ class AddLimitDetailState extends State<AddLimitDetail> {
     return tempWidgetList;
 
   }
+
+  void updateLimitRequest() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    //var obj = {"kode_customer": row_pending[i].customer_code, "limit_baru": row_pending[i].limit, "user_code": row_pending[i].user_code, "id": row_pending[i].id};
+
+    Alert(
+      context: context,
+      title: "Konfirmasi",
+      content: Text("Apakah Anda yakin ingin menyetujui permintaan limit ini?"),
+      cancel: true,
+      type: "warning",
+      defaultAction: (){
+        changeLimitRequest();
+      }
+    );
+  }
+
+  void changeLimitRequest() async {
+    FocusScope.of(context).requestFocus(FocusNode());
+    setState(() {
+      acceptLimitRequestLoading = true;
+    });
+
+    // Alert(context: context, loading: true, disableBackButton: true);
+
+    //var obj = {"kode_customer": row_pending[i].customer_code, "limit_baru": row_pending[i].limit, "user_code": row_pending[i].user_code, "id": row_pending[i].id};
+    printHelp("cek cust code "+ resultObject[0]["No_"]);
+    printHelp("cek limit baru "+ limitRequestController.text.toString());
+    printHelp("cek user code "+ user_code);
+    printHelp("cek id "+ resultObject[0]["No_"]);
+
+    
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+
+
+    // String getChangeLimit = await customerAPI.changeLimit(context, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"${prefs.getString('user_code')}","nama_cust":"${resultObject[0]['Name']}","limit_baru":"${limitRequestController.text}","old_limit":"${resultObject[0]['Limit']}","piutang":${resultObject[10]['piutang']},"limit_dmd_lama":"${prefs.getInt('limit_dmd')}","limit_dmd_baru":"${limitDMDController.text}"}');
+
+    // Navigator.of(context).pop();
+
+    // if(getChangeLimit == "OK"){
+    //   Alert(
+    //     context: context,
+    //     title: "Alert",
+    //     content: Text("Ubah limit sukses"),
+    //     cancel: false,
+    //     type: "warning"
+    //   );
+    // } else {
+    //   Alert(
+    //     context: context,
+    //     title: "Alert",
+    //     content: Text(getChangeLimit),
+    //     cancel: false,
+    //     type: "warning"
+    //   );
+    // }
+
+    // setState(() {
+    //   acceptLimitRequestLoading = false;
+    // });
+
+  }
+
 
   void updateLimit() async {
     // setState(() {
@@ -1603,9 +1968,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                   changeLimit();
                 }
               );
-            }
-
-          
+            }   
       }
     }
 
