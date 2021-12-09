@@ -299,23 +299,22 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
       if(type == 1) {
         Navigator.pushNamed(
           context,
-          "getHistoryLimitGabunganDetail1",
+          "historyLimitRequestDetail/${tempLimitHistory.id}/4",
           arguments: result_,
         );
       } else if(type == 2) {
         Navigator.pushNamed(
           context,
-          "getHistoryLimitGabunganDetail2",
+          "historyLimitRequestDetail/${tempLimitHistory.id}/5",
           arguments: result_,
         );
-      } else if(type == 3) {
+      } else {
         Navigator.pushNamed(
           context,
-          "getHistoryLimitGabunganDetail3",
+          "historyLimitRequestDetail/${tempLimitHistory.id}/6",
           arguments: result_,
         );
       }
-      
 
     } else {
       Alert(context: context, loading: true, disableBackButton: true);
@@ -328,25 +327,11 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
 
       Navigator.of(context).pop();
 
-      if(type == 1) {
-        Navigator.pushNamed(
-          context,
-          "getHistoryLimitDetail1",
-          arguments: result_
-        );
-      } else if(type == 2) {
-        Navigator.pushNamed(
-          context,
-          "getHistoryLimitDetail2",
-          arguments: result_
-        );
-      } else if(type == 3) {
-        Navigator.pushNamed(
-          context,
-          "getHistoryLimitDetail3",
-          arguments: result_
-        );
-      }
+      Navigator.pushNamed(
+        context,
+        "historyLimitRequestDetail/${tempLimitHistory.id}/$type",
+        arguments: result_,
+      );
 
     }
 

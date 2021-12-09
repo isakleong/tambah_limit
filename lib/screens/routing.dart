@@ -30,7 +30,7 @@ MaterialPageRoute routing(int mode, int id, List<String> pages, RouteSettings se
       return MaterialPageRoute(builder: (context)=> HistoryLimitRequest());
       break;
     case 'historyLimitRequestDetail':
-      return MaterialPageRoute(builder: (context)=> HistoryLimitRequestDetail(model: settings.arguments));
+      return MaterialPageRoute(builder: (context)=> HistoryLimitRequestDetail(mode: mode, id: id, model: settings.arguments));
       break;
     case 'getHistoryLimitDetail1':
       return MaterialPageRoute(builder: (context)=> AddLimitDetail(model: settings.arguments, callMode: "historyLimitDetail", type: 1));
