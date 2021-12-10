@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tambah_limit/models/limitHistoryModel.dart';
 import 'package:tambah_limit/models/resultModel.dart';
+import 'package:tambah_limit/resources/customerAPI.dart';
 import 'package:tambah_limit/settings/configuration.dart';
 import 'package:tambah_limit/tools/function.dart';
 import 'package:tambah_limit/widgets/TextView.dart';
@@ -33,6 +34,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
 
   String user_code = "";
   int request_limit = 0;
+  String user_code_request = "";
 
   bool acceptLimitRequestLoading = false;
   bool rejectLimitRequestLoading = false;
@@ -46,12 +48,6 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
   final ScrollController _scrollController = ScrollController();
 
   final currencyFormatter = NumberFormat('#,##0', 'ID');
-
-  Future<Null> setSharedPrefs() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    resultObject = jsonDecode(result.data.toString());
-    prefs.setInt("limit_dmd", resultObject[0]["limit_dmd"]);
-  }
 
   @override
   void initState() {
@@ -71,7 +67,6 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     final _resultObject = jsonDecode(result.data.toString());
 
     if(pageType > 3){
-      print("cek merah "+ (_resultObject[0]["old_limit"].toString()));
       // final _newValue = currencyFormatter.format(_resultObject[0]["old_limit"]).toString();
         limitDMDController.value = TextEditingValue(
           text: _resultObject[0]["old_limit"].toString(),
@@ -90,6 +85,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     }
 
     request_limit = prefs.getInt("request_limit");
+    user_code_request = prefs.getString("user_code_request");
 
     limitRequestController.value = TextEditingValue(
       text: currencyFormatter.format(request_limit).toString(),
@@ -101,7 +97,11 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     setState(() {
       resultObject = _resultObject;
     });
-    setSharedPrefs();
+    
+    if(resultObject[0]["limit_dmd"] != null){
+      prefs.setInt("limit_dmd", resultObject[0]["limit_dmd"]);
+    }
+    
   }
 
 
@@ -1290,7 +1290,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                     ),
                   ),
                 ),
-                pageType== 1 && (user_code.toLowerCase() == "tanto" || user_code.toLowerCase() == "hermawan") ?
+                (pageType== 1 || pageType == 4) && (user_code.toLowerCase() == "tanto" || user_code.toLowerCase() == "hermawan") ?
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -1614,43 +1614,40 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
       acceptLimitRequestLoading = true;
     });
 
-    // Alert(context: context, loading: true, disableBackButton: true);
+    Alert(context: context, loading: true, disableBackButton: true);
 
     //var obj = {"kode_customer": row_pending[i].customer_code, "limit_baru": row_pending[i].limit, "user_code": row_pending[i].user_code, "id": row_pending[i].id};
-    printHelp("cek cust code "+ resultObject[0]["No_"]);
-    printHelp("cek limit baru "+ limitRequestController.text.toString());
-    printHelp("cek user code "+ user_code);
-    printHelp("cek id "+ resultObject[0]["No_"]);
+    // printHelp("cek cust code "+ resultObject[0]["No_"]);
+    // printHelp("cek limit baru "+ limitRequestController.text.toString());
+    // printHelp("cek user code "+ user_code_request);
+    // printHelp("cek id "+ widget.id.toString());
+    // printHelp("cek user login "+ user_code);
 
-    
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    String getChangeLimit = await customerAPI.updateLimitRequest(context, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"${user_code_request}","limit_baru":"${limitRequestController.text}","user_login":"${user_code}","id":"${widget.id}"}');
 
+    Navigator.of(context).pop();
 
-    // String getChangeLimit = await customerAPI.changeLimit(context, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"${prefs.getString('user_code')}","nama_cust":"${resultObject[0]['Name']}","limit_baru":"${limitRequestController.text}","old_limit":"${resultObject[0]['Limit']}","piutang":${resultObject[10]['piutang']},"limit_dmd_lama":"${prefs.getInt('limit_dmd')}","limit_dmd_baru":"${limitDMDController.text}"}');
+    if(getChangeLimit == "OK"){
+      Alert(
+        context: context,
+        title: "Info",
+        content: Text("Ubah limit sukses"),
+        cancel: false,
+        type: "warning"
+      );
+    } else {
+      Alert(
+        context: context,
+        title: "Info",
+        content: Text(getChangeLimit),
+        cancel: false,
+        type: "warning"
+      );
+    }
 
-    // Navigator.of(context).pop();
-
-    // if(getChangeLimit == "OK"){
-    //   Alert(
-    //     context: context,
-    //     title: "Alert",
-    //     content: Text("Ubah limit sukses"),
-    //     cancel: false,
-    //     type: "warning"
-    //   );
-    // } else {
-    //   Alert(
-    //     context: context,
-    //     title: "Alert",
-    //     content: Text(getChangeLimit),
-    //     cancel: false,
-    //     type: "warning"
-    //   );
-    // }
-
-    // setState(() {
-    //   acceptLimitRequestLoading = false;
-    // });
+    setState(() {
+      acceptLimitRequestLoading = false;
+    });
 
   }
 

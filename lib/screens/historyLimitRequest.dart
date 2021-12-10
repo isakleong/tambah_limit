@@ -293,6 +293,7 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
 
       final SharedPreferences sharedPreferences = await _sharedPreferences;
       await sharedPreferences.setInt("request_limit", int.parse(tempLimitHistory.limit));
+      await sharedPreferences.setString("user_code_request", tempLimitHistory.user_code);
 
       Navigator.of(context).pop();
 
@@ -323,7 +324,7 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
 
       final SharedPreferences sharedPreferences = await _sharedPreferences;
       await sharedPreferences.setInt("request_limit", int.parse(tempLimitHistory.limit));
-      await sharedPreferences.setInt("id_request_limit", tempLimitHistory.id);
+      await sharedPreferences.setString("user_code_request", tempLimitHistory.user_code);
 
       Navigator.of(context).pop();
 

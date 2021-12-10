@@ -23,8 +23,8 @@ class Button extends StatelessWidget {
       onPressed: onTap,
       child: loading ?
         Container(
-          width: 45,
-          height: 25,
+          width: 40,
+          height: 20,
           child:FlareActor('assets/flare/loading-button.flr', animation: "Play")
         )
         :
@@ -32,7 +32,7 @@ class Button extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           primary: backgroundColor,
           padding: EdgeInsets.all(14),
-          elevation: 3,
+          elevation: 2,
           )
     );
   }

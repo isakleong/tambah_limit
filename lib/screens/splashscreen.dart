@@ -3,10 +3,10 @@ import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:open_file/open_file.dart';
+// import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:percent_indicator/percent_indicator.dart';
-import 'package:permission_handler/permission_handler.dart';
+// import 'package:percent_indicator/percent_indicator.dart';
+// import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'package:http/http.dart' show Client;
@@ -71,120 +71,110 @@ class SplashScreenState extends State<SplashScreen> {
     final SharedPreferences sharedPreferences = await _sharedPreferences;
     await sharedPreferences.setString("fcmToken", fcmToken);
 
-    final isPermissionStatusGranted = await checkAppsPermission();
-    if(isPermissionStatusGranted) {
-      doCheckVersion();
-    } else {
-      checkAppsPermission();
-    }
+    // final isPermissionStatusGranted = await checkAppsPermission();
+    doCheckVersion();
+    // if(isPermissionStatusGranted) {
+    //   doCheckVersion();
+    // } else {
+    //   // checkAppsPermission();
+    // }
   }
 
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
 
-  Future<void> downloadNewVersion() async {
-    String url = "";
+  // Future<void> downloadNewVersion() async {
+  //   String url = "";
 
-    bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    String url_address_1 = config.baseUrl + "/" + config.apkName+".apk";
-    String url_address_2 = config.baseUrlAlt + "/" + config.apkName+".apk";
+  //   bool isUrlAddress_1 = false, isUrlAddress_2 = false;
+  //   String url_address_1 = config.baseUrl + "/" + config.apkName+".apk";
+  //   String url_address_2 = config.baseUrlAlt + "/" + config.apkName+".apk";
 
-    try {
-		  final conn_1 = await ConnectionTest(url_address_1, context);
-      printHelp("GET STATUS 1 "+conn_1);
-      if(conn_1 == "OK"){
-        isUrlAddress_1 = true;
-      }
-	  } on SocketException {
-      isUrlAddress_1 = false;
-      isGetVersionSuccess = "Gagal terhubung dengan server";
-    }
+  //   try {
+	// 	  final conn_1 = await ConnectionTest(url_address_1, context);
+  //     printHelp("GET STATUS 1 "+conn_1);
+  //     if(conn_1 == "OK"){
+  //       isUrlAddress_1 = true;
+  //     }
+	//   } on SocketException {
+  //     isUrlAddress_1 = false;
+  //     isGetVersionSuccess = "Gagal terhubung dengan server";
+  //   }
 
-    if(isUrlAddress_1) {
-      url = url_address_1;
-    } else {
-      try {
-        final conn_2 = await ConnectionTest(url_address_2, context);
-        printHelp("GET STATUS 2 "+conn_2);
-        if(conn_2 == "OK"){
-          isUrlAddress_2 = true;
-        }
-      } on SocketException {
-        isUrlAddress_2 = false;
-        isGetVersionSuccess = "Gagal terhubung dengan server";
-      }
-    }
-    if(isUrlAddress_2){
-      url = url_address_2;
-    }
+  //   if(isUrlAddress_1) {
+  //     url = url_address_1;
+  //   } else {
+  //     try {
+  //       final conn_2 = await ConnectionTest(url_address_2, context);
+  //       printHelp("GET STATUS 2 "+conn_2);
+  //       if(conn_2 == "OK"){
+  //         isUrlAddress_2 = true;
+  //       }
+  //     } on SocketException {
+  //       isUrlAddress_2 = false;
+  //       isGetVersionSuccess = "Gagal terhubung dengan server";
+  //     }
+  //   }
+  //   if(isUrlAddress_2){
+  //     url = url_address_2;
+  //   }
 
-    if(url != "") {
-      final isPermissionStatusGranted = await checkAppsPermission();
+  //   if(url != "") {
+  //     final isPermissionStatusGranted = await checkAppsPermission();
 
-      if(isPermissionStatusGranted) {
-        try {
-          Dio dio = Dio();
+  //     if(isPermissionStatusGranted) {
+  //       try {
+  //         Dio dio = Dio();
 
-          String downloadPath = await getFilePath(config.apkName+".apk");
+  //         String downloadPath = await getFilePath(config.apkName+".apk");
 
-          printHelp("download path "+downloadPath);
-          printHelp("url download "+ url);
+  //         printHelp("download path "+downloadPath);
+  //         printHelp("url download "+ url);
 
-          // await dio.download(url, downloadPath, onReceiveProgress: (received, total){
-          //   if(total != -1) {
-          //     setState(() {
-          //       // progressValue = (received / total * 100).toStringAsFixed(0) + "%";
-          //       isDownloadNewVersion = true;
-          //       progressValue = (received / total * 100)/100;
-          //       progressText = (received / total * 100).toStringAsFixed(0) + "%";
-          //     });
-          //   }
-          // });
+  //         dio.download(url, downloadPath,
+  //           onReceiveProgress: (rcv, total) {
+  //             print(
+  //                 'received: ${rcv.toStringAsFixed(0)} out of total: ${total.toStringAsFixed(0)}');
 
-          dio.download(url, downloadPath,
-            onReceiveProgress: (rcv, total) {
-              print(
-                  'received: ${rcv.toStringAsFixed(0)} out of total: ${total.toStringAsFixed(0)}');
+  //             _setState(() {
+  //               progressValue = (rcv / total * 100)/100;
+  //               progressText = ((rcv / total) * 100).toStringAsFixed(0);
+  //             });
 
-              _setState(() {
-                progressValue = (rcv / total * 100)/100;
-                progressText = ((rcv / total) * 100).toStringAsFixed(0);
-              });
+  //             if (progressText == '100') {
+  //               _setState(() {
+  //                 isDownloadNewVersion = true;
+  //               });
+  //             } else if (double.parse(progressText) < 100) {}
+  //           },
+  //           deleteOnError: true,
+  //         ).then((_) async {
+  //           _setState(() {
+  //             if (progressText == '100') {
+  //               isDownloadNewVersion = true;
+  //             }
 
-              if (progressText == '100') {
-                _setState(() {
-                  isDownloadNewVersion = true;
-                });
-              } else if (double.parse(progressText) < 100) {}
-            },
-            deleteOnError: true,
-          ).then((_) async {
-            _setState(() {
-              if (progressText == '100') {
-                isDownloadNewVersion = true;
-              }
+  //             isDownloadNewVersion = false;
+  //           });
 
-              isDownloadNewVersion = false;
-            });
+  //           Navigator.of(context).pop();
+  //           // var directory = await getApplicationDocumentsDirectory(); OpenFile.open(downloadPath);
 
-            Navigator.of(context).pop();
-            var directory = await getApplicationDocumentsDirectory(); OpenFile.open(downloadPath);
+  //           setState(() {
+  //             isLoadingVersion = false;
+  //             isDownloadNewVersion = false;
+  //           });
+  //         });
 
-            setState(() {
-              isLoadingVersion = false;
-              isDownloadNewVersion = false;
-            });
-          });
+  //       } catch (e) {
 
-        } catch (e) {
+  //       }
 
-        }
+  //     }
 
-      }
-
-    } else {
-      //gagal terhubung
-    }
-  }
+  //   } else {
+  //     //gagal terhubung
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -284,7 +274,7 @@ class SplashScreenState extends State<SplashScreen> {
               isLoadingVersion = false;
               isDownloadNewVersion = true;
             });
-            downloadNewVersion();
+            // downloadNewVersion();
             showDialog (
               context: context,
               barrierDismissible: false,
@@ -301,21 +291,21 @@ class SplashScreenState extends State<SplashScreen> {
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Center(
-                            child: CircularPercentIndicator(
-                              radius: 120.0,
-                              lineWidth: 13.0,
-                              animation: false,
-                              percent: progressValue,
-                              center: new Text("${progressText}%", style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                              footer: Padding(
-                                padding: EdgeInsets.only(top: 10),
-                                child: new Text("Mengunduh pembaruan aplikasi", style: new TextStyle(fontWeight: FontWeight.bold)),
-                              ),
-                              circularStrokeCap: CircularStrokeCap.round,
-                              progressColor: config.primaryColor,
-                            ),
-                          ),
+                          // Center(
+                          //   child: CircularPercentIndicator(
+                          //     radius: 120.0,
+                          //     lineWidth: 13.0,
+                          //     animation: false,
+                          //     percent: progressValue,
+                          //     center: new Text("${progressText}%", style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                          //     footer: Padding(
+                          //       padding: EdgeInsets.only(top: 10),
+                          //       child: new Text("Mengunduh pembaruan aplikasi", style: new TextStyle(fontWeight: FontWeight.bold)),
+                          //     ),
+                          //     circularStrokeCap: CircularStrokeCap.round,
+                          //     progressColor: config.primaryColor,
+                          //   ),
+                          // ),
                         ],
                       );
                     }),
@@ -344,37 +334,37 @@ class SplashScreenState extends State<SplashScreen> {
     }
   }
 
-  Future<bool> checkAppsPermission() async {
-    final serviceStatus = await Permission.storage.isGranted;
+  // Future<bool> checkAppsPermission() async {
+  //   final serviceStatus = await Permission.storage.isGranted;
 
-    bool isPermissionGranted = serviceStatus == ServiceStatus.enabled;
+  //   bool isPermissionGranted = serviceStatus == ServiceStatus.enabled;
 
-    final status = await Permission.storage.request();
+  //   final status = await Permission.storage.request();
 
-    // if(status == PermissionStatus.granted) {
-    // } else if (status == PermissionStatus.denied) {
-    //   print('Permission denied');
-    // } else if (status == PermissionStatus.permanentlyDenied) {
-    //   print('Permission Permanently Denied');
-    // }
+  //   // if(status == PermissionStatus.granted) {
+  //   // } else if (status == PermissionStatus.denied) {
+  //   //   print('Permission denied');
+  //   // } else if (status == PermissionStatus.permanentlyDenied) {
+  //   //   print('Permission Permanently Denied');
+  //   // }
 
-    if(status != PermissionStatus.granted) {
-      await openAppSettings();
-    }
+  //   if(status != PermissionStatus.granted) {
+  //     await openAppSettings();
+  //   }
 
-    return status == PermissionStatus.granted;
+  //   return status == PermissionStatus.granted;
 
-  }
+  // }
 
-  Future<String> getFilePath(filename) async {
-    String path = '';
+  // Future<String> getFilePath(filename) async {
+  //   String path = '';
 
-    Directory dir = await getExternalStorageDirectory();
+  //   Directory dir = await getExternalStorageDirectory();
 
-    path = '${dir.path}/$filename';
+  //   path = '${dir.path}/$filename';
 
-    return path;
-  }
+  //   return path;
+  // }
 
   Future<String> getVersion(final context, {String parameter=""}) async {
     Client client = Client();
@@ -437,7 +427,7 @@ class SplashScreenState extends State<SplashScreen> {
   }
 
   startTimer() {
-    var _duration = Duration(milliseconds: 1000);
+    var _duration = Duration(milliseconds: 2000);
     return Timer(_duration, navigate);
   }
 
@@ -450,7 +440,7 @@ class SplashScreenState extends State<SplashScreen> {
     Navigator.pushReplacement(
                   context,
                   PageRouteBuilder(
-                      transitionDuration: Duration(seconds: 5),
+                      transitionDuration: Duration(seconds: 4),
                       pageBuilder: (_, __, ___) => Login()));
 
   }

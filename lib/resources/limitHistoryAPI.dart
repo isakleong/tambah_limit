@@ -95,14 +95,14 @@ class LimitHistoryAPI {
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
 
     if(type == 1) {
-      url_address_1 = config.baseUrl + "/" + "getLimitReqHist.php" + (parameter == "" ? "" : "?" + parameter);
-      url_address_2 = config.baseUrlAlt + "/" + "getLimitReqHist.php" + (parameter == "" ? "" : "?" + parameter);
+      url_address_1 = config.baseUrl + "/" + "getLimitReqHistCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      url_address_2 = config.baseUrlAlt + "/" + "getLimitReqHistCoba.php" + (parameter == "" ? "" : "?" + parameter);
     } else if(type == 2) {
-      url_address_1 = config.baseUrl + "/" + "getLimitDoneHist.php" + (parameter == "" ? "" : "?" + parameter);
-      url_address_2 = config.baseUrlAlt + "/" + "getLimitDoneHist.php" + (parameter == "" ? "" : "?" + parameter);
+      url_address_1 = config.baseUrl + "/" + "getLimitDoneHistCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      url_address_2 = config.baseUrlAlt + "/" + "getLimitDoneHistCoba.php" + (parameter == "" ? "" : "?" + parameter);
     } else if(type == 3) {
-      url_address_1 = config.baseUrl + "/" + "getLimitRejectHist.php" + (parameter == "" ? "" : "?" + parameter);
-      url_address_2 = config.baseUrlAlt + "/" + "getLimitRejectHist.php" + (parameter == "" ? "" : "?" + parameter);
+      url_address_1 = config.baseUrl + "/" + "getLimitRejectHistCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      url_address_2 = config.baseUrlAlt + "/" + "getLimitRejectHistCoba.php" + (parameter == "" ? "" : "?" + parameter);
     }
 
     try {

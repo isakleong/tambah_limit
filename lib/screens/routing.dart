@@ -32,24 +32,6 @@ MaterialPageRoute routing(int mode, int id, List<String> pages, RouteSettings se
     case 'historyLimitRequestDetail':
       return MaterialPageRoute(builder: (context)=> HistoryLimitRequestDetail(mode: mode, id: id, model: settings.arguments));
       break;
-    case 'getHistoryLimitDetail1':
-      return MaterialPageRoute(builder: (context)=> AddLimitDetail(model: settings.arguments, callMode: "historyLimitDetail", type: 1));
-      break;
-    case 'getHistoryLimitDetail2':
-      return MaterialPageRoute(builder: (context)=> AddLimitDetail(model: settings.arguments, callMode: "historyLimitDetail", type: 2));
-      break;
-    case 'getHistoryLimitDetail3':
-      return MaterialPageRoute(builder: (context)=> AddLimitDetail(model: settings.arguments, callMode: "historyLimitDetail", type: 3));
-      break;
-    case 'getHistoryLimitGabunganDetail1':
-      return MaterialPageRoute(builder: (context)=> AddLimitDetail(model: settings.arguments, callMode: "historyLimitGabunganDetail", type: 1));
-      break;
-    case 'getHistoryLimitGabunganDetail2':
-      return MaterialPageRoute(builder: (context)=> AddLimitDetail(model: settings.arguments, callMode: "historyLimitGabunganDetail", type: 2));
-      break;
-    case 'getHistoryLimitGabunganDetail3':
-      return MaterialPageRoute(builder: (context)=> AddLimitDetail(model: settings.arguments, callMode: "historyLimitGabunganDetail", type: 3));
-      break;
     case 'addLimitDetail':
       return MaterialPageRoute(builder: (context)=> AddLimitDetail(model: settings.arguments, callMode: "addLimitDetail"));
       break;
