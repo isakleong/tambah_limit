@@ -118,10 +118,10 @@ class AddLimitCorporateState extends State<AddLimitCorporate> {
       } else {
         Alert(
           context: context,
-          title: "Alert",
+          title: "Maaf,",
           content: Text(result_.message),
           cancel: false,
-          type: "warning"
+          type: "error"
         );
         setState(() {
           result = null;

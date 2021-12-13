@@ -371,7 +371,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                     )
                                                   : Alert(
                                                       context: context,
-                                                      title: "Alert",
+                                                      title: "Info,",
                                                       content: Text(
                                                           "Tidak ada data"),
                                                       cancel: false,
@@ -577,7 +577,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                     )
                                                   : Alert(
                                                       context: context,
-                                                      title: "Alert",
+                                                      title: "Info,",
                                                       content: Text(
                                                           "Tidak ada data"),
                                                       cancel: false,
@@ -781,7 +781,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                     )
                                                   : Alert(
                                                       context: context,
-                                                      title: "Alert",
+                                                      title: "Info,",
                                                       content: Text(
                                                           "Tidak ada data"),
                                                       cancel: false,
@@ -909,7 +909,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                     )
                                                   : Alert(
                                                       context: context,
-                                                      title: "Alert",
+                                                      title: "Info,",
                                                       content: Text(
                                                           "Tidak ada data"),
                                                       cancel: false,
@@ -1013,7 +1013,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                         )
                                                       : Alert(
                                                           context: context,
-                                                          title: "Alert",
+                                                          title: "Info,",
                                                           content: Text(
                                                               "Tidak ada data"),
                                                           cancel: false,
@@ -1124,7 +1124,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                     )
                                                   : Alert(
                                                       context: context,
-                                                      title: "Alert",
+                                                      title: "Info,",
                                                       content: Text(
                                                           "Tidak ada data"),
                                                       cancel: false,
@@ -1266,7 +1266,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                     )
                                                   : Alert(
                                                       context: context,
-                                                      title: "Alert",
+                                                      title: "Info,",
                                                       content: Text(
                                                           "Tidak ada data"),
                                                       cancel: false,
@@ -1387,7 +1387,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                     )
                                                   : Alert(
                                                       context: context,
-                                                      title: "Alert",
+                                                      title: "Info,",
                                                       content: Text(
                                                           "Tidak ada data"),
                                                       cancel: false,
@@ -1509,7 +1509,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                     )
                                                   : Alert(
                                                       context: context,
-                                                      title: "Alert",
+                                                      title: "Info,",
                                                       content: Text(
                                                           "Tidak ada data"),
                                                       cancel: false,
@@ -1883,7 +1883,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
             int.parse(limitDMDController.text) == limit_dmd_lama)) {
       Alert(
           context: context,
-          title: "Alert",
+          title: "Info,",
           content: Text("Limit Baru atau Limit DMD harus diisi"),
           cancel: false,
           type: "warning");
@@ -1893,7 +1893,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
               int.parse(limitDMDController.text)) {
         Alert(
             context: context,
-            title: "Alert",
+            title: "Info,",
             content: Text("Limit Baru melebihi Limit DMD!"),
             cancel: false,
             type: "warning");
@@ -1904,7 +1904,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
         if (int.parse(limitRequestController.text) > max_limit) {
           Alert(
               context: context,
-              title: "Alert",
+              title: "Konfirmasi,",
               content: Text("Limit melebihi kapasitas. Kirim permintaan?"),
               cancel: true,
               type: "warning",
@@ -1914,7 +1914,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
         } else {
           Alert(
               context: context,
-              title: "Alert",
+              title: "Konfirmasi,",
               content: Text("Ubah Limit Customer?"),
               cancel: true,
               type: "warning",
@@ -1948,14 +1948,14 @@ class AddLimitDetailState extends State<AddLimitDetail> {
     if (getChangeLimit == "OK") {
       Alert(
           context: context,
-          title: "Alert",
+          title: "Terima kasih,",
           content: Text("Ubah limit sukses"),
           cancel: false,
-          type: "warning");
+          type: "success");
     } else {
       Alert(
           context: context,
-          title: "Alert",
+          title: "Info,",
           content: Text(getChangeLimit),
           cancel: false,
           type: "warning");
@@ -1985,17 +1985,17 @@ class AddLimitDetailState extends State<AddLimitDetail> {
     if (getRequestLimit == "OK") {
       Alert(
           context: context,
-          title: "Alert",
+          title: "Terima kasih,",
           content: Text("Permintaan sudah dikirim"),
           cancel: false,
-          type: "warning");
+          type: "success");
     } else {
       Alert(
           context: context,
-          title: "Alert",
+          title: "Maaf,",
           content: Text(getRequestLimit),
           cancel: false,
-          type: "warning");
+          type: "error");
     }
 
     setState(() {

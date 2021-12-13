@@ -50,27 +50,33 @@ class LimitHistoryAPI {
     }
 
     if(url != "") {
+      try {
+        final response = await client.get(url);
 
-      final response = await client.get(url);
+        printHelp("status code "+response.statusCode.toString());
 
-      printHelp("status code "+response.statusCode.toString());
+        printHelp("cek body "+response.body);
+        var parsedJson = jsonDecode(response.body);
 
-      printHelp("cek body "+response.body);
-      var parsedJson = jsonDecode(response.body);
+        if(response.body.toString() != "false") {
+          limitHistory = LimitHistory.fromJson(parsedJson[0]);
 
-      if(response.body.toString() != "false") {
-        limitHistory = LimitHistory.fromJson(parsedJson[0]);
+          if(limitHistory.customer_code != ""){
+            getLimitRequestHistorySuccess = "OK";
+          }
 
-        if(limitHistory.customer_code != ""){
-          getLimitRequestHistorySuccess = "OK";
+          var resultObject = jsonEncode(response.body);
+          result = new Result(success: 1, message: "OK", data: response.body.toString());
+
+        } else {
+          getLimitRequestHistorySuccess = "Data tidak ditemukan";
+          result = new Result(success: 0, message: "Data tidak ditemukan");
         }
 
-        var resultObject = jsonEncode(response.body);
-        result = new Result(success: 1, message: "OK", data: response.body.toString());
-
-      } else {
-        getLimitRequestHistorySuccess = "Data tidak ditemukan";
-        result = new Result(success: 0, message: "Data tidak ditemukan");
+      } catch (e) {
+        getLimitRequestHistorySuccess = "Gagal terhubung dengan server";
+        result = new Result(success: -1, message: "Gagal terhubung dengan server");
+        print(e);
       }
 
     } else {
@@ -135,52 +141,54 @@ class LimitHistoryAPI {
     }
 
     if(url != ""){
+      try {
+        final response = await client.get(url);
 
-      final response = await client.get(url);
+        printHelp("status code "+response.statusCode.toString());
+        printHelp("cek body "+response.body);
 
-      printHelp("status code "+response.statusCode.toString());
-      printHelp("cek body "+response.body);
+        var parsedJson = jsonDecode(response.body);
 
-      var parsedJson = jsonDecode(response.body);
+        if(response.body.toString() != "false") {
+          printHelp("masuk sini 1");
+          // limitHistory = LimitHistory.fromJson(response.body);
 
-      if(response.body.toString() != "false") {
-        printHelp("masuk sini 1");
-        // limitHistory = LimitHistory.fromJson(response.body);
+          // if(limitHistory.customer_code != ""){
+          //   printHelp("masuk sini 2 "+limitHistory.customer_code);
+          //   getLimitRequestHistorySuccess = "OK";
+          // }
 
-        // if(limitHistory.customer_code != ""){
-        //   printHelp("masuk sini 2 "+limitHistory.customer_code);
-        //   getLimitRequestHistorySuccess = "OK";
-        // }
+          result = new Result(success: 1, message: "OK", data: parsedJson);
 
-        result = new Result(success: 1, message: "OK", data: parsedJson);
+          // final parsedJson = jsonDecode(response.body);
+          // result = Result.fromJson(parsedJson);
+          result.data.map((item) {
+              limitHistoryList.add(LimitHistory.fromJson(item));
+            }).toList();
 
-        // final parsedJson = jsonDecode(response.body);
-        // result = Result.fromJson(parsedJson);
-        result.data.map((item) {
-            limitHistoryList.add(LimitHistory.fromJson(item));
-          }).toList();
+          // var resultObject = jsonDecode(result.data.toString());
+          // limitHistoryList.add(LimitHistory.fromJson(parsedJson))
 
-        // var resultObject = jsonDecode(result.data.toString());
-        // limitHistoryList.add(LimitHistory.fromJson(parsedJson))
+          printHelp("cek list length "+ limitHistoryList.length.toString());
 
-        printHelp("cek list length "+ limitHistoryList.length.toString());
+          // if (result.success == 1) {
+          //   if (result.data[0] != null) {
+          //     result.data[0].map((item) {
+          //       limitHistoryList.add(LimitHistory.fromJson(item));
+          //     }).toList();
+          //   }
+          // }
 
-        // if (result.success == 1) {
-        //   if (result.data[0] != null) {
-        //     result.data[0].map((item) {
-        //       limitHistoryList.add(LimitHistory.fromJson(item));
-        //     }).toList();
-        //   }
-        // }
+        } else {
+          getLimitRequestHistorySuccess = "Data tidak ditemukan";
+          result = new Result(success: 0, message: "Data tidak ditemukan");
+        }
 
-      } else {
-        getLimitRequestHistorySuccess = "Data tidak ditemukan";
-        result = new Result(success: 0, message: "Data tidak ditemukan");
+      } catch (e) {
+        getLimitRequestHistorySuccess = "Gagal terhubung dengan server";
+        result = new Result(success: -1, message: "Gagal terhubung dengan server");
+        print(e);
       }
-
-      
-
-
 
     } else {
       getLimitRequestHistorySuccess = "Gagal terhubung dengan server";

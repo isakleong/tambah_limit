@@ -247,10 +247,10 @@ class ProfileState extends State<Profile> {
       if(getChangePassword == "OK"){
         Alert(
           context: context,
-          title: "Alert",
+          title: "Terima kasih,",
           content: Text("Password berhasil diubah, silahkan lakukan login ulang"),
           cancel: false,
-          type: "warning",
+          type: "success",
           defaultAction: () {
             if (mounted) {
               Navigator.of(context).pop();
@@ -265,10 +265,10 @@ class ProfileState extends State<Profile> {
       } else {
         Alert(
           context: context,
-          title: "Alert",
+          title: "Maaf,",
           content: Text(getChangePassword),
           cancel: false,
-          type: "warning"
+          type: "error"
         );
       }
 
@@ -279,10 +279,10 @@ class ProfileState extends State<Profile> {
     } else {
       Alert(
           context: context,
-          title: "Alert",
+          title: "Maaf,",
           content: Text(getOldPassword),
           cancel: false,
-          type: "warning"
+          type: "error"
         );
     }
 

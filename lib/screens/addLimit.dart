@@ -73,7 +73,7 @@ class AddLimitState extends State<AddLimit> {
           margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
           child: Button(
             backgroundColor: config.darkOpacityBlueColor,
-            child: TextView("LANJUTKAN", 3, color: Colors.white),
+            child: TextView("LANJUTKAN", 3, color: Colors.white, caps: true),
             onTap: () {
               getLimit();
             },
@@ -177,10 +177,10 @@ class AddLimitState extends State<AddLimit> {
       } else {
         Alert(
           context: context,
-          title: "Alert",
+          title: "Maaf,",
           content: Text(result_.message),
           cancel: false,
-          type: "warning"
+          type: "error"
         );
         setState(() {
           result = null;

@@ -161,7 +161,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                 //Detail Informasi section
                 SingleChildScrollView(
                   child: Container(
-                    padding: EdgeInsets.symmetric(vertical:15, horizontal:30),
+                    padding: EdgeInsets.symmetric(vertical:30, horizontal:30),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -272,7 +272,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                                             :
                                             Alert(
                                               context: context,
-                                              title: "Alert",
+                                              title: "Info,",
                                               content: Text("Tidak ada data"),
                                               cancel: false,
                                               type: "warning"
@@ -392,7 +392,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                                             :
                                             Alert(
                                               context: context,
-                                              title: "Alert",
+                                              title: "Info,",
                                               content: Text("Tidak ada data"),
                                               cancel: false,
                                               type: "warning"
@@ -511,7 +511,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                                             :
                                             Alert(
                                               context: context,
-                                              title: "Alert",
+                                              title: "Info,",
                                               content: Text("Tidak ada data"),
                                               cancel: false,
                                               type: "warning"
@@ -607,7 +607,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                                             :
                                             Alert(
                                               context: context,
-                                              title: "Alert",
+                                              title: "Info,",
                                               content: Text("Tidak ada data"),
                                               cancel: false,
                                               type: "warning"
@@ -683,7 +683,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                                                 :
                                                 Alert(
                                                   context: context,
-                                                  title: "Alert",
+                                                  title: "Info,",
                                                   content: Text("Tidak ada data"),
                                                   cancel: false,
                                                   type: "warning"
@@ -760,7 +760,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                                             :
                                             Alert(
                                               context: context,
-                                              title: "Alert",
+                                              title: "Info,",
                                               content: Text("Tidak ada data"),
                                               cancel: false,
                                               type: "warning"
@@ -868,7 +868,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                                             :
                                             Alert(
                                               context: context,
-                                              title: "Alert",
+                                              title: "Info,",
                                               content: Text("Tidak ada data"),
                                               cancel: false,
                                               type: "warning"
@@ -955,7 +955,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                                             :
                                             Alert(
                                               context: context,
-                                              title: "Alert",
+                                              title: "Info,",
                                               content: Text("Tidak ada data"),
                                               cancel: false,
                                               type: "warning"
@@ -1042,7 +1042,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                                             :
                                             Alert(
                                               context: context,
-                                              title: "Alert",
+                                              title: "Info,",
                                               content: Text("Tidak ada data"),
                                               cancel: false,
                                               type: "warning"
@@ -1157,10 +1157,14 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
             TextView("Limit Yang Ditolak", 1),
             leading: IconButton(
               icon: Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.popAndPushNamed(
+                context,
+                "historyLimitRequest"
+              )
             ),
           ),
           body: Container(
+            margin: EdgeInsets.symmetric(vertical: 20, horizontal: 5),
             child: Form(
               key: _HistoryLimitFormKey,
               child: Column(
@@ -1308,7 +1312,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                             caps: true,
                           ),
                           onTap: () {
-                            // updateLimitRequest();
+                            updateLimitGabunganRequest(1);
                           },
                         ),
                       ),
@@ -1328,7 +1332,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                             caps: true,
                           ),
                           onTap: () {
-                            
+                            updateLimitGabunganRequest(0);
                           },
                         ),
                       ),
@@ -1378,7 +1382,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                  padding: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
                   child: TextFormField(
                     enabled: false,
                     decoration: new InputDecoration(
@@ -1545,12 +1549,12 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                           loading: acceptLimitRequestLoading,
                           backgroundColor: config.darkOpacityBlueColor,
                           child: TextView(
-                            "terima normal",
+                            "terima",
                             3,
                             caps: true,
                           ),
                           onTap: () {
-                            updateLimitRequest();
+                            updateLimitRequest(1);
                           },
                         ),
                       ),
@@ -1570,7 +1574,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                             caps: true,
                           ),
                           onTap: () {
-                            
+                            updateLimitRequest(0);
                           },
                         ),
                       ),
@@ -1591,62 +1595,172 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
 
   }
 
-  void updateLimitRequest() async {
+  void updateLimitGabunganRequest(int command) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    //var obj = {"kode_customer": row_pending[i].customer_code, "limit_baru": row_pending[i].limit, "user_code": row_pending[i].user_code, "id": row_pending[i].id};
+    //var obj = {"kode_customer": row_pending[i].customer_code, "limit_baru": row_pending[i].limit, "user_code": row_pending[i].user_code, "id": row_pending[i].id, "old_limit": localStorage
+
+    Alert(
+      context: context,
+      title: "Konfirmasi,",
+      content: command == 1 ? Text("Apakah Anda yakin ingin menyetujui permintaan limit ini?") : Text("Apakah Anda yakin ingin menolak permintaan limit ini?"),
+      cancel: true,
+      type: "warning",
+      defaultAction: (){
+        command == 1 ? changeLimitRequestGabungan(1) : changeLimitRequestGabungan(0);
+      }
+    );
+  }
+
+  void changeLimitRequestGabungan(int command) async {
+    FocusScope.of(context).requestFocus(FocusNode());
+    setState(() {
+      command == 1 ? acceptLimitRequestLoading = true : rejectLimitRequestLoading = true;
+    });
+
+    Alert(context: context, loading: true, disableBackButton: true);
+
+
+    String getChangeLimit = "";
+
+    if(command == 1) {
+      getChangeLimit = await customerAPI.updateLimitGabunganRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['corporate_code']}","user_code":"$user_code_request","limit_baru":"${limitRequestController.text}","old_limit":"${limitDMDController.text}","user_login":"$user_code","id":"${widget.id}"}');
+    } else {
+      getChangeLimit = await customerAPI.updateLimitGabunganRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['corporate_code']}","user_code":"$user_code_request","id":"${widget.id}"}');
+    }
+
+    Navigator.of(context).pop();
+
+    if(command == 1 ) {
+      if(getChangeLimit == "OK"){
+        Alert(
+          context: context,
+          title: "Terima kasih,",
+          content: Text("Ubah limit sukses"),
+          cancel: false,
+          type: "success",
+          defaultAction: () {
+            Navigator.popAndPushNamed(
+              context,
+              "historyLimitRequest"
+            );
+          }
+        );
+      } else {
+        Alert(
+          context: context,
+          title: "Info,",
+          content: Text(getChangeLimit),
+          cancel: false,
+          type: "warning"
+        );
+      }
+    } else {
+      if(getChangeLimit == "OK"){
+        Alert(
+          context: context,
+          title: "Terima kasih,",
+          content: Text("Limit tidak diubah"),
+          cancel: false,
+          type: "success",
+          defaultAction: () {
+            Navigator.popAndPushNamed(
+              context,
+              "historyLimitRequest"
+            );
+          }
+        );
+      }
+    }
+
+    setState(() {
+      command == 1 ? acceptLimitRequestLoading = false : rejectLimitRequestLoading = false;
+    });
+
+  }
+
+  void updateLimitRequest(int command) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     //var obj = {"kode_customer": row_pending[i].customer_code, "limit_baru": row_pending[i].limit, "user_code": row_pending[i].user_code, "id": row_pending[i].id};
 
     Alert(
       context: context,
-      title: "Konfirmasi",
-      content: Text("Apakah Anda yakin ingin menyetujui permintaan limit ini?"),
+      title: "Konfirmasi,",
+      content: command == 1 ? Text("Apakah Anda yakin ingin menyetujui permintaan limit ini?") : Text("Apakah Anda yakin ingin menolak permintaan limit ini?"),
       cancel: true,
       type: "warning",
       defaultAction: (){
-        changeLimitRequest();
+        command == 1 ? changeLimitRequest(1) : changeLimitRequest(0);
       }
     );
   }
 
-  void changeLimitRequest() async {
+  void changeLimitRequest(int command) async {
     FocusScope.of(context).requestFocus(FocusNode());
     setState(() {
-      acceptLimitRequestLoading = true;
+      command == 1 ? acceptLimitRequestLoading = true : rejectLimitRequestLoading = true;
     });
 
     Alert(context: context, loading: true, disableBackButton: true);
 
-    //var obj = {"kode_customer": row_pending[i].customer_code, "limit_baru": row_pending[i].limit, "user_code": row_pending[i].user_code, "id": row_pending[i].id};
-    // printHelp("cek cust code "+ resultObject[0]["No_"]);
-    // printHelp("cek limit baru "+ limitRequestController.text.toString());
-    // printHelp("cek user code "+ user_code_request);
-    // printHelp("cek id "+ widget.id.toString());
-    // printHelp("cek user login "+ user_code);
+    String getChangeLimit = "";
 
-    String getChangeLimit = await customerAPI.updateLimitRequest(context, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"${user_code_request}","limit_baru":"${limitRequestController.text}","user_login":"${user_code}","id":"${widget.id}"}');
+    if(command == 1) {
+      getChangeLimit = await customerAPI.updateLimitRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"$user_code_request","limit_baru":"${limitRequestController.text}","user_login":"$user_code","id":"${widget.id}"}');
+    } else {
+      getChangeLimit = await customerAPI.updateLimitRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"$user_code_request","id":"${widget.id}"}');
+    }
 
     Navigator.of(context).pop();
 
-    if(getChangeLimit == "OK"){
-      Alert(
-        context: context,
-        title: "Info",
-        content: Text("Ubah limit sukses"),
-        cancel: false,
-        type: "warning"
-      );
+    if(command == 1 ) {
+      if(getChangeLimit == "OK"){
+        Alert(
+          context: context,
+          title: "Terima kasih,",
+          content: Text("Ubah limit sukses"),
+          cancel: false,
+          type: "success",
+          defaultAction: () {
+            Navigator.popAndPushNamed(
+              context,
+              "historyLimitRequest"
+            );
+          }
+        );
+      } else {
+        Alert(
+          context: context,
+          title: "Info,",
+          content: Text(getChangeLimit),
+          cancel: false,
+          type: "warning"
+        );
+      }
     } else {
-      Alert(
-        context: context,
-        title: "Info",
-        content: Text(getChangeLimit),
-        cancel: false,
-        type: "warning"
-      );
+      if(getChangeLimit == "OK"){
+        Alert(
+          context: context,
+          title: "Terima kasih,",
+          content: Text("Limit tidak diubah"),
+          cancel: false,
+          type: "success",
+          defaultAction: () {
+            Navigator.popAndPushNamed(
+              context,
+              "historyLimitRequest"
+            );
+          }
+        );
+      }
     }
 
+    
+
     setState(() {
-      acceptLimitRequestLoading = false;
+      command == 1 ? acceptLimitRequestLoading = false : rejectLimitRequestLoading = false;
     });
 
   }

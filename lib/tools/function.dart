@@ -146,7 +146,7 @@ void Alert({
         titleWidget = Row(
           children: <Widget>[
             showIcon ? Padding(padding: EdgeInsets.only(right: 20), child:icon) : Container(),
-            TextView(title, 2),
+            Expanded(child: TextView(title, 2)),
           ],
         );
         
@@ -156,7 +156,7 @@ void Alert({
       titleWidget = Row(
         children: <Widget>[
           showIcon ? Padding(padding: EdgeInsets.only(right: 20), child:icon) : Container(),
-          TextView("Warning", 2),
+          Expanded(child: TextView("Warning", 2)),
         ],
       );
     }
@@ -188,7 +188,7 @@ void Alert({
               ) : Container(),
               Button(
                 key: Key("ok"),
-                child: cancel ? TextView("Ya", 2, size: 12, caps: false, color: Colors.white) : type == "error" ? TextView("Coba Lagi", 2, size: 12, caps: false, color: Colors.white) : TextView("Ok", 2, size: 12, caps: false, color: Colors.white),
+                child: cancel ? TextView("Ya", 2, size: 12, caps: false, color: Colors.white) : type == "error" ? TextView("Ok", 2, size: 12, caps: false, color: Colors.white) : TextView("Ok", 2, size: 12, caps: false, color: Colors.white),
                 fill: true,
                 onTap: () {
                   Navigator.of(context).pop();

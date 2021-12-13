@@ -66,26 +66,34 @@ class CustomerAPI {
       // } else {
       // }
 
-      final response = await client.get(url);
+      try {
 
-      printHelp("status code "+response.statusCode.toString());
+        final response = await client.get(url);
 
-      printHelp("cek body "+response.body);
-      var parsedJson = jsonDecode(response.body);
+        printHelp("status code "+response.statusCode.toString());
 
-      if(response.body.toString() != "false") {
-        customer = Customer.fromJson(parsedJson[0]);
+        printHelp("cek body "+response.body);
+        var parsedJson = jsonDecode(response.body);
 
-        if(customer.No_ != ""){
-          getBlockInfoSuccess = "OK";
+        if(response.body.toString() != "false") {
+          customer = Customer.fromJson(parsedJson[0]);
+
+          if(customer.No_ != ""){
+            getBlockInfoSuccess = "OK";
+          }
+
+          var resultObject = jsonEncode(response.body);
+          result = new Result(success: 1, message: "OK", data: response.body.toString());
+
+        } else {
+          getBlockInfoSuccess = "Data Customer tidak ditemukan";
+          result = new Result(success: 0, message: "Data Customer tidak ditemukan");
         }
 
-        var resultObject = jsonEncode(response.body);
-        result = new Result(success: 1, message: "OK", data: response.body.toString());
-
-      } else {
-        getBlockInfoSuccess = "Data Customer tidak ditemukan";
-        result = new Result(success: 0, message: "Data Customer tidak ditemukan");
+      } catch (e) {
+        getBlockInfoSuccess = "Gagal terhubung dengan server";
+        result = new Result(success: -1, message: "Gagal terhubung dengan server");
+        print(e);
       }
 
     } else {
@@ -141,25 +149,31 @@ class CustomerAPI {
 
     if(url != "") {
 
-      final response = await client.get(url);
+      try {
+        final response = await client.get(url);
 
-      printHelp("CEK YAAAAA "+ url);
+        printHelp("CEK YAAAAA "+ url);
 
-      printHelp("status code "+response.statusCode.toString());
-      printHelp("cek body "+response.body);
+        printHelp("status code "+response.statusCode.toString());
+        printHelp("cek body "+response.body);
 
-      printHelp(url);
+        printHelp(url);
 
-      var parsedJson = jsonDecode(response.body);
+        var parsedJson = jsonDecode(response.body);
 
-      if(response.body.toString() != "false") {
-        customer = Customer.fromJson(parsedJson[0]);
+        if(response.body.toString() != "false") {
+          customer = Customer.fromJson(parsedJson[0]);
 
-        var resultObject = jsonEncode(response.body);
-        result = new Result(success: 1, message: "OK", data: response.body.toString());
+          var resultObject = jsonEncode(response.body);
+          result = new Result(success: 1, message: "OK", data: response.body.toString());
 
-      } else {
-        result = new Result(success: 0, message: "Data Customer tidak ditemukan");
+        } else {
+          result = new Result(success: 0, message: "Data Customer tidak ditemukan");
+        }
+          
+      } catch (e) {
+        result = new Result(success: -1, message: "Gagal terhubung dengan server");
+        print(e);
       }
 
     } else {
@@ -212,28 +226,32 @@ class CustomerAPI {
     url = config.baseUrl + "/" + "getLimitGabungan.php" + (parameter == "" ? "" : "?" + parameter);
 
     if(url != "") {
+      try {
 
-      final response = await client.get(url).catchError((onError){
+        final response = await client.get(url);
+
+        printHelp("status code "+response.statusCode.toString());
+        printHelp("cek body "+response.body);
+
+        if(response.body.toString() != "false" && response.body.toString() != "otoritas") {
+          var parsedJson = jsonDecode(response.body);
+
+          customer = Customer.fromJson(parsedJson[0]);
+
+          var resultObject = jsonEncode(response.body);
+          result = new Result(success: 1, message: "OK", data: response.body.toString());
+
+        } else {
+          if(response.body.toString() == "false") {
+            result = new Result(success: 0, message: "Data Customer Gabungan tidak ditemukan");
+          } else if(response.body.toString() == "otoritas") {
+            result = new Result(success: 0, message: "Maaf, Anda tidak mempunyai otoritas untuk merubah limit pada pelanggan gabungan ini");
+          }  
+        }
+
+      } catch (e) {
         result = new Result(success: -1, message: "Gagal terhubung dengan server");
-      });
-
-      printHelp("status code "+response.statusCode.toString());
-      printHelp("cek body "+response.body);
-
-      if(response.body.toString() != "false" && response.body.toString() != "otoritas") {
-        var parsedJson = jsonDecode(response.body);
-
-        customer = Customer.fromJson(parsedJson[0]);
-
-        var resultObject = jsonEncode(response.body);
-        result = new Result(success: 1, message: "OK", data: response.body.toString());
-
-      } else {
-        if(response.body.toString() == "false") {
-          result = new Result(success: 0, message: "Data Customer Gabungan tidak ditemukan");
-        } else if(response.body.toString() == "otoritas") {
-          result = new Result(success: 0, message: "Maaf, Anda tidak mempunyai otoritas untuk merubah limit pada pelanggan gabungan ini");
-        }  
+        print(e);
       }
 
     } else {
@@ -248,8 +266,10 @@ class CustomerAPI {
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    String url_address_1 = config.baseUrl + "/" + "updateBlock.php" + (parameter == "" ? "" : "?" + parameter);
-    String url_address_2 = config.baseUrlAlt + "/" + "updateBlock.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_1 = "", url_address_2 = "";
+
+    url_address_1 = config.baseUrl + "/" + "tesIP.php" + (parameter == "" ? "" : "?" + parameter);
+    url_address_2 = config.baseUrlAlt + "/" + "tesIP.php" + (parameter == "" ? "" : "?" + parameter);
 
     try {
 		  final conn_1 = await ConnectionTest(url_address_1, context);
@@ -262,7 +282,7 @@ class CustomerAPI {
     }
 
     if(isUrlAddress_1) {
-      url = url_address_1;
+      url = config.baseUrl + "/" + "updateBlock.php" + (parameter == "" ? "" : "?" + parameter);
     } else {
       try {
         final conn_2 = await ConnectionTest(url_address_2, context);
@@ -275,20 +295,27 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = url_address_2;
+      url = config.baseUrlAlt + "/" + "updateBlock.php" + (parameter == "" ? "" : "?" + parameter);
     }
 
     if(url != "") {
 
-      final response = await client.get(url);
+      try {
 
-      printHelp("status code "+response.statusCode.toString());
+        final response = await client.get(url);
 
-      if(response.body.toString() != "false") {
-        result = new Result(success: 1, message: "Ubah status Blocked berhasil");
+        printHelp("status code "+response.statusCode.toString());
 
-      } else {
-        result = new Result(success: 0, message: "Gagal terhubung dengan server");
+        if(response.body.toString() != "false") {
+          result = new Result(success: 1, message: "Ubah status Blocked berhasil");
+
+        } else {
+          result = new Result(success: 0, message: "Gagal terhubung dengan server");
+        }
+
+      } catch (e) {
+        result = new Result(success: -1, message: "Gagal terhubung dengan server");
+        print(e);
       }
 
     } else {
@@ -304,8 +331,10 @@ class CustomerAPI {
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    String url_address_1 = config.baseUrl + "/" + "addRequestLimitCoba.php" + (parameter == "" ? "" : "?" + parameter);
-    String url_address_2 = config.baseUrlAlt + "/" + "addRequestLimitCoba.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_1 = "", url_address_2 = "";
+
+    url_address_1 = config.baseUrl + "/" + "tesIP.php" + (parameter == "" ? "" : "?" + parameter);
+    url_address_2 = config.baseUrlAlt + "/" + "tesIP.php" + (parameter == "" ? "" : "?" + parameter);
 
     try {
 		  final conn_1 = await ConnectionTest(url_address_1, context);
@@ -319,7 +348,7 @@ class CustomerAPI {
     }
 
     if(isUrlAddress_1) {
-      url = url_address_1;
+      url = config.baseUrl + "/" + "addRequestLimitCoba.php" + (parameter == "" ? "" : "?" + parameter);
     } else {
       try {
         final conn_2 = await ConnectionTest(url_address_2, context);
@@ -333,23 +362,28 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = url_address_2;
+      url = config.baseUrlAlt + "/" + "addRequestLimitCoba.php" + (parameter == "" ? "" : "?" + parameter);
     }
 
     if(url != "") {
-      String coba = config.baseUrlAlt + "/" + "addRequestLimitCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      try {
 
-      final response = await client.get(url);
+        final response = await client.get(url);
 
-      printHelp("status code "+response.statusCode.toString());
+        printHelp("status code "+response.statusCode.toString());
 
-      printHelp("cek body "+response.body);
+        printHelp("cek body "+response.body);
 
-      if(response.body.toString() == "success") {
-        isAddRequestLimitSuccess = "OK";
-      
-      } else {
+        if(response.body.toString() == "success") {
+          isAddRequestLimitSuccess = "OK";
+        
+        } else {
+          isAddRequestLimitSuccess = "Gagal terhubung dengan server";
+        }
+
+      } catch (e) {
         isAddRequestLimitSuccess = "Gagal terhubung dengan server";
+        print(e);
       }
 
     } else {
@@ -366,8 +400,10 @@ class CustomerAPI {
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    String url_address_1 = config.baseUrl + "/" + "addRequestLimitGCoba.php" + (parameter == "" ? "" : "?" + parameter);
-    String url_address_2 = config.baseUrlAlt + "/" + "addRequestLimitGCoba.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_1 = "", url_address_2 = "";
+
+    url_address_1 = config.baseUrl + "/" + "tesIP.php" + (parameter == "" ? "" : "?" + parameter);
+    url_address_2 = config.baseUrlAlt + "/" + "tesIP.php" + (parameter == "" ? "" : "?" + parameter);
 
     try {
 		  final conn_1 = await ConnectionTest(url_address_1, context);
@@ -381,7 +417,7 @@ class CustomerAPI {
     }
 
     if(isUrlAddress_1) {
-      url = url_address_1;
+      url = config.baseUrl + "/" + "addRequestLimitGCoba.php" + (parameter == "" ? "" : "?" + parameter);
     } else {
       try {
         final conn_2 = await ConnectionTest(url_address_2, context);
@@ -395,23 +431,27 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = url_address_2;
+      url = config.baseUrlAlt + "/" + "addRequestLimitsdsdGCoba.php" + (parameter == "" ? "" : "?" + parameter);
     }
 
     if(url != "") {
-      String coba = config.baseUrlAlt + "/" + "addRequestLimitGCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      try {
+        final response = await client.get(url);
 
-      final response = await client.get(url);
+        printHelp("status code "+response.statusCode.toString());
 
-      printHelp("status code "+response.statusCode.toString());
+        printHelp("cek body "+response.body);
 
-      printHelp("cek body "+response.body);
+        if(response.body.toString() == "success") {
+          isAddRequestLimitSuccess = "OK";
+        
+        } else {
+          isAddRequestLimitSuccess = "Gagal terhubung dengan server";
+        }
 
-      if(response.body.toString() == "success") {
-        isAddRequestLimitSuccess = "OK";
-      
-      } else {
+      } catch (e) {
         isAddRequestLimitSuccess = "Gagal terhubung dengan server";
+        print(e);
       }
 
     } else {
@@ -422,14 +462,16 @@ class CustomerAPI {
 
   }
 
-  Future<String> updateLimitRequest(final context, {String parameter=""}) async {
+  Future<String> updateLimitGabunganRequest(final context, {int command, String parameter=""}) async {
     String isChangeLimitSuccess = "";
     Customer customer;
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    String url_address_1 = config.baseUrl + "/" + "updateLimitRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
-    String url_address_2 = config.baseUrlAlt + "/" + "updateLimitRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_1 = "", url_address_2 = "";
+
+    url_address_1 = config.baseUrl + "/" + "tesIP.php" + (parameter == "" ? "" : "?" + parameter);
+    url_address_2 = config.baseUrlAlt + "/" + "tesIP.php" + (parameter == "" ? "" : "?" + parameter);
 
     try {
 		  final conn_1 = await ConnectionTest(url_address_1, context);
@@ -443,7 +485,11 @@ class CustomerAPI {
     }
 
     if(isUrlAddress_1) {
-      url = url_address_1;
+      if(command == 1) {
+        url = config.baseUrl + "/" + "updateLimitCRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      } else {
+        url = config.baseUrl + "/" + "rejectLimitCRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      }
     } else {
       try {
         final conn_2 = await ConnectionTest(url_address_2, context);
@@ -457,22 +503,142 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = url_address_2;
+      if(command == 1) {
+        url = config.baseUrlAlt + "/" + "updateLimitCRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      } else {
+        url = config.baseUrlAlt + "/" + "rejectLimitCRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      }
     }
 
     if(url != "") {
-      String coba = config.baseUrlAlt + "/" + "updateLimitRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      if(command == 1) {
+        try {
+          final response = await client.get(url);
 
-      final response = await client.get(url);
+          printHelp("status code "+response.statusCode.toString());
 
-      printHelp("status code "+response.statusCode.toString());
+          printHelp("cek body "+response.body);
 
-      printHelp("cek body "+response.body);
+          if(response.body.toString() == "success") {
+            isChangeLimitSuccess = "OK";
+          } else {
+            isChangeLimitSuccess = "Limit tidak boleh melebihi " + response.body.toString();
+          }
 
-      if(response.body.toString() == "success") {
-        isChangeLimitSuccess = "OK";
+        } catch (e) {
+          isChangeLimitSuccess = "Gagal terhubung dengan server";
+          printHelp(e);
+        }
+
       } else {
-        isChangeLimitSuccess = "Limit tidak boleh melebihi " + response.body.toString();
+        try {
+          final response = await client.get(url);
+
+          printHelp("status code "+response.statusCode.toString());
+
+          printHelp("cek body "+response.body);
+
+          if(response.body.toString() == "success") {
+            isChangeLimitSuccess = "OK";
+          }
+        } catch (e) {
+          isChangeLimitSuccess = "Gagal terhubung dengan server";
+          printHelp(e);
+        }
+      }
+
+    } else {
+      isChangeLimitSuccess = "Gagal terhubung dengan server";
+    }
+
+    return isChangeLimitSuccess;
+
+  }
+
+  Future<String> updateLimitRequest(final context, {int command, String parameter=""}) async {
+    String isChangeLimitSuccess = "";
+    Customer customer;
+    String url = "";
+
+    bool isUrlAddress_1 = false, isUrlAddress_2 = false;
+    String url_address_1 = "", url_address_2 = "";
+
+    url_address_1 = config.baseUrl + "/" + "tesIP.php" + (parameter == "" ? "" : "?" + parameter);
+    url_address_2 = config.baseUrlAlt + "/" + "tesIP.php" + (parameter == "" ? "" : "?" + parameter);
+
+    try {
+		  final conn_1 = await ConnectionTest(url_address_1, context);
+      if(conn_1 == "OK"){
+        isUrlAddress_1 = true;
+      }
+	  } on SocketException {
+      isUrlAddress_1 = false;
+      isChangeLimitSuccess = "Gagal terhubung dengan server";
+      // throw Exception('No Internet connection');
+    }
+
+    if(isUrlAddress_1) {
+      if(command == 1) {
+        url = config.baseUrl + "/" + "updateLimitRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      } else {
+        url = config.baseUrl + "/" + "rejectLimitRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      }
+    } else {
+      try {
+        final conn_2 = await ConnectionTest(url_address_2, context);
+        if(conn_2 == "OK"){
+          isUrlAddress_2 = true;
+        }
+      } on SocketException {
+        isUrlAddress_2 = false;
+        isChangeLimitSuccess = "Gagal terhubung dengan server";
+        // throw Exception('No Internet connection');
+      }
+    }
+    if(isUrlAddress_2){
+      if(command == 1) {
+        url = config.baseUrlAlt + "/" + "updateLimitRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      } else {
+        url = config.baseUrlAlt + "/" + "rejectLimitRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      }
+    }
+
+    if(url != "") {
+      if(command == 1) {
+        try {
+          final response = await client.get(url);
+
+          printHelp("status code "+response.statusCode.toString());
+
+          printHelp("cek body "+response.body);
+
+          if(response.body.toString() == "success") {
+            isChangeLimitSuccess = "OK";
+          } else {
+            isChangeLimitSuccess = "Limit tidak boleh melebihi " + response.body.toString();
+          }
+
+        } catch (e) {
+          isChangeLimitSuccess = "Gagal terhubung dengan server";
+          print(e);
+        }
+
+      } else {
+        try {
+          final response = await client.get(url);
+
+          printHelp("status code "+response.statusCode.toString());
+
+          printHelp("cek body "+response.body);
+
+          if(response.body.toString() == "success") {
+            isChangeLimitSuccess = "OK";
+          }
+
+        } catch (e) {
+          isChangeLimitSuccess = "Gagal terhubung dengan server";
+          print(e);
+        }
       }
 
     } else {
@@ -489,8 +655,10 @@ class CustomerAPI {
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    String url_address_1 = config.baseUrl + "/" + "updateLimitCoba.php" + (parameter == "" ? "" : "?" + parameter);
-    String url_address_2 = config.baseUrlAlt + "/" + "updateLimitCoba.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_1 = "", url_address_2 = "";
+
+    url_address_1 = config.baseUrl + "/" + "tesIP.php" + (parameter == "" ? "" : "?" + parameter);
+    url_address_2 = config.baseUrlAlt + "/" + "tesIP.php" + (parameter == "" ? "" : "?" + parameter);
 
     try {
 		  final conn_1 = await ConnectionTest(url_address_1, context);
@@ -504,7 +672,7 @@ class CustomerAPI {
     }
 
     if(isUrlAddress_1) {
-      url = url_address_1;
+      url = config.baseUrl + "/" + "updateLimitCoba.php" + (parameter == "" ? "" : "?" + parameter);
     } else {
       try {
         final conn_2 = await ConnectionTest(url_address_2, context);
@@ -518,24 +686,29 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = url_address_2;
+      url = config.baseUrlAlt + "/" + "updateLimitCoba.php" + (parameter == "" ? "" : "?" + parameter);
     }
 
     if(url != "") {
-      String coba = config.baseUrlAlt + "/" + "updateLimitCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      try {
 
-      final response = await client.get(url);
+        final response = await client.get(url);
 
-      printHelp("status code "+response.statusCode.toString());
+        printHelp("status code "+response.statusCode.toString());
 
-      printHelp("cek body "+response.body);
+        printHelp("cek body "+response.body);
 
-      if(response.body.toString() == "success") {
-        isChangeLimitSuccess = "OK";
-      } else if(response.body.toString() == "false") {
-        isChangeLimitSuccess = "Limit tidak boleh dibawah NOL";
-      } else {
-        isChangeLimitSuccess = "Limit tidak boleh melebihi " + response.body.toString();
+        if(response.body.toString() == "success") {
+          isChangeLimitSuccess = "OK";
+        } else if(response.body.toString() == "false") {
+          isChangeLimitSuccess = "Limit tidak boleh dibawah NOL";
+        } else {
+          isChangeLimitSuccess = "Limit tidak boleh melebihi " + response.body.toString();
+        }
+
+      } catch (e) {
+        isChangeLimitSuccess = "Gagal terhubung dengan server";
+        print(e);
       }
 
     } else {
@@ -552,8 +725,10 @@ class CustomerAPI {
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    String url_address_1 = config.baseUrl + "/" + "updateLimitGabunganCoba.php" + (parameter == "" ? "" : "?" + parameter);
-    String url_address_2 = config.baseUrlAlt + "/" + "updateLimitGabunganCoba.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_1 = "", url_address_2 = "";
+
+    url_address_1 = config.baseUrl + "/" + "tesIP.php" + (parameter == "" ? "" : "?" + parameter);
+    url_address_2 = config.baseUrlAlt + "/" + "tesIP.php" + (parameter == "" ? "" : "?" + parameter);
 
     try {
 		  final conn_1 = await ConnectionTest(url_address_1, context);
@@ -567,7 +742,7 @@ class CustomerAPI {
     }
 
     if(isUrlAddress_1) {
-      url = url_address_1;
+      url = config.baseUrl + "/" + "updateLimitGabunganCoba.php" + (parameter == "" ? "" : "?" + parameter);
     } else {
       try {
         final conn_2 = await ConnectionTest(url_address_2, context);
@@ -581,24 +756,28 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = url_address_2;
+      url = config.baseUrlAlt + "/" + "updateLimitGabunganCoba.php" + (parameter == "" ? "" : "?" + parameter);
     }
 
     if(url != "") {
-      String coba = config.baseUrlAlt + "/" + "updateLimitGabunganCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      try {
+        final response = await client.get(url);
 
-      final response = await client.get(url);
+        printHelp("status code "+response.statusCode.toString());
 
-      printHelp("status code "+response.statusCode.toString());
+        printHelp("cek body "+response.body);
 
-      printHelp("cek body "+response.body);
+        if(response.body.toString() == "success") {
+          isChangeLimitSuccess = "OK";
+        } else if(response.body.toString() == "false") {
+          isChangeLimitSuccess = "Limit tidak boleh dibawah NOL";
+        } else {
+          isChangeLimitSuccess = "Limit tidak boleh melebihi " + response.body.toString();
+        }
 
-      if(response.body.toString() == "success") {
-        isChangeLimitSuccess = "OK";
-      } else if(response.body.toString() == "false") {
-        isChangeLimitSuccess = "Limit tidak boleh dibawah NOL";
-      } else {
-        isChangeLimitSuccess = "Limit tidak boleh melebihi " + response.body.toString();
+      } catch (e) {
+        isChangeLimitSuccess = "Gagal terhubung dengan server";
+        print(e);
       }
 
     } else {

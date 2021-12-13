@@ -20,6 +20,8 @@ class Configuration extends InheritedWidget {
   String initRoute = "";
 
   bool updateShouldNotify(oldWidget) => true;
+
+  
   
   static Configuration of(BuildContext context) {
     return (context.dependOnInheritedWidgetOfExactType());
@@ -69,6 +71,9 @@ class Configuration extends InheritedWidget {
   Color darkerBlueColor = Color(0xFF006EA3);
   Color lightDarkBlueColor = Color(0xFFEAF0FF);
   Color grayNonActiveColor = Color(0xFFBDBDBD);
+
+  bool isAppLive = false;
+  bool isScreenAtDashboard = false;
 
 }
 

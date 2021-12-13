@@ -5,6 +5,7 @@ import 'package:http/http.dart' show Client;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:tambah_limit/models/limitHistoryModel.dart';
@@ -103,32 +104,84 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                 :
                 requestHistoryWidgetList.length != 0
                 ?
-                ListView(
-                  scrollDirection: Axis.vertical,
-                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-                  physics: ScrollPhysics(),
-                  shrinkWrap: true,
-                  children: requestHistoryWidgetList,
+                SmartRefresher(
+                  onRefresh: _onRequestRefresh,
+                  controller: _refreshRequestController,
+                  physics: BouncingScrollPhysics(),
+                  header: WaterDropMaterialHeader(),
+                  child: ListView(
+                    scrollDirection: Axis.vertical,
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                    physics: ScrollPhysics(),
+                    shrinkWrap: true,
+                    children: requestHistoryWidgetList,
+                  ),
                 )
                 :
-                Container(),
-
+                SmartRefresher(
+                  onRefresh: _onRequestRefresh,
+                  controller: _refreshRequestController,
+                  physics: BouncingScrollPhysics(),
+                  header: WaterDropMaterialHeader(),
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 15),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          child: Image.asset("assets/illustration/request-history.png", alignment: Alignment.center, fit: BoxFit.fill, scale: 2.75)
+                        ),
+                        SizedBox(height: 30),
+                        Container(
+                          child: TextView("Tidak ada data permintaan limit\nyang diminta", 3, color: config.grayColor, align: TextAlign.center),
+                        )
+                      ],
+                    )
+                  ),
+                ),
+            
                 approvedLimitHistoryListLoading
                 ?
                 loadingRequestHistory()
                 :
                 approvedHistoryWidgetList.length != 0
                 ?
-                ListView(
-                  scrollDirection: Axis.vertical,
-                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-                  physics: ScrollPhysics(),
-                  shrinkWrap: true,
-                  children: approvedHistoryWidgetList,
+                SmartRefresher(
+                  onRefresh: _onApprovedRefresh,
+                  controller: _refreshApprovedController,
+                  physics: BouncingScrollPhysics(),
+                  header: WaterDropMaterialHeader(),
+                  child: ListView(
+                    scrollDirection: Axis.vertical,
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                    physics: ScrollPhysics(),
+                    shrinkWrap: true,
+                    children: approvedHistoryWidgetList,
+                  ),
                 )
                 :
-                Container(),
-
+                SmartRefresher(
+                  onRefresh: _onApprovedRefresh,
+                  controller: _refreshApprovedController,
+                  physics: BouncingScrollPhysics(),
+                  header: WaterDropMaterialHeader(),
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 15),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          child: Image.asset("assets/illustration/accepted-history.png", alignment: Alignment.center, fit: BoxFit.fill, scale: 2.75)
+                        ),
+                        SizedBox(height: 30),
+                        Container(
+                          child: TextView("Tidak ada data permintaan limit\nyang disetujui", 3, color: config.grayColor, align: TextAlign.center),
+                        )
+                      ],
+                    )
+                  ),
+                ),
+            
                 
                 rejectedLimitHistoryListLoading
                 ?
@@ -136,15 +189,41 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                 :
                 rejectedHistoryWidgetList.length != 0
                 ?
-                ListView(
-                  scrollDirection: Axis.vertical,
-                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-                  physics: ScrollPhysics(),
-                  shrinkWrap: true,
-                  children: rejectedHistoryWidgetList,
+                SmartRefresher(
+                  onRefresh: _onRejectedRefresh,
+                  controller: _refreshRejectedController,
+                  physics: BouncingScrollPhysics(),
+                  header: WaterDropMaterialHeader(),
+                  child: ListView(
+                    scrollDirection: Axis.vertical,
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                    physics: ScrollPhysics(),
+                    shrinkWrap: true,
+                    children: rejectedHistoryWidgetList,
+                  ),
                 )
                 :
-                Container(),
+                SmartRefresher(
+                  onRefresh: _onRejectedRefresh,
+                  controller: _refreshRejectedController,
+                  physics: BouncingScrollPhysics(),
+                  header: WaterDropMaterialHeader(),
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 15),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          child: Image.asset("assets/illustration/rejected-history.png", alignment: Alignment.center, fit: BoxFit.fill, scale: 2.75)
+                        ),
+                        SizedBox(height: 30),
+                        Container(
+                          child: TextView("Tidak ada data permintaan limit\nyang ditolak", 3, color: config.grayColor, align: TextAlign.center),
+                        )
+                      ],
+                    )
+                  ),
+                ),
               ],
             ),
           ),
@@ -298,19 +377,19 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
       Navigator.of(context).pop();
 
       if(type == 1) {
-        Navigator.pushNamed(
+        Navigator.popAndPushNamed(
           context,
           "historyLimitRequestDetail/${tempLimitHistory.id}/4",
           arguments: result_,
         );
       } else if(type == 2) {
-        Navigator.pushNamed(
+        Navigator.popAndPushNamed(
           context,
           "historyLimitRequestDetail/${tempLimitHistory.id}/5",
           arguments: result_,
         );
       } else {
-        Navigator.pushNamed(
+        Navigator.popAndPushNamed(
           context,
           "historyLimitRequestDetail/${tempLimitHistory.id}/6",
           arguments: result_,
@@ -328,7 +407,7 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
 
       Navigator.of(context).pop();
 
-      Navigator.pushNamed(
+      Navigator.popAndPushNamed(
         context,
         "historyLimitRequestDetail/${tempLimitHistory.id}/$type",
         arguments: result_,
@@ -404,6 +483,75 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
 
     return tempWidgetList;
 
+  }
+
+  RefreshController _refreshRequestController =
+      RefreshController(initialRefresh: false);
+
+  void _onRequestRefresh() async{
+    setState(() {
+      requestLimitHistoryListLoading = true;
+      // approvedLimitHistoryListLoading = true;
+      // rejectedLimitHistoryListLoading = true;
+    });
+
+    if(requestLimitHistoryListLoading){
+      getRequestHistoryList(1);
+    }
+
+    // if(approvedLimitHistoryListLoading){
+    //   getRequestHistoryList(2);
+    // }
+
+    // if(rejectedLimitHistoryListLoading){
+    //   getRequestHistoryList(3);
+    // }
+  }
+
+  RefreshController _refreshApprovedController =
+      RefreshController(initialRefresh: false);
+
+  void _onApprovedRefresh() async{
+    setState(() {
+      // requestLimitHistoryListLoading = true;
+      approvedLimitHistoryListLoading = true;
+      // rejectedLimitHistoryListLoading = true;
+    });
+
+    // if(requestLimitHistoryListLoading){
+    //   getRequestHistoryList(1);
+    // }
+
+    if(approvedLimitHistoryListLoading){
+      getRequestHistoryList(2);
+    }
+
+    // if(rejectedLimitHistoryListLoading){
+    //   getRequestHistoryList(3);
+    // }
+  }
+
+  RefreshController _refreshRejectedController =
+      RefreshController(initialRefresh: false);
+
+  void _onRejectedRefresh() async{
+    setState(() {
+      // requestLimitHistoryListLoading = true;
+      // approvedLimitHistoryListLoading = true;
+      rejectedLimitHistoryListLoading = true;
+    });
+
+    // if(requestLimitHistoryListLoading){
+    //   getRequestHistoryList(1);
+    // }
+
+    // if(approvedLimitHistoryListLoading){
+    //   getRequestHistoryList(2);
+    // }
+
+    if(rejectedLimitHistoryListLoading){
+      getRequestHistoryList(3);
+    }
   }
 
 }

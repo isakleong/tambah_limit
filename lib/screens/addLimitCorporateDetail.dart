@@ -241,7 +241,7 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
     if(limitRequestController.text.isEmpty){
       Alert(
         context: context,
-        title: "Alert",
+        title: "Info,",
         content: Text(
             "Kode Customer Gabungan harus diisi"),
         cancel: false,
@@ -251,10 +251,10 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
       if(result.data == null){
         Alert(
           context: context,
-          title: "Alert",
+          title: "Maaf,",
           content: Text(result.message),
           cancel: false,
-          type: "warning",
+          type: "error",
         );
       } else {
 
@@ -265,16 +265,16 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
         if(limitRequestController.text.isEmpty){
           Alert(
             context: context,
-            title: "Alert",
+            title: "Info,",
             content: Text("Limit Baru harus diisi"),
             cancel: false,
             type: "warning"
           );
         } else {
-          if(!(int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > max_limit)){
+          if((int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > max_limit)){
             Alert(
               context: context,
-              title: "Alert",
+              title: "Konfirmasi,",
               content: Text("Limit melebihi kapasitas. Kirim permintaan?"),
               cancel: true,
               type: "warning",
@@ -285,7 +285,7 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
           } else {
             Alert(
               context: context,
-              title: "Alert",
+              title: "Konfirmasi,",
               content: Text(
                   "Ubah Limit Customer Gabungan?"),
               cancel: true,
@@ -322,10 +322,16 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
     if(getChangeLimit == "OK"){
       Alert(
         context: context,
-        title: "Alert",
+        title: "Terima kasih,",
         content: Text("Ubah limit sukses"),
         cancel: false,
-        type: "warning"
+        type: "success",
+        defaultAction: () {
+          Navigator.popAndPushNamed(
+              context,
+              "addLimitCorporate"
+          );
+        }
       );
 
       setState(() {
@@ -334,7 +340,7 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
     } else {
       Alert(
         context: context,
-        title: "Alert",
+        title: "Info,",
         content: Text(getChangeLimit),
         cancel: false,
         type: "warning"
@@ -366,18 +372,24 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
     if(getRequestLimit == "OK"){
       Alert(
         context: context,
-        title: "Alert",
+        title: "Terima kasih,",
         content: Text("Permintaan sudah dikirim"),
         cancel: false,
-        type: "warning"
+        type: "success",
+        defaultAction: () {
+          Navigator.popAndPushNamed(
+              context,
+              "addLimitCorporate"
+          );
+        }
       );
     } else {
       Alert(
         context: context,
-        title: "Alert",
+        title: "Maaf,",
         content: Text(getRequestLimit),
         cancel: false,
-        type: "warning"
+        type: "error"
       );
     }
 

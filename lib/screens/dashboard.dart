@@ -118,6 +118,12 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    config.isScreenAtDashboard = true;
+  }
+
+  @override
   Widget build(BuildContext context) {
     List<Widget> blockInfoDetailWidgetList = showBlockInfoDetail(config);
 
@@ -193,6 +199,32 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         title: TextView(dashboardTitle, 1),
         automaticallyImplyLeading: false,
         actions: [
+          InkWell(
+            onTap: () {
+              Alert(
+                context: context,
+                title: "Konfirmasi,",
+                content: Text("Apakah Anda yakin ingin keluar dari aplikasi?"),
+                cancel: true,
+                type: "warning",
+                defaultAction: () async {
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                  await prefs.remove("limit_dmd");
+                  await prefs.remove("request_limit");
+                  await prefs.remove("user_code_request");
+                  await prefs.clear();
+                  Navigator.pushReplacementNamed(
+                    context,
+                    "login",
+                  );
+              });
+              
+            },
+            child: Container(
+              margin: EdgeInsets.only(right: 10),
+              child:Icon (Icons.logout, size: 28),
+            ),
+          ),
           
         ],
       ),
@@ -529,7 +561,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         ?
                         Alert(
                           context: context,
-                          title: "Alert",
+                          title: "Konfirmasi,",
                           content: Text("Apakah Anda yakin ingin menyimpan data?"),
                           cancel: true,
                           type: "warning",
@@ -540,7 +572,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         :
                         Alert(
                           context: context,
-                          title: "Alert",
+                          title: "Info,",
                           content: Text("Mohon untuk melakukan perubahan data terlebih dahulu"),
                           cancel: false,
                           type: "warning"
@@ -606,7 +638,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     if(result.success == 1){
       Alert(
         context: context,
-        title: "Alert",
+        title: "Terima kasih,",
         content: Text(result_.message),
         cancel: false,
         type: "success"
@@ -614,10 +646,10 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     } else{
       Alert(
         context: context,
-        title: "Alert",
+        title: "Maaf,",
         content: Text(result_.message),
         cancel: false,
-        type: "warning"
+        type: "error"
       );
     }
     setState(() {
@@ -660,10 +692,10 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       } else {
         Alert(
           context: context,
-          title: "Alert",
+          title: "Maaf,",
           content: Text(result_.message),
           cancel: false,
-          type: "warning"
+          type: "error"
         );
         setState(() {
           result = null;
