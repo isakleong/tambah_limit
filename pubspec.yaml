@@ -41,10 +41,11 @@ dependencies:
   shimmer: ^2.0.0
   path_provider: ^2.0.4
   dio: ^3.0.0
-  permission_handler: ^8.1.6
-  percent_indicator: ^3.4.0
-  open_file: ^3.0.3
   pull_to_refresh: ^2.0.0
+  overlay_support: ^1.2.1
+  # permission_handler: ^8.1.6
+  # percent_indicator: ^3.4.0
+  # open_file: ^3.0.3
   # firebase_messaging: ^11.1.0
   # firebase_core: ^1.10.0
 
@@ -109,5 +110,5 @@ flutter:
     - assets/flare/warning.flr
     - assets/flare/play-pause.flr
     - assets/flare/loading-button.flr
-
+    
     - assets/illustration/

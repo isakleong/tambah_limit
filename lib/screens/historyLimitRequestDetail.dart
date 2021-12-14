@@ -1307,7 +1307,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                           loading: acceptLimitRequestLoading,
                           backgroundColor: config.darkOpacityBlueColor,
                           child: TextView(
-                            "terima gabungan",
+                            "terima",
                             3,
                             caps: true,
                           ),

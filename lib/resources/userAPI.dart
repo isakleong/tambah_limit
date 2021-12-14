@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:http/http.dart' show Client;
+import 'package:http/http.dart' show Client, Request;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tambah_limit/models/resultModel.dart';
 
@@ -57,7 +57,15 @@ class UserAPI {
 
     if(url != "") {
       try {
-        final response = await client.get(url);
+        // final response = await client.get(url);
+
+        final response = await client.get(url).timeout(
+          Duration(seconds: 3),
+          onTimeout: () {
+            isLoginSuccess = "TIMEOUT";
+            return null;
+          },
+        );
 
         var parsedJson = jsonDecode(response.body);
         if(response.body.toString() != "false") {

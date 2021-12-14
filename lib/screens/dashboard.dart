@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:bottom_bar_with_sheet/bottom_bar_with_sheet.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' show Client;
 
@@ -31,6 +32,8 @@ import 'package:tambah_limit/widgets/bottombarWithIcon.dart';
 import 'package:tambah_limit/widgets/bottomBarLayout.dart';
 
 import 'package:tambah_limit/widgets/button.dart';
+
+Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstance();
 
 enum CustomerBlockedType { NotBlocked, BlockedShip, BlockedInvoice, BlockedAll }  
 
@@ -112,6 +115,173 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         }
       });
     });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print("message recieved yaaa hehehe");
+      print(message.notification.body);
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return WillPopScope(
+            onWillPop:(){},
+            child: AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(7.5)),
+              ),
+              title: Row(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(right: 20), 
+                    child:Container(
+                      child: FlareActor('assets/flare/warning.flr', animation: "Play"),
+                      width: 40,
+                      height: 40,
+                    )
+                  ),
+                  Expanded(child: TextView("Notifikasi,", 2)),
+                ],
+              ),
+              content: Text(message.notification.body),
+              actions: [
+                TextButton(
+                  child: Button(
+                    child: TextView("OK", 2, size: 12, caps: false, color: Colors.white),
+                    fill: false,
+                    onTap: () async {
+
+                      Result result_;
+
+                      if (message.data['body'].toString().toLowerCase().contains("terdapat request tambah limit")) {
+
+                        if(message.data['customer_code'].toString().length > 11) {
+                          Alert(context: context, loading: true, disableBackButton: true);
+                          
+                          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+                          
+                          final SharedPreferences sharedPreferences = await _sharedPreferences;
+                          await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+                          await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                          
+                          Navigator.pushNamed(
+                            context,
+                            "historyLimitRequestDetail/${message.data['id']}/4",
+                            arguments: result_,
+                          );
+
+                        } else {
+                          Alert(context: context, loading: true, disableBackButton: true);
+
+                          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+
+                          final SharedPreferences sharedPreferences = await _sharedPreferences;
+                          await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+                          await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+
+                          Navigator.pushNamed(
+                            context,
+                            "historyLimitRequestDetail/${message.data['id']}/1",
+                            arguments: result_,
+                          );
+                        }
+
+                      } else if(message.data['body'].toString().toLowerCase().contains("diterima")) {
+
+                        if(message.data['customer_code'].toString().length > 11) {
+                          Alert(context: context, loading: true, disableBackButton: true);
+                          
+                          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+                          
+                          final SharedPreferences sharedPreferences = await _sharedPreferences;
+                          await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+                          await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+                          Navigator.of(context).pop();
+                          
+                          Navigator.pushNamed(
+                            context,
+                            "historyLimitRequestDetail/${message.data['id']}/5",
+                            arguments: result_,
+                          );
+
+                        } else {
+                          Alert(context: context, loading: true, disableBackButton: true);
+
+                          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+
+                          final SharedPreferences sharedPreferences = await _sharedPreferences;
+                          await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+                          await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+                          Navigator.of(context).pop();
+
+                          Navigator.pushNamed(
+                            context,
+                            "historyLimitRequestDetail/${message.data['id']}/2",
+                            arguments: result_,
+                          );
+                        }
+
+
+                      } else if(message.data['body'].toString().toLowerCase().contains("ditolak")) {
+
+                        if(message.data['customer_code'].toString().length > 11) {
+                          Alert(context: context, loading: true, disableBackButton: true);
+                          
+                          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+                          
+                          final SharedPreferences sharedPreferences = await _sharedPreferences;
+                          await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+                          await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+                          Navigator.of(context).pop();
+                          
+                          Navigator.pushNamed(
+                            context,
+                            "historyLimitRequestDetail/${message.data['id']}/6",
+                            arguments: result_,
+                          );
+
+                        } else {
+                          Alert(context: context, loading: true, disableBackButton: true);
+
+                          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+
+                          final SharedPreferences sharedPreferences = await _sharedPreferences;
+                          await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+                          await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+                          Navigator.of(context).pop();
+
+                          Navigator.pushNamed(
+                            context,
+                            "historyLimitRequestDetail/${message.data['id']}/3",
+                            arguments: result_,
+                          );
+                        }
+
+                      }
+
+                    },
+                  ),
+                  onPressed: () async {
+                    
+                    // Navigator.of(context).pop();
+
+                  },
+                )
+              ],
+            ),
+          );
+        });
+    });
     
     super.initState();
     
@@ -121,6 +291,50 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   void didChangeDependencies() {
     super.didChangeDependencies();
     config.isScreenAtDashboard = true;
+
+    FirebaseMessaging.onMessageOpenedApp.listen((message) async {
+      printHelp('Message clicked !');
+      printHelp("CEK BODY NOTIF "+ message.data['body']);
+      Result result_;
+      
+      if (message.data['body'].toString().toLowerCase().contains("terdapat request tambah limit")) {
+        printHelp("MASUK NEW REQUEST ");
+        // if(config.isAppLive == false){
+        //   while(config.isScreenAtDashboard == false){
+        //     await Future.delayed(Duration(milliseconds: 500));
+        //   }
+        // }
+        if(message.data['customer_code'].toString().length > 11) {
+          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+          
+          final SharedPreferences sharedPreferences = await _sharedPreferences;
+          await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+          await sharedPreferences.setString("user_code_request", message.data['user_code']);
+          
+          Navigator.pushNamed(
+            context,
+            "historyLimitRequestDetail/${message.data['id']}/4",
+            arguments: result_,
+          );
+        } else {
+          Alert(context: context, loading: true, disableBackButton: true);
+
+          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+
+          final SharedPreferences sharedPreferences = await _sharedPreferences;
+          await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+          await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+          Navigator.of(context).pop();
+
+          Navigator.pushNamed(
+            context,
+            "historyLimitRequestDetail/${message.data['id']}/1",
+            arguments: result_,
+          );
+        }
+      }
+    });
   }
 
   @override
@@ -150,11 +364,12 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   focusNode: customerIdFocus,
                   validate: customerIdValid,
                   keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.done,
+                  textInputAction: TextInputAction.go,
                   textCapitalization: TextCapitalization.characters,
                   hintText: "Kode Pelanggan",
                   onSubmitted: (value) {
                     customerIdFocus.unfocus();
+                    getBlockInfo();
                   },
                 ),
               ),
@@ -212,6 +427,8 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   await prefs.remove("limit_dmd");
                   await prefs.remove("request_limit");
                   await prefs.remove("user_code_request");
+                  await prefs.remove("user_code");
+                  await prefs.remove("max_limit");
                   await prefs.clear();
                   Navigator.pushReplacementNamed(
                     context,

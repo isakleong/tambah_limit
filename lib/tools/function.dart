@@ -100,7 +100,7 @@ String APIUrl(String url, {String parameter = "", bool print = false, BuildConte
 void Alert({
     context, String title, Widget content, List<Widget> actions, VoidCallback defaultAction,
     bool cancel = true, String type = "warning", bool showIcon = true, bool disableBackButton = false,
-    VoidCallback willPopAction, loading = false, double value
+    VoidCallback willPopAction, loading = false, double value, String errorBtnTitle = "Ok"
   }) {
 
   Configuration config = new Configuration();
@@ -188,7 +188,7 @@ void Alert({
               ) : Container(),
               Button(
                 key: Key("ok"),
-                child: cancel ? TextView("Ya", 2, size: 12, caps: false, color: Colors.white) : type == "error" ? TextView("Ok", 2, size: 12, caps: false, color: Colors.white) : TextView("Ok", 2, size: 12, caps: false, color: Colors.white),
+                child: cancel ? TextView("Ya", 2, size: 12, caps: false, color: Colors.white) : type == "error" ? TextView(errorBtnTitle, 2, size: 12, caps: false, color: Colors.white) : TextView("Ok", 2, size: 12, caps: false, color: Colors.white),
                 fill: true,
                 onTap: () {
                   Navigator.of(context).pop();

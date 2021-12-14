@@ -15,6 +15,8 @@ import 'package:tambah_limit/widgets/EditText.dart';
 import 'package:tambah_limit/widgets/TextView.dart';
 import 'package:tambah_limit/widgets/button.dart';
 
+Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstance();
+
 class Login extends StatefulWidget {
   final Result result;
 
@@ -41,9 +43,19 @@ class LoginState extends State<Login> {
 
   DateTime currentBackPressTime;
 
+  String fcmToken = "";
+
+  FirebaseMessaging messaging;
   @override
   void initState() {
     super.initState();
+    messaging = FirebaseMessaging.instance;
+    messaging.getToken().then((value){
+        print("token: "+value);
+        setState(() {
+          fcmToken = value;
+        });
+    });
 
     // //get fcm token
     // String token = await FirebaseMessaging.instance.getToken();
@@ -78,6 +90,14 @@ class LoginState extends State<Login> {
   // Future<void> _messageHandler(RemoteMessage message) async {
   //   print('background message ${message.notification.body}');
   // }
+
+  @override
+  void didChangeDependencies() async {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    final SharedPreferences sharedPreferences = await _sharedPreferences;
+    await sharedPreferences.setString("fcmToken", fcmToken);
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -156,7 +176,7 @@ class LoginState extends State<Login> {
                             ),
                             onSubmitted: (value) {
                               passwordFocus.unfocus();
-                              //submitValidation(2);
+                              submitValidation();
                             },
                           ),
                         ),
@@ -192,14 +212,14 @@ class LoginState extends State<Login> {
       loginLoading = true;
     });
 
-    // Alert(context: context, loading: true, disableBackButton: true);
+    Alert(context: context, loading: true, disableBackButton: true);
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String fcmToken = prefs.getString("fcmToken");
 
     String getLogin = await userAPI.login(context, parameter: 'json={"user_code":"${usernameController.text}","user_pass":"${passwordController.text}","token":"${fcmToken}"}');
 
-    // Navigator.of(context).pop();
+    Navigator.of(context).pop();
 
     if(getLogin == "OK"){
       Navigator.pushReplacementNamed(
@@ -232,18 +252,6 @@ class LoginState extends State<Login> {
       doLogin();
     }
   }
-
-  void Printy() async {
-    String value;
-    try{
-      value = await platform.invokeMethod("printy");
-      print(value);
-    } catch (e){
-      print(e);
-    }
-    print(value);
-  }
-
 
   _fieldFocusChange(BuildContext context, FocusNode currentFocus,FocusNode nextFocus) {
     currentFocus.unfocus();

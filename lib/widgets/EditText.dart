@@ -71,7 +71,7 @@ class EditText extends StatelessWidget{
         hintText: this.hintText,
         filled: true,
         fillColor: this.hintText == "Username" || this.hintText == "Password" ? config.lightBlueColor : config.lightOpactityBlueColor,
-        focusColor: config.orangeColor,
+        focusColor: config.secondaryColor,
         suffix: suffixIcon,
         prefixIcon: prefixIcon,
         errorText: validate ? "${hintText} ${alertMessage}" : null

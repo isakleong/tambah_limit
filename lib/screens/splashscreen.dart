@@ -3,14 +3,15 @@ import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:open_file/open_file.dart';
+// import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:percent_indicator/percent_indicator.dart';
-import 'package:permission_handler/permission_handler.dart';
+// import 'package:percent_indicator/percent_indicator.dart';
+// import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'package:http/http.dart' show Client;
 import 'package:tambah_limit/models/resultModel.dart';
+import 'package:tambah_limit/resources/customerAPI.dart';
 
 import 'package:tambah_limit/screens/login.dart';
 import 'package:tambah_limit/settings/configuration.dart';
@@ -24,7 +25,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class SplashScreenState extends State<SplashScreen> {
-  String isGetVersionSuccess = "";
+  String getCheckVersion = "";
   bool isLoadingVersion = false;
 
   bool isDownloadNewVersion = false;
@@ -35,8 +36,13 @@ class SplashScreenState extends State<SplashScreen> {
 
   bool _initialized = false;
   bool _error = false;
+  bool isNotificationOpened = false;
+
+  Result notificationData;
+  String notificationRoute = "";
 
   String fcmToken = "";
+  String user_code = "";
 
   void initializeFlutterFire() async {
     try {
@@ -45,6 +51,143 @@ class SplashScreenState extends State<SplashScreen> {
       setState(() {
         _initialized = true;
       });
+
+      //handle notification in terminate state
+      RemoteMessage message =
+        await FirebaseMessaging.instance.getInitialMessage();
+
+      if (message != null) {
+        Result result_;
+      
+        if (message.data['body'].toString().toLowerCase().contains("terdapat request tambah limit")) {
+          if(config.isAppLive == false){
+            while(config.isScreenAtDashboard == false){
+              await Future.delayed(Duration(milliseconds: 500));
+            }
+          }
+
+          if(message.data['customer_code'].toString().length > 11) {
+            Alert(context: context, loading: true, disableBackButton: true);
+
+            result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+            
+            final SharedPreferences sharedPreferences = await _sharedPreferences;
+            await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+            await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+            Navigator.of(context).pop();
+            
+            Navigator.pushNamed(
+              context,
+              "historyLimitRequestDetail/${message.data['id']}/4",
+              arguments: result_,
+            );
+          } else {
+            Alert(context: context, loading: true, disableBackButton: true);
+
+            result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+
+            final SharedPreferences sharedPreferences = await _sharedPreferences;
+            await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+            await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+            Navigator.of(context).pop();
+
+            Navigator.pushNamed(
+              context,
+              "historyLimitRequestDetail/${message.data['id']}/1",
+              arguments: result_,
+            );
+          }
+
+        } else if(message.data['body'].toString().toLowerCase().contains("diterima")) {
+          if(config.isAppLive == false){
+            while(config.isScreenAtDashboard == false){
+              await Future.delayed(Duration(milliseconds: 500));
+            }
+          }
+
+          if(message.data['customer_code'].toString().length > 11) {
+            Alert(context: context, loading: true, disableBackButton: true);
+
+            result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+            
+            final SharedPreferences sharedPreferences = await _sharedPreferences;
+            await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+            await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+            Navigator.of(context).pop();
+            
+            Navigator.pushNamed(
+              context,
+              "historyLimitRequestDetail/${message.data['id']}/5",
+              arguments: result_,
+            );
+          } else {
+            Alert(context: context, loading: true, disableBackButton: true);
+
+            result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+
+            final SharedPreferences sharedPreferences = await _sharedPreferences;
+            await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+            await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+            Navigator.of(context).pop();
+
+            Navigator.pushNamed(
+              context,
+              "historyLimitRequestDetail/${message.data['id']}/2",
+              arguments: result_,
+            );
+          }
+
+        } else if(message.data['body'].toString().toLowerCase().contains("ditolak")) {
+          if(config.isAppLive == false){
+            while(config.isScreenAtDashboard == false){
+              await Future.delayed(Duration(milliseconds: 500));
+            }
+          }
+
+          if(message.data['customer_code'].toString().length > 11) {
+            Alert(context: context, loading: true, disableBackButton: true);
+
+            result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+            
+            final SharedPreferences sharedPreferences = await _sharedPreferences;
+            await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+            await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+            Navigator.of(context).pop();
+            
+            Navigator.pushNamed(
+              context,
+              "historyLimitRequestDetail/${message.data['id']}/6",
+              arguments: result_,
+            );
+          } else {
+            Alert(context: context, loading: true, disableBackButton: true);
+
+            result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+
+            final SharedPreferences sharedPreferences = await _sharedPreferences;
+            await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+            await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+            Navigator.of(context).pop();
+
+            Navigator.pushNamed(
+              context,
+              "historyLimitRequestDetail/${message.data['id']}/3",
+              arguments: result_,
+            );
+          }
+
+        }
+
+
+      }
+
+
     } catch(e) {
       // Set `_error` state to true if Firebase initialization fails
       setState(() {
@@ -72,138 +215,171 @@ class SplashScreenState extends State<SplashScreen> {
     final SharedPreferences sharedPreferences = await _sharedPreferences;
     await sharedPreferences.setString("fcmToken", fcmToken);
 
-    final isPermissionStatusGranted = await checkAppsPermission();
-    if(isPermissionStatusGranted) {
-      doCheckVersion();
-    } else {
-      checkAppsPermission();
-    }
+    setState(() {
+      user_code = sharedPreferences.getString("user_code");
+    });
+
+    // final isPermissionStatusGranted = await checkAppsPermission();
+    doCheckVersion();
+    // if(isPermissionStatusGranted) {
+    //   doCheckVersion();
+    // } else {
+    //   // checkAppsPermission();
+    // }
 
     FirebaseMessaging.onMessageOpenedApp.listen((message) async {
-      printHelp('Message clicked !');
-      printHelp("CEK BODY NOTIF "+ message.data['body']);
-      // Result result = new Result(success: 1, message: "notification", data: message.data['type']);
-      if (message.data['type'] == 'chat') {
-        printHelp("MASUK YA ");
+      printHelp('Message clicked -- splash !');
+      printHelp("CEK BODY NOTIF --splash  "+ message.data['body']);
+      Result result_;
+      
+      if (message.data['body'].toString().toLowerCase().contains("terdapat request tambah limit")) {
+        printHelp("MASUK NEW REQUEST -- splash ");
         if(config.isAppLive == false){
           while(config.isScreenAtDashboard == false){
             await Future.delayed(Duration(milliseconds: 500));
           }
         }
-        Navigator.pushNamed(context, 
-          'chat', 
-          arguments: message.data['body'],
-        );
+        if(message.data['customer_code'].toString().length > 11) {
+          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+          
+          final SharedPreferences sharedPreferences = await _sharedPreferences;
+          await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+          await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+          setState(() {
+            isNotificationOpened = true;
+            notificationData = result_;
+            notificationRoute = "historyLimitRequestDetail/${message.data['id']}/4";
+          });
+          
+          // Navigator.pushNamed(
+          //   context,
+          //   "historyLimitRequestDetail/${message.data['id']}/4",
+          //   arguments: result_,
+          // );
+        } else {
+          // Alert(context: context, loading: true, disableBackButton: true);
+
+          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+
+          final SharedPreferences sharedPreferences = await _sharedPreferences;
+          await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+          await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+          setState(() {
+            isNotificationOpened = true;
+            notificationData = result_;
+            notificationRoute = "historyLimitRequestDetail/${message.data['id']}/1";
+          });
+
+          // Navigator.of(context).pop();
+
+          // Navigator.pushNamed(
+          //   context,
+          //   "historyLimitRequestDetail/${message.data['id']}/1",
+          //   arguments: result_,
+          // );
+        }
       }
     });
+    
   }
 
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
 
-  Future<void> downloadNewVersion() async {
-    String url = "";
+  // Future<void> downloadNewVersion() async {
+  //   String url = "";
 
-    bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    String url_address_1 = config.baseUrl + "/" + config.apkName+".apk";
-    String url_address_2 = config.baseUrlAlt + "/" + config.apkName+".apk";
+  //   bool isUrlAddress_1 = false, isUrlAddress_2 = false;
+  //   String url_address_1 = config.baseUrl + "/" + config.apkName+".apk";
+  //   String url_address_2 = config.baseUrlAlt + "/" + config.apkName+".apk";
 
-    try {
-		  final conn_1 = await ConnectionTest(url_address_1, context);
-      printHelp("GET STATUS 1 "+conn_1);
-      if(conn_1 == "OK"){
-        isUrlAddress_1 = true;
-      }
-	  } on SocketException {
-      isUrlAddress_1 = false;
-      isGetVersionSuccess = "Gagal terhubung dengan server";
-    }
+  //   try {
+	// 	  final conn_1 = await ConnectionTest(url_address_1, context);
+  //     printHelp("GET STATUS 1 "+conn_1);
+  //     if(conn_1 == "OK"){
+  //       isUrlAddress_1 = true;
+  //     }
+	//   } on SocketException {
+  //     isUrlAddress_1 = false;
+  //     isGetVersionSuccess = "Gagal terhubung dengan server";
+  //   }
 
-    if(isUrlAddress_1) {
-      url = url_address_1;
-    } else {
-      try {
-        final conn_2 = await ConnectionTest(url_address_2, context);
-        printHelp("GET STATUS 2 "+conn_2);
-        if(conn_2 == "OK"){
-          isUrlAddress_2 = true;
-        }
-      } on SocketException {
-        isUrlAddress_2 = false;
-        isGetVersionSuccess = "Gagal terhubung dengan server";
-      }
-    }
-    if(isUrlAddress_2){
-      url = url_address_2;
-    }
+  //   if(isUrlAddress_1) {
+  //     url = url_address_1;
+  //   } else {
+  //     try {
+  //       final conn_2 = await ConnectionTest(url_address_2, context);
+  //       printHelp("GET STATUS 2 "+conn_2);
+  //       if(conn_2 == "OK"){
+  //         isUrlAddress_2 = true;
+  //       }
+  //     } on SocketException {
+  //       isUrlAddress_2 = false;
+  //       isGetVersionSuccess = "Gagal terhubung dengan server";
+  //     }
+  //   }
+  //   if(isUrlAddress_2){
+  //     url = url_address_2;
+  //   }
 
-    if(url != "") {
-      final isPermissionStatusGranted = await checkAppsPermission();
+  //   if(url != "") {
+  //     final isPermissionStatusGranted = await checkAppsPermission();
 
-      if(isPermissionStatusGranted) {
-        try {
-          Dio dio = Dio();
+  //     if(isPermissionStatusGranted) {
+  //       try {
+  //         Dio dio = Dio();
 
-          String downloadPath = await getFilePath(config.apkName+".apk");
+  //         String downloadPath = await getFilePath(config.apkName+".apk");
 
-          printHelp("download path "+downloadPath);
-          printHelp("url download "+ url);
+  //         printHelp("download path "+downloadPath);
+  //         printHelp("url download "+ url);
 
-          // await dio.download(url, downloadPath, onReceiveProgress: (received, total){
-          //   if(total != -1) {
-          //     setState(() {
-          //       // progressValue = (received / total * 100).toStringAsFixed(0) + "%";
-          //       isDownloadNewVersion = true;
-          //       progressValue = (received / total * 100)/100;
-          //       progressText = (received / total * 100).toStringAsFixed(0) + "%";
-          //     });
-          //   }
-          // });
+  //         dio.download(url, downloadPath,
+  //           onReceiveProgress: (rcv, total) {
+  //             print(
+  //                 'received: ${rcv.toStringAsFixed(0)} out of total: ${total.toStringAsFixed(0)}');
 
-          dio.download(url, downloadPath,
-            onReceiveProgress: (rcv, total) {
-              print(
-                  'received: ${rcv.toStringAsFixed(0)} out of total: ${total.toStringAsFixed(0)}');
+  //             _setState(() {
+  //               progressValue = (rcv / total * 100)/100;
+  //               progressText = ((rcv / total) * 100).toStringAsFixed(0);
+  //             });
 
-              _setState(() {
-                progressValue = (rcv / total * 100)/100;
-                progressText = ((rcv / total) * 100).toStringAsFixed(0);
-              });
+  //             if (progressText == '100') {
+  //               _setState(() {
+  //                 isDownloadNewVersion = true;
+  //               });
+  //             } else if (double.parse(progressText) < 100) {}
+  //           },
+  //           deleteOnError: true,
+  //         ).then((_) async {
+  //           _setState(() {
+  //             if (progressText == '100') {
+  //               isDownloadNewVersion = true;
+  //             }
 
-              if (progressText == '100') {
-                _setState(() {
-                  isDownloadNewVersion = true;
-                });
-              } else if (double.parse(progressText) < 100) {}
-            },
-            deleteOnError: true,
-          ).then((_) async {
-            _setState(() {
-              if (progressText == '100') {
-                isDownloadNewVersion = true;
-              }
+  //             isDownloadNewVersion = false;
+  //           });
 
-              isDownloadNewVersion = false;
-            });
+  //           Navigator.of(context).pop();
+  //           // var directory = await getApplicationDocumentsDirectory(); OpenFile.open(downloadPath);
 
-            Navigator.of(context).pop();
-            var directory = await getApplicationDocumentsDirectory(); OpenFile.open(downloadPath);
+  //           setState(() {
+  //             isLoadingVersion = false;
+  //             isDownloadNewVersion = false;
+  //           });
+  //         });
 
-            setState(() {
-              isLoadingVersion = false;
-              isDownloadNewVersion = false;
-            });
-          });
+  //       } catch (e) {
 
-        } catch (e) {
+  //       }
 
-        }
+  //     }
 
-      }
-
-    } else {
-      //gagal terhubung
-    }
-  }
+  //   } else {
+  //     //gagal terhubung
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -282,16 +458,14 @@ class SplashScreenState extends State<SplashScreen> {
     //get apk version
     String checkVersion = await getVersion(context);
 
-    printHelp("cek error "+isGetVersionSuccess);
-
     setState(() {
       isLoadingVersion = false;
     });
 
-    if(isGetVersionSuccess == "OK") {
-      if(checkVersion != config.apkVersion) {
-        printHelp("hmm check version "+ checkVersion);
-        printHelp("hmm check version "+ config.apkVersion);
+    if(checkVersion == "OK") {
+      if(getCheckVersion != config.apkVersion) {
+        printHelp("getcheckversion "+getCheckVersion);
+        printHelp("apkVersion "+config.apkVersion);
         Alert(
           context: context,
           title: "Info,",
@@ -303,7 +477,7 @@ class SplashScreenState extends State<SplashScreen> {
               isLoadingVersion = false;
               isDownloadNewVersion = true;
             });
-            downloadNewVersion();
+            // downloadNewVersion();
             showDialog (
               context: context,
               barrierDismissible: false,
@@ -320,21 +494,21 @@ class SplashScreenState extends State<SplashScreen> {
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Center(
-                            child: CircularPercentIndicator(
-                              radius: 120.0,
-                              lineWidth: 13.0,
-                              animation: false,
-                              percent: progressValue,
-                              center: new Text("${progressText}%", style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                              footer: Padding(
-                                padding: EdgeInsets.only(top: 10),
-                                child: new Text("Mengunduh pembaruan aplikasi", style: new TextStyle(fontWeight: FontWeight.bold)),
-                              ),
-                              circularStrokeCap: CircularStrokeCap.round,
-                              progressColor: config.primaryColor,
-                            ),
-                          ),
+                          // Center(
+                          //   child: CircularPercentIndicator(
+                          //     radius: 120.0,
+                          //     lineWidth: 13.0,
+                          //     animation: false,
+                          //     percent: progressValue,
+                          //     center: new Text("${progressText}%", style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                          //     footer: Padding(
+                          //       padding: EdgeInsets.only(top: 10),
+                          //       child: new Text("Mengunduh pembaruan aplikasi", style: new TextStyle(fontWeight: FontWeight.bold)),
+                          //     ),
+                          //     circularStrokeCap: CircularStrokeCap.round,
+                          //     progressColor: config.primaryColor,
+                          //   ),
+                          // ),
                         ],
                       );
                     }),
@@ -342,8 +516,6 @@ class SplashScreenState extends State<SplashScreen> {
                 );
               }
             );
-
-            
           }
         );            
       } else {
@@ -352,54 +524,56 @@ class SplashScreenState extends State<SplashScreen> {
     } else {
       Alert(
         context: context,
-        title: "Oops,",
-        content: Text(isGetVersionSuccess),
+        title: "Maaf,",
+        content: Text(checkVersion),
         cancel: false,
         type: "error",
+        errorBtnTitle: "Coba Lagi",
         defaultAction: () {
-          // doCheckVersion();
+          doCheckVersion();
         }
       );
     }
   }
 
-  Future<bool> checkAppsPermission() async {
-    final serviceStatus = await Permission.storage.isGranted;
+  // Future<bool> checkAppsPermission() async {
+  //   final serviceStatus = await Permission.storage.isGranted;
 
-    bool isPermissionGranted = serviceStatus == ServiceStatus.enabled;
+  //   bool isPermissionGranted = serviceStatus == ServiceStatus.enabled;
 
-    final status = await Permission.storage.request();
+  //   final status = await Permission.storage.request();
 
-    // if(status == PermissionStatus.granted) {
-    // } else if (status == PermissionStatus.denied) {
-    //   print('Permission denied');
-    // } else if (status == PermissionStatus.permanentlyDenied) {
-    //   print('Permission Permanently Denied');
-    // }
+  //   // if(status == PermissionStatus.granted) {
+  //   // } else if (status == PermissionStatus.denied) {
+  //   //   print('Permission denied');
+  //   // } else if (status == PermissionStatus.permanentlyDenied) {
+  //   //   print('Permission Permanently Denied');
+  //   // }
 
-    if(status != PermissionStatus.granted) {
-      await openAppSettings();
-    }
+  //   if(status != PermissionStatus.granted) {
+  //     await openAppSettings();
+  //   }
 
-    return status == PermissionStatus.granted;
+  //   return status == PermissionStatus.granted;
 
-  }
+  // }
 
-  Future<String> getFilePath(filename) async {
-    String path = '';
+  // Future<String> getFilePath(filename) async {
+  //   String path = '';
 
-    Directory dir = await getExternalStorageDirectory();
+  //   Directory dir = await getExternalStorageDirectory();
 
-    path = '${dir.path}/$filename';
+  //   path = '${dir.path}/$filename';
 
-    return path;
-  }
+  //   return path;
+  // }
 
   Future<String> getVersion(final context, {String parameter=""}) async {
     Client client = Client();
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
+    String isGetVersionSuccess = "";
     String url_address_1 = config.baseUrl + "/" + "getVersion.php" + (parameter == "" ? "" : "?" + parameter);
     String url_address_2 = config.baseUrlAlt + "/" + "getVersion.php" + (parameter == "" ? "" : "?" + parameter);
 
@@ -439,6 +613,9 @@ class SplashScreenState extends State<SplashScreen> {
 
         if(response.body.toString() != "false") {
           isGetVersionSuccess = "OK";
+          setState(() {
+            getCheckVersion = response.body.toString();
+          });
         } else {
           isGetVersionSuccess = "Gagal terhubung dengan server";
         }
@@ -450,30 +627,56 @@ class SplashScreenState extends State<SplashScreen> {
       isGetVersionSuccess = "Gagal terhubung dengan server";
     }
 
-    printHelp("lempar "+response.body.toString());
-
-    return response.body.toString();
+    return isGetVersionSuccess;
   }
 
   startTimer() {
-    config.isAppLive = true;
     var _duration = Duration(milliseconds: 2000);
     return Timer(_duration, navigate);
   }
 
-  void navigate() {
-    // Navigator.pushNamed(
-    //   context,
-    //   "login"
-    // );
-    
+  void navigate() async {
+    // if(isNotificationOpened) {
+    //   Navigator.pushNamed(
+    //     context,
+    //     notificationRoute,
+    //     arguments: notificationData,
+    //   );
 
-    Navigator.pushReplacement(
-                  context,
-                  PageRouteBuilder(
-                      transitionDuration: Duration(seconds: 4),
-                      pageBuilder: (_, __, ___) => Login()));
+    // } else {
 
+    //   String user_code = "";
+    //   SharedPreferences prefs = await SharedPreferences.getInstance();
+    //   user_code = prefs.getString("user_code");
+    //   if(user_code != "") {
+    //     Navigator.pushReplacementNamed(
+    //       context,
+    //       'dashboard'
+    //     );
+    //   } else {
+    //     Navigator.pushReplacement(
+    //       context,
+    //       PageRouteBuilder(
+    //           transitionDuration: Duration(seconds: 4),
+    //           pageBuilder: (_, __, ___) => Login()));
+    //   }
+
+    // }
+
+    final SharedPreferences sharedPreferences = await _sharedPreferences;
+    if(sharedPreferences.containsKey("user_code")) {
+      Navigator.pushReplacementNamed(
+        context,
+        'dashboard'
+      );
+    } else {
+      
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+            transitionDuration: Duration(seconds: 4),
+            pageBuilder: (_, __, ___) => Login()));
+    }
   }
 
 }
