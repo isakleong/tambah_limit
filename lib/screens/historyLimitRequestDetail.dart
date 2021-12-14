@@ -829,34 +829,67 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                                                           child: TextView("Cat", 3, color: Colors.black),
                                                         ),
                                                         SizedBox(height: 30),
-                                                        Scrollbar(
-                                                          isAlwaysShown: true,
-                                                          controller: _scrollController,
-                                                          child: SingleChildScrollView(
-                                                            controller: _scrollController,
-                                                            scrollDirection: Axis.horizontal,
-                                                            child: DataTable(
-                                                              columns: [
-                                                                DataColumn(
-                                                                  label: TextView("Pengambilan Tertinggi", 4,)
-                                                                ),
-                                                                DataColumn(
-                                                                  label: TextView("Rata-rata Payment", 4)
-                                                                ),
-                                                                DataColumn(
-                                                                  label: TextView("Total Omzet", 4)
-                                                                ),
-                                                              ],
-                                                              rows: List.generate(resultObject[15].length,(index){
-                                                                return DataRow(
-                                                                  cells: [
-                                                                    DataCell(TextView("Rp " + currencyFormatter.format(resultObject[15][index]["jum_byr"]), 4)),
-                                                                    DataCell(TextView("Rp " + currencyFormatter.format(resultObject[15][index]["rata2"]) + " -- " + "${resultObject[15][index]["pengali"]} X", 4)),
-                                                                    DataCell(TextView("Rp " + currencyFormatter.format(resultObject[18]["total_omzet_cat"]), 4)),
+                                                        Container(
+                                                          child: Column(
+                                                            children: [
+                                                              Container(
+                                                                child: Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  children: [
+                                                                    Container(
+                                                                      child: TextView("Pengambilan Tertinggi", 4),
+                                                                    ),
+                                                                    Container(
+                                                                      child: Column(
+                                                                        children: List.generate(resultObject[15].length, (index) {
+                                                                          return Container(
+                                                                            margin: EdgeInsets.only(top: 10),
+                                                                            child: TextView("Rp " + currencyFormatter.format(resultObject[15][index]["jum_byr"]), 4)
+                                                                            );  
+                                                                          },
+                                                                        )
+                                                                      ),
+                                                                    )
                                                                   ],
-                                                                );
-                                                              }),
-                                                            ),
+                                                                ),
+                                                              ),
+                                                              SizedBox(height: 40),
+                                                              Container(
+                                                                child: Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  children: [
+                                                                    Container(
+                                                                      child: TextView("Rata-rata Payment", 4),
+                                                                    ),
+                                                                    Container(
+                                                                      child: Column(
+                                                                        children: List.generate(resultObject[15].length, (index) {
+                                                                          return Container(
+                                                                            child: TextView("Rp " + currencyFormatter.format(resultObject[15][index]["rata2"]) + "\n(" + "${resultObject[15][index]["pengali"]} x)", 4, align: TextAlign.end)
+                                                                            );  
+                                                                          },
+                                                                        )
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              SizedBox(height: 40),
+                                                              Container(
+                                                                child: Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  children: [
+                                                                    Container(
+                                                                      child: TextView("Total Omzet", 4),
+                                                                    ),
+                                                                    Container(
+                                                                      child: TextView("Rp " + currencyFormatter.format(resultObject[18]["total_omzet_cat"]), 4),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
                                                           ),
                                                         ),
                                                       ],
@@ -916,34 +949,67 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                                                           child: TextView("BB", 3, color: Colors.black),
                                                         ),
                                                         SizedBox(height: 30),
-                                                        Scrollbar(
-                                                          isAlwaysShown: true,
-                                                          controller: _scrollController,
-                                                          child: SingleChildScrollView(
-                                                            controller: _scrollController,
-                                                            scrollDirection: Axis.horizontal,
-                                                            child: DataTable(
-                                                              columns: [
-                                                                DataColumn(
-                                                                  label: TextView("Pengambilan Tertinggi", 4,)
-                                                                ),
-                                                                DataColumn(
-                                                                  label: TextView("Rata-rata Payment", 4)
-                                                                ),
-                                                                DataColumn(
-                                                                  label: TextView("Total Omzet", 4)
-                                                                ),
-                                                              ],
-                                                              rows: List.generate(resultObject[16].length,(index){
-                                                                return DataRow(
-                                                                  cells: [
-                                                                    DataCell(TextView("Rp " + currencyFormatter.format(resultObject[16][index]["jum_byr"]), 4)),
-                                                                    DataCell(TextView("Rp " + currencyFormatter.format(resultObject[16][index]["rata2"]) + " -- " + "${resultObject[16][index]["pengali"]} X", 4)),
-                                                                    DataCell(TextView("Rp " + currencyFormatter.format(resultObject[19]["total_omzet_bb"]), 4)),
+                                                        Container(
+                                                          child: Column(
+                                                            children: [
+                                                              Container(
+                                                                child: Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  children: [
+                                                                    Container(
+                                                                      child: TextView("Pengambilan Tertinggi", 4),
+                                                                    ),
+                                                                    Container(
+                                                                      child: Column(
+                                                                        children: List.generate(resultObject[16].length, (index) {
+                                                                          return Container(
+                                                                            margin: EdgeInsets.only(top: 10),
+                                                                            child: TextView("Rp " + currencyFormatter.format(resultObject[16][index]["jum_byr"]), 4)
+                                                                            );  
+                                                                          },
+                                                                        )
+                                                                      ),
+                                                                    )
                                                                   ],
-                                                                );
-                                                              }),
-                                                            ),
+                                                                ),
+                                                              ),
+                                                              SizedBox(height: 40),
+                                                              Container(
+                                                                child: Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  children: [
+                                                                    Container(
+                                                                      child: TextView("Rata-rata Payment", 4),
+                                                                    ),
+                                                                    Container(
+                                                                      child: Column(
+                                                                        children: List.generate(resultObject[16].length, (index) {
+                                                                          return Container(
+                                                                            child: TextView("Rp " + currencyFormatter.format(resultObject[16][index]["rata2"]) + "\n(" + "${resultObject[16][index]["pengali"]} x)", 4, align: TextAlign.end)
+                                                                            );  
+                                                                          },
+                                                                        )
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              SizedBox(height: 40),
+                                                              Container(
+                                                                child: Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  children: [
+                                                                    Container(
+                                                                      child: TextView("Total Omzet", 4),
+                                                                    ),
+                                                                    Container(
+                                                                      child: TextView("Rp " + currencyFormatter.format(resultObject[19]["total_omzet_bb"]), 4),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
                                                           ),
                                                         ),
                                                       ],
@@ -1003,34 +1069,67 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                                                           child: TextView("Mebel", 3, color: Colors.black),
                                                         ),
                                                         SizedBox(height: 30),
-                                                        Scrollbar(
-                                                          isAlwaysShown: true,
-                                                          controller: _scrollController,
-                                                          child: SingleChildScrollView(
-                                                            controller: _scrollController,
-                                                            scrollDirection: Axis.horizontal,
-                                                            child: DataTable(
-                                                              columns: [
-                                                                DataColumn(
-                                                                  label: TextView("Pengambilan Tertinggi", 4,)
-                                                                ),
-                                                                DataColumn(
-                                                                  label: TextView("Rata-rata Payment", 4)
-                                                                ),
-                                                                DataColumn(
-                                                                  label: TextView("Total Omzet", 4)
-                                                                ),
-                                                              ],
-                                                              rows: List.generate(resultObject[17].length,(index){
-                                                                return DataRow(
-                                                                  cells: [
-                                                                    DataCell(TextView("Rp " + currencyFormatter.format(resultObject[17][index]["jum_byr"]), 4)),
-                                                                    DataCell(TextView("Rp " + currencyFormatter.format(resultObject[17][index]["rata2"]) + " -- " + "${resultObject[17][index]["pengali"]} X", 4)),
-                                                                    DataCell(TextView("Rp " + currencyFormatter.format(resultObject[20]["total_omzet_mebel"]), 4)),
+                                                        Container(
+                                                          child: Column(
+                                                            children: [
+                                                              Container(
+                                                                child: Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  children: [
+                                                                    Container(
+                                                                      child: TextView("Pengambilan Tertinggi", 4),
+                                                                    ),
+                                                                    Container(
+                                                                      child: Column(
+                                                                        children: List.generate(resultObject[17].length, (index) {
+                                                                          return Container(
+                                                                            margin: EdgeInsets.only(top: 10),
+                                                                            child: TextView("Rp " + currencyFormatter.format(resultObject[17][index]["jum_byr"]), 4)
+                                                                            );  
+                                                                          },
+                                                                        )
+                                                                      ),
+                                                                    )
                                                                   ],
-                                                                );
-                                                              }),
-                                                            ),
+                                                                ),
+                                                              ),
+                                                              SizedBox(height: 40),
+                                                              Container(
+                                                                child: Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  children: [
+                                                                    Container(
+                                                                      child: TextView("Rata-rata Payment", 4),
+                                                                    ),
+                                                                    Container(
+                                                                      child: Column(
+                                                                        children: List.generate(resultObject[17].length, (index) {
+                                                                          return Container(
+                                                                            child: TextView("Rp " + currencyFormatter.format(resultObject[17][index]["rata2"]) + "\n(" + "${resultObject[17][index]["pengali"]} x)", 4, align: TextAlign.end)
+                                                                            );  
+                                                                          },
+                                                                        )
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              SizedBox(height: 40),
+                                                              Container(
+                                                                child: Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  children: [
+                                                                    Container(
+                                                                      child: TextView("Total Omzet", 4),
+                                                                    ),
+                                                                    Container(
+                                                                      child: TextView("Rp " + currencyFormatter.format(resultObject[20]["total_omzet_mebel"]), 4),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
                                                           ),
                                                         ),
                                                       ],
@@ -1080,41 +1179,39 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                         Container(
                           child: TextView("Informasi Lainnya", 1, color: config.blueColor),
                         ),
-                        Scrollbar(
-                          isAlwaysShown: true,
-                          controller: _scrollController,
-                          child: SingleChildScrollView(
-                            controller: _scrollController,
-                            scrollDirection: Axis.horizontal,
-                            child: DataTable(
-                              columns: [
-                                DataColumn(
-                                  label: TextView("SO Outstanding", 4,)
+                        Container(
+                          child: Column(
+                            children: [
+                              ListTile(
+                                title: TextView("SO Outstanding", 4),
+                                trailing: Container(
+                                  child: TextView("Rp " + currencyFormatter.format(resultObject[11]["ov"]),4)
                                 ),
-                                DataColumn(
-                                  label: TextView("Shipment Not Invoiced", 4)
+                              ),
+
+                              ListTile(
+                                title: TextView("Shipment Not Invoiced", 4),
+                                trailing: Container(
+                                  child: TextView("Rp " + currencyFormatter.format(resultObject[9]["jum"]),4)
                                 ),
-                                DataColumn(
-                                  label: TextView("Total Retur", 4)
+                              ),
+
+                              ListTile(
+                                title: TextView("Total Retur", 4),
+                                trailing: Container(
+                                  child: TextView("Rp " + currencyFormatter.format(resultObject[8]["retur"]),4)
                                 ),
-                                DataColumn(
-                                  label: TextView("Piutang", 4)
+                              ),
+
+                              ListTile(
+                                title: TextView("Piutang", 4),
+                                trailing: Container(
+                                  child: TextView("Rp " + currencyFormatter.format(resultObject[10]["piutang"]),4)
                                 ),
-                              ],
-                              rows: [
-                                DataRow(
-                                  cells: [
-                                    DataCell(TextView("Rp " + currencyFormatter.format(resultObject[11]["ov"]), 4)),
-                                    DataCell(TextView("Rp " + currencyFormatter.format(resultObject[9]["jum"]), 4)),
-                                    DataCell(TextView("Rp " + currencyFormatter.format(resultObject[8]["retur"]), 4)),
-                                    DataCell(TextView("Rp " + currencyFormatter.format(resultObject[10]["piutang"]), 4)),
-                                  ],
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
-
                       ],
                     )
                   ),
@@ -1157,10 +1254,11 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
             TextView("Limit Yang Ditolak", 1),
             leading: IconButton(
               icon: Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.popAndPushNamed(
-                context,
-                "historyLimitRequest"
-              )
+              onPressed: () => Navigator.of(context).pop()
+              // onPressed: () => Navigator.popAndPushNamed(
+              //   context,
+              //   "historyLimitRequest"
+              // )
             ),
           ),
           body: Container(
@@ -1625,7 +1723,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     String getChangeLimit = "";
 
     if(command == 1) {
-      getChangeLimit = await customerAPI.updateLimitGabunganRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['corporate_code']}","user_code":"$user_code_request","limit_baru":"${limitRequestController.text}","old_limit":"${limitDMDController.text}","user_login":"$user_code","id":"${widget.id}"}');
+      getChangeLimit = await customerAPI.updateLimitGabunganRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['corporate_code']}","user_code":"$user_code_request","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}","old_limit":"${limitDMDController.text.replaceAll(new RegExp('\\.'),'')}","user_login":"$user_code","id":"${widget.id}"}');
     } else {
       getChangeLimit = await customerAPI.updateLimitGabunganRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['corporate_code']}","user_code":"$user_code_request","id":"${widget.id}"}');
     }
@@ -1708,7 +1806,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     String getChangeLimit = "";
 
     if(command == 1) {
-      getChangeLimit = await customerAPI.updateLimitRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"$user_code_request","limit_baru":"${limitRequestController.text}","user_login":"$user_code","id":"${widget.id}"}');
+      getChangeLimit = await customerAPI.updateLimitRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"$user_code_request","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}","user_login":"$user_code","id":"${widget.id}"}');
     } else {
       getChangeLimit = await customerAPI.updateLimitRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"$user_code_request","id":"${widget.id}"}');
     }

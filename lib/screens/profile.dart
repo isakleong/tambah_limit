@@ -87,6 +87,9 @@ class ProfileState extends State<Profile> {
                 onSubmitted: (value) {
                   _fieldFocusChange(context, oldPasswordFocus, newPasswordFocus);
                 },
+                onChanged: (value) {
+                  
+                },
               ),
             ),
             Container(
@@ -221,7 +224,17 @@ class ProfileState extends State<Profile> {
     });
 
     if(!oldPasswordValid && !newPasswordValid && !confirmPasswordValid){
-      doChangePassword();
+      Alert(
+        context: context,
+        title: "Konfirmasi,",
+        content: Text("Apakah Anda yakin ingin mengubah password?"),
+        cancel: true,
+        type: "warning",
+        defaultAction: () async {
+          doChangePassword();
+      });
+      
+      
     }
 
   }
@@ -251,14 +264,31 @@ class ProfileState extends State<Profile> {
           content: Text("Password berhasil diubah, silahkan lakukan login ulang"),
           cancel: false,
           type: "success",
-          defaultAction: () {
-            if (mounted) {
-              Navigator.of(context).pop();
-              Navigator.popAndPushNamed(
+          defaultAction: () async {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.remove("limit_dmd");
+              await prefs.remove("request_limit");
+              await prefs.remove("user_code_request");
+              await prefs.remove("user_code");
+              await prefs.remove("max_limit");
+              await prefs.clear();
+              Navigator.pushReplacementNamed(
                 context,
-                "login"
+                "login",
               );
-            }
+            // if (mounted) {
+            //   SharedPreferences prefs = await SharedPreferences.getInstance();
+            //   await prefs.remove("limit_dmd");
+            //   await prefs.remove("request_limit");
+            //   await prefs.remove("user_code_request");
+            //   await prefs.remove("user_code");
+            //   await prefs.remove("max_limit");
+            //   await prefs.clear();
+            //   Navigator.pushReplacementNamed(
+            //     context,
+            //     "login",
+            //   );
+            // }
           } 
         );
         

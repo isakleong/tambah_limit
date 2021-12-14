@@ -149,8 +149,9 @@ class CustomerAPI {
 
     if(url != "") {
 
+      var response;
       try {
-        final response = await client.get(url);
+        response = await client.get(url);
 
         printHelp("CEK YAAAAA "+ url);
 
@@ -161,18 +162,23 @@ class CustomerAPI {
 
         var parsedJson = jsonDecode(response.body);
 
-        if(response.body.toString() != "false") {
+        if(response.body.toString() != "false" && response.body.toString() != "otoritas") {
           customer = Customer.fromJson(parsedJson[0]);
-
-          var resultObject = jsonEncode(response.body);
           result = new Result(success: 1, message: "OK", data: response.body.toString());
-
         } else {
-          result = new Result(success: 0, message: "Data Customer tidak ditemukan");
+          if(response.body.toString() == "false") {
+            result = new Result(success: 0, message: "Data Customer tidak ditemukan");
+          } else if(jsonDecode(jsonEncode(response.body)).toString().trim() == "otoritas") {
+            result = new Result(success: 0, message: "Anda tidak mempunyai otoritas untuk merubah limit pada pelanggan ini");
+          }
         }
           
       } catch (e) {
-        result = new Result(success: -1, message: "Gagal terhubung dengan server");
+        if(response.body.toString() == "otoritas") {
+          result = new Result(success: 0, message: "Anda tidak mempunyai otoritas untuk merubah limit pada pelanggan ini");
+        } else {
+          result = new Result(success: -1, message: "Data Customer tidak ditemukan");
+        }
         print(e);
       }
 
@@ -245,7 +251,7 @@ class CustomerAPI {
           if(response.body.toString() == "false") {
             result = new Result(success: 0, message: "Data Customer Gabungan tidak ditemukan");
           } else if(response.body.toString() == "otoritas") {
-            result = new Result(success: 0, message: "Maaf, Anda tidak mempunyai otoritas untuk merubah limit pada pelanggan gabungan ini");
+            result = new Result(success: 0, message: "Anda tidak mempunyai otoritas untuk merubah limit pada pelanggan gabungan ini");
           }  
         }
 

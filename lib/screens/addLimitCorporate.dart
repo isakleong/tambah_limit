@@ -70,6 +70,7 @@ class AddLimitCorporateState extends State<AddLimitCorporate> {
         bottomNavigationBar:Container(
           margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
           child: Button(
+            loading: searchLoading,
             backgroundColor: config.darkOpacityBlueColor,
             child: TextView("LANJUTKAN", 3, color: Colors.white),
             onTap: () {

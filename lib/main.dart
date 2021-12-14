@@ -51,40 +51,38 @@ void main() async {
   HttpOverrides.global = MyHttpOverrides();
   runApp(
     Configuration(
-      child: OverlaySupport.global(
-        child: MaterialApp (
-          title: config.apkName,
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            bottomSheetTheme: BottomSheetThemeData(
-              backgroundColor: Colors.black.withOpacity(0),
-            )
-          ),
-          onGenerateRoute: (RouteSettings settings) {
-            List<String> pages = [];
-            int mode = 0;
-            int id = 0;
-      
-            pages = settings.name.split("/");
-      
-            // contohnya route/id/mode
-            // optional : arguments
-      
-            // mode 0 = gk dari mana2
-            // mode 1 = api
-            // mode 2 = local storage
-            // mode 3 = dari model
-            // customNavigator(context, "quizInfo/${item.id}/3", arguments: item);
-            if (pages.length > 1) {
-              id = int.tryParse(pages[1]);
-            }
-            if (pages.length > 2) {
-              mode = int.tryParse(pages[2]);
-            }
-      
-            return routing(mode, id, pages, settings);
-          },
+      child: MaterialApp (
+        title: config.apkName,
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          bottomSheetTheme: BottomSheetThemeData(
+            backgroundColor: Colors.black.withOpacity(0),
+          )
         ),
+        onGenerateRoute: (RouteSettings settings) {
+          List<String> pages = [];
+          int mode = 0;
+          int id = 0;
+    
+          pages = settings.name.split("/");
+    
+          // contohnya route/id/mode
+          // optional : arguments
+    
+          // mode 0 = gk dari mana2
+          // mode 1 = api
+          // mode 2 = local storage
+          // mode 3 = dari model
+          // customNavigator(context, "quizInfo/${item.id}/3", arguments: item);
+          if (pages.length > 1) {
+            id = int.tryParse(pages[1]);
+          }
+          if (pages.length > 2) {
+            mode = int.tryParse(pages[2]);
+          }
+    
+          return routing(mode, id, pages, settings);
+        },
       ),
     )
   );

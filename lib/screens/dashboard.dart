@@ -199,9 +199,9 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                           
                           result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
                           
-                          final SharedPreferences sharedPreferences = await _sharedPreferences;
-                          await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
-                          await sharedPreferences.setString("user_code_request", message.data['user_code']);
+                          // final SharedPreferences sharedPreferences = await _sharedPreferences;
+                          // await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+                          // await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
                           Navigator.of(context).pop();
                           
@@ -216,10 +216,11 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
                           result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
 
-                          final SharedPreferences sharedPreferences = await _sharedPreferences;
-                          await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
-                          await sharedPreferences.setString("user_code_request", message.data['user_code']);
+                          // final SharedPreferences sharedPreferences = await _sharedPreferences;
+                          // await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+                          // await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
+                          Navigator.of(context).pop();
                           Navigator.of(context).pop();
 
                           Navigator.pushNamed(
@@ -409,7 +410,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
     return Scaffold(
       key: _scaffoldKey,
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: TextView(dashboardTitle, 1),
         automaticallyImplyLeading: false,
@@ -517,6 +518,10 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                     child: TextView("Tambah Limit", 3, color: Colors.white),
                     onTap: () {
                       _bottomBarController.toggleSheet();
+                      setState(() {
+                        customerIdController.text = "";
+                        result = null;
+                      });
                       Navigator.pushNamed(
                           context,
                           "addLimit"
@@ -532,6 +537,10 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                     child: TextView("Tambah Limit Corporate", 3, color: Colors.white),
                     onTap: () {
                       _bottomBarController.toggleSheet();
+                      setState(() {
+                        customerIdController.text = "";
+                        result = null;
+                      });
                       Navigator.pushNamed(
                           context,
                           "addLimitCorporate"
@@ -641,18 +650,18 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                     enabled: false,
                     decoration: new InputDecoration(
                       hintStyle: TextStyle(
-                        color: config.grayNonActiveColor
+                        color: Colors.black
                       ),
                       labelStyle: TextStyle(
-                        color: config.grayNonActiveColor
+                        color: Colors.black
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Kode Pelanggan",
                       hintText: resultObject[0]["No_"],
-                      icon: Icon(Icons.bookmark),
+                      icon: Icon(Icons.bookmark, color: config.grayColor),
                       disabledBorder: OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
+                          borderSide: BorderSide(color: config.grayColor, width: 1.5,),
                       ),
                     ),
                   ),
@@ -663,18 +672,18 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                     enabled: false,
                     decoration: new InputDecoration(
                       hintStyle: TextStyle(
-                        color: config.grayNonActiveColor
+                        color: Colors.black
                       ),
                       labelStyle: TextStyle(
-                        color: config.grayNonActiveColor
+                        color: Colors.black
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Nama Pelanggan",
                       hintText: resultObject[0]["Name"],
-                      icon: Icon(Icons.person),
+                      icon: Icon(Icons.person, color: config.grayColor),
                       disabledBorder: OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
+                          borderSide: BorderSide(color: config.grayColor, width: 1.5,),
                       ),
                     ),
                   ),
@@ -685,18 +694,18 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                     enabled: false,
                     decoration: new InputDecoration(
                       hintStyle: TextStyle(
-                        color: config.grayNonActiveColor
+                        color: Colors.black
                       ),
                       labelStyle: TextStyle(
-                        color: config.grayNonActiveColor
+                        color: Colors.black
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Alamat Pelanggan",
                       hintText: resultObject[0]["Address"],
-                      icon: Icon(Icons.location_on),
+                      icon: Icon(Icons.location_on, color: config.grayColor),
                       disabledBorder: OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
+                          borderSide: BorderSide(color: config.grayColor, width: 1.5,),
                       ),
                     ),
                   ),

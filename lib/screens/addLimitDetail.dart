@@ -106,14 +106,6 @@ class AddLimitDetailState extends State<AddLimitDetail> {
       length: 2,
       child: Scaffold(
           resizeToAvoidBottomInset: true,
-          // appBar: AppBar(
-          //   title: TextView("Tambah Limit", 1),
-          //   leading: IconButton(
-          //     icon: Icon(Icons.arrow_back, color: Colors.white),
-          //     onPressed: () => Navigator.popAndPushNamed(context, "dashboard"),
-          //   ),
-          //   bottom:
-          // ),
           body: NestedScrollView(
             headerSliverBuilder:
                 (BuildContext context, bool innerBoxIsScrolled) {
@@ -148,34 +140,6 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                         shrinkWrap: true,
                         children: changeLimitWidgetList,
                       ),
-
-                // Container(
-                //           child: ListView.builder(
-                //             itemCount: 3,
-                //             padding: EdgeInsets.only(left: 16, right: 16),
-                //             scrollDirection: Axis.horizontal,
-                //             itemBuilder: (context, index){
-                //               return Card(
-                //                 elevation: 0,
-                //                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                //                 child: Container(
-                //                   height: 140,
-                //                   width: 75,
-                //                   decoration: BoxDecoration(
-                //                     borderRadius: BorderRadius.circular(12),
-                //                     border: Border.all(color: Colors.amber, width: 1),
-                //                   ),
-                //                   child: Column(
-                //                     children: [
-                //                       Image.asset("assets/illustration/varnish.png", height: 50,),
-                //                       Text("Cat")
-                //                     ],
-                //                   ),
-                //                 ),
-                //               );
-                //             },
-                //           ),
-                //         ),
 
                 //Detail Informasi section
                 SingleChildScrollView(
@@ -1213,49 +1177,67 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                                 ),
                                                                 SizedBox(
                                                                     height: 30),
-                                                                Scrollbar(
-                                                                  isAlwaysShown:
-                                                                      true,
-                                                                  controller:
-                                                                      _scrollController,
-                                                                  child:
-                                                                      SingleChildScrollView(
-                                                                    controller:
-                                                                        _scrollController,
-                                                                    scrollDirection:
-                                                                        Axis.horizontal,
-                                                                    child:
-                                                                        DataTable(
-                                                                      columns: [
-                                                                        DataColumn(
-                                                                            label:
-                                                                                TextView(
-                                                                          "Pengambilan Tertinggi",
-                                                                          4,
-                                                                        )),
-                                                                        DataColumn(
-                                                                            label:
-                                                                                TextView("Rata-rata Payment", 4)),
-                                                                        DataColumn(
-                                                                            label:
-                                                                                TextView("Total Omzet", 4)),
-                                                                      ],
-                                                                      rows: List.generate(
-                                                                          resultObject[15]
-                                                                              .length,
-                                                                          (index) {
-                                                                        return DataRow(
-                                                                          cells: [
-                                                                            DataCell(TextView("Rp " + currencyFormatter.format(resultObject[15][index]["jum_byr"]),
-                                                                                4)),
-                                                                            DataCell(TextView("Rp " + currencyFormatter.format(resultObject[15][index]["rata2"]) + " -- " + "${resultObject[15][index]["pengali"]} X",
-                                                                                4)),
-                                                                            DataCell(TextView("Rp " + currencyFormatter.format(resultObject[18]["total_omzet_cat"]),
-                                                                                4)),
+                                                                Container(
+                                                                  child: Column(
+                                                                    children: [
+                                                                      Container(
+                                                                        child: Row(
+                                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                                          children: [
+                                                                            Container(
+                                                                              child: TextView("Pengambilan Tertinggi", 4),
+                                                                            ),
+                                                                            Container(
+                                                                              child: Column(
+                                                                                children: List.generate(resultObject[15].length, (index) {
+                                                                                  return Container(
+                                                                                    margin: EdgeInsets.only(top: 10),
+                                                                                    child: TextView("Rp " + currencyFormatter.format(resultObject[15][index]["jum_byr"]), 4)
+                                                                                    );  
+                                                                                  },
+                                                                                )
+                                                                              ),
+                                                                            )
                                                                           ],
-                                                                        );
-                                                                      }),
-                                                                    ),
+                                                                        ),
+                                                                      ),
+                                                                      SizedBox(height: 40),
+                                                                      Container(
+                                                                        child: Row(
+                                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                          children: [
+                                                                            Container(
+                                                                              child: TextView("Rata-rata Payment", 4),
+                                                                            ),
+                                                                            Container(
+                                                                              child: Column(
+                                                                                children: List.generate(resultObject[15].length, (index) {
+                                                                                  return Container(
+                                                                                    child: TextView("Rp " + currencyFormatter.format(resultObject[15][index]["rata2"]) + "\n(" + "${resultObject[15][index]["pengali"]} x)", 4, align: TextAlign.end)
+                                                                                    );  
+                                                                                  },
+                                                                                )
+                                                                              ),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                      SizedBox(height: 40),
+                                                                      Container(
+                                                                        child: Row(
+                                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                          children: [
+                                                                            Container(
+                                                                              child: TextView("Total Omzet", 4),
+                                                                            ),
+                                                                            Container(
+                                                                              child: TextView("Rp " + currencyFormatter.format(resultObject[18]["total_omzet_cat"]), 4),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ],
                                                                   ),
                                                                 ),
                                                               ],
@@ -1334,49 +1316,67 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                                 ),
                                                                 SizedBox(
                                                                     height: 30),
-                                                                Scrollbar(
-                                                                  isAlwaysShown:
-                                                                      true,
-                                                                  controller:
-                                                                      _scrollController,
-                                                                  child:
-                                                                      SingleChildScrollView(
-                                                                    controller:
-                                                                        _scrollController,
-                                                                    scrollDirection:
-                                                                        Axis.horizontal,
-                                                                    child:
-                                                                        DataTable(
-                                                                      columns: [
-                                                                        DataColumn(
-                                                                            label:
-                                                                                TextView(
-                                                                          "Pengambilan Tertinggi",
-                                                                          4,
-                                                                        )),
-                                                                        DataColumn(
-                                                                            label:
-                                                                                TextView("Rata-rata Payment", 4)),
-                                                                        DataColumn(
-                                                                            label:
-                                                                                TextView("Total Omzet", 4)),
-                                                                      ],
-                                                                      rows: List.generate(
-                                                                          resultObject[16]
-                                                                              .length,
-                                                                          (index) {
-                                                                        return DataRow(
-                                                                          cells: [
-                                                                            DataCell(TextView("Rp " + currencyFormatter.format(resultObject[16][index]["jum_byr"]),
-                                                                                4)),
-                                                                            DataCell(TextView("Rp " + currencyFormatter.format(resultObject[16][index]["rata2"]) + " -- " + "${resultObject[16][index]["pengali"]} X",
-                                                                                4)),
-                                                                            DataCell(TextView("Rp " + currencyFormatter.format(resultObject[19]["total_omzet_bb"]),
-                                                                                4)),
+                                                                Container(
+                                                                  child: Column(
+                                                                    children: [
+                                                                      Container(
+                                                                        child: Row(
+                                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                                          children: [
+                                                                            Container(
+                                                                              child: TextView("Pengambilan Tertinggi", 4),
+                                                                            ),
+                                                                            Container(
+                                                                              child: Column(
+                                                                                children: List.generate(resultObject[16].length, (index) {
+                                                                                  return Container(
+                                                                                    margin: EdgeInsets.only(top: 10),
+                                                                                    child: TextView("Rp " + currencyFormatter.format(resultObject[16][index]["jum_byr"]), 4)
+                                                                                    );  
+                                                                                  },
+                                                                                )
+                                                                              ),
+                                                                            )
                                                                           ],
-                                                                        );
-                                                                      }),
-                                                                    ),
+                                                                        ),
+                                                                      ),
+                                                                      SizedBox(height: 40),
+                                                                      Container(
+                                                                        child: Row(
+                                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                          children: [
+                                                                            Container(
+                                                                              child: TextView("Rata-rata Payment", 4),
+                                                                            ),
+                                                                            Container(
+                                                                              child: Column(
+                                                                                children: List.generate(resultObject[16].length, (index) {
+                                                                                  return Container(
+                                                                                    child: TextView("Rp " + currencyFormatter.format(resultObject[16][index]["rata2"]) + "\n(" + "${resultObject[16][index]["pengali"]} x)", 4, align: TextAlign.end)
+                                                                                    );  
+                                                                                  },
+                                                                                )
+                                                                              ),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                      SizedBox(height: 40),
+                                                                      Container(
+                                                                        child: Row(
+                                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                          children: [
+                                                                            Container(
+                                                                              child: TextView("Total Omzet", 4),
+                                                                            ),
+                                                                            Container(
+                                                                              child: TextView("Rp " + currencyFormatter.format(resultObject[19]["total_omzet_bb"]), 4),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ],
                                                                   ),
                                                                 ),
                                                               ],
@@ -1456,49 +1456,67 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                                 ),
                                                                 SizedBox(
                                                                     height: 30),
-                                                                Scrollbar(
-                                                                  isAlwaysShown:
-                                                                      true,
-                                                                  controller:
-                                                                      _scrollController,
-                                                                  child:
-                                                                      SingleChildScrollView(
-                                                                    controller:
-                                                                        _scrollController,
-                                                                    scrollDirection:
-                                                                        Axis.horizontal,
-                                                                    child:
-                                                                        DataTable(
-                                                                      columns: [
-                                                                        DataColumn(
-                                                                            label:
-                                                                                TextView(
-                                                                          "Pengambilan Tertinggi",
-                                                                          4,
-                                                                        )),
-                                                                        DataColumn(
-                                                                            label:
-                                                                                TextView("Rata-rata Payment", 4)),
-                                                                        DataColumn(
-                                                                            label:
-                                                                                TextView("Total Omzet", 4)),
-                                                                      ],
-                                                                      rows: List.generate(
-                                                                          resultObject[17]
-                                                                              .length,
-                                                                          (index) {
-                                                                        return DataRow(
-                                                                          cells: [
-                                                                            DataCell(TextView("Rp " + currencyFormatter.format(resultObject[17][index]["jum_byr"]),
-                                                                                4)),
-                                                                            DataCell(TextView("Rp " + currencyFormatter.format(resultObject[17][index]["rata2"]) + " -- " + "${resultObject[17][index]["pengali"]} X",
-                                                                                4)),
-                                                                            DataCell(TextView("Rp " + currencyFormatter.format(resultObject[20]["total_omzet_mebel"]),
-                                                                                4)),
+                                                                Container(
+                                                                  child: Column(
+                                                                    children: [
+                                                                      Container(
+                                                                        child: Row(
+                                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                                          children: [
+                                                                            Container(
+                                                                              child: TextView("Pengambilan Tertinggi", 4),
+                                                                            ),
+                                                                            Container(
+                                                                              child: Column(
+                                                                                children: List.generate(resultObject[17].length, (index) {
+                                                                                  return Container(
+                                                                                    margin: EdgeInsets.only(top: 10),
+                                                                                    child: TextView("Rp " + currencyFormatter.format(resultObject[17][index]["jum_byr"]), 4)
+                                                                                    );  
+                                                                                  },
+                                                                                )
+                                                                              ),
+                                                                            )
                                                                           ],
-                                                                        );
-                                                                      }),
-                                                                    ),
+                                                                        ),
+                                                                      ),
+                                                                      SizedBox(height: 40),
+                                                                      Container(
+                                                                        child: Row(
+                                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                          children: [
+                                                                            Container(
+                                                                              child: TextView("Rata-rata Payment", 4),
+                                                                            ),
+                                                                            Container(
+                                                                              child: Column(
+                                                                                children: List.generate(resultObject[17].length, (index) {
+                                                                                  return Container(
+                                                                                    child: TextView("Rp " + currencyFormatter.format(resultObject[17][index]["rata2"]) + "\n(" + "${resultObject[17][index]["pengali"]} x)", 4, align: TextAlign.end)
+                                                                                    );  
+                                                                                  },
+                                                                                )
+                                                                              ),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                      SizedBox(height: 40),
+                                                                      Container(
+                                                                        child: Row(
+                                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                          children: [
+                                                                            Container(
+                                                                              child: TextView("Total Omzet", 4),
+                                                                            ),
+                                                                            Container(
+                                                                              child: TextView("Rp " + currencyFormatter.format(resultObject[20]["total_omzet_mebel"]), 4),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ],
                                                                   ),
                                                                 ),
                                                               ],
@@ -1550,55 +1568,39 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                             color: config.lighterGrayColor,
                           ),
                           Container(
-                            child: TextView("Informasi Lainnya", 1,
-                                color: config.blueColor),
+                            child: TextView("Informasi Lainnya", 1, color: config.blueColor),
                           ),
-                          Scrollbar(
-                            isAlwaysShown: true,
-                            controller: _scrollController,
-                            child: SingleChildScrollView(
-                              controller: _scrollController,
-                              scrollDirection: Axis.horizontal,
-                              child: DataTable(
-                                columns: [
-                                  DataColumn(
-                                      label: TextView(
-                                    "SO Outstanding",
-                                    4,
-                                  )),
-                                  DataColumn(
-                                      label:
-                                          TextView("Shipment Not Invoiced", 4)),
-                                  DataColumn(label: TextView("Total Retur", 4)),
-                                  DataColumn(label: TextView("Piutang", 4)),
-                                ],
-                                rows: [
-                                  DataRow(
-                                    cells: [
-                                      DataCell(TextView(
-                                          "Rp " +
-                                              currencyFormatter.format(
-                                                  resultObject[11]["ov"]),
-                                          4)),
-                                      DataCell(TextView(
-                                          "Rp " +
-                                              currencyFormatter.format(
-                                                  resultObject[9]["jum"]),
-                                          4)),
-                                      DataCell(TextView(
-                                          "Rp " +
-                                              currencyFormatter.format(
-                                                  resultObject[8]["retur"]),
-                                          4)),
-                                      DataCell(TextView(
-                                          "Rp " +
-                                              currencyFormatter.format(
-                                                  resultObject[10]["piutang"]),
-                                          4)),
-                                    ],
+                          Container(
+                            child: Column(
+                              children: [
+                                ListTile(
+                                  title: TextView("SO Outstanding", 4),
+                                  trailing: Container(
+                                    child: TextView("Rp " + currencyFormatter.format(resultObject[11]["ov"]),4)
                                   ),
-                                ],
-                              ),
+                                ),
+
+                                ListTile(
+                                  title: TextView("Shipment Not Invoiced", 4),
+                                  trailing: Container(
+                                    child: TextView("Rp " + currencyFormatter.format(resultObject[9]["jum"]),4)
+                                  ),
+                                ),
+
+                                ListTile(
+                                  title: TextView("Total Retur", 4),
+                                  trailing: Container(
+                                    child: TextView("Rp " + currencyFormatter.format(resultObject[8]["retur"]),4)
+                                  ),
+                                ),
+
+                                ListTile(
+                                  title: TextView("Piutang", 4),
+                                  trailing: Container(
+                                    child: TextView("Rp " + currencyFormatter.format(resultObject[10]["piutang"]),4)
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -1655,18 +1657,18 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                 child: TextFormField(
                   enabled: false,
                   decoration: new InputDecoration(
-                    hintStyle: TextStyle(color: config.grayNonActiveColor),
-                    labelStyle: TextStyle(color: config.grayNonActiveColor),
+                    hintStyle: TextStyle(color: Colors.black),
+                    labelStyle: TextStyle(color: Colors.black),
                     floatingLabelBehavior: FloatingLabelBehavior.always,
                     labelText: "Kode Pelanggan",
                     hintText: resultObject[0]["No_"],
-                    icon: Icon(Icons.bookmark),
+                    icon: Icon(Icons.bookmark, color: config.grayColor),
                     disabledBorder: OutlineInputBorder(
                       borderRadius: new BorderRadius.circular(
                         5.0,
                       ),
                       borderSide: BorderSide(
-                        color: config.grayNonActiveColor,
+                        color: config.grayColor,
                         width: 1.5,
                       ),
                     ),
@@ -1678,18 +1680,18 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                 child: TextFormField(
                   enabled: false,
                   decoration: new InputDecoration(
-                    hintStyle: TextStyle(color: config.grayNonActiveColor),
-                    labelStyle: TextStyle(color: config.grayNonActiveColor),
+                    hintStyle: TextStyle(color: Colors.black),
+                    labelStyle: TextStyle(color: Colors.black),
                     floatingLabelBehavior: FloatingLabelBehavior.always,
                     labelText: "Nama Pelanggan",
                     hintText: resultObject[0]["Name"],
-                    icon: Icon(Icons.person),
+                    icon: Icon(Icons.person, color: config.grayColor),
                     disabledBorder: OutlineInputBorder(
                       borderRadius: new BorderRadius.circular(
                         5.0,
                       ),
                       borderSide: BorderSide(
-                        color: config.grayNonActiveColor,
+                        color: config.grayColor,
                         width: 1.5,
                       ),
                     ),
@@ -1701,18 +1703,18 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                 child: TextFormField(
                   enabled: false,
                   decoration: new InputDecoration(
-                    hintStyle: TextStyle(color: config.grayNonActiveColor),
-                    labelStyle: TextStyle(color: config.grayNonActiveColor),
+                    hintStyle: TextStyle(color: Colors.black),
+                    labelStyle: TextStyle(color: Colors.black),
                     floatingLabelBehavior: FloatingLabelBehavior.always,
                     labelText: "Alamat Pelanggan",
                     hintText: resultObject[0]["Address"],
-                    icon: Icon(Icons.location_on),
+                    icon: Icon(Icons.location_on, color: config.grayColor),
                     disabledBorder: OutlineInputBorder(
                       borderRadius: new BorderRadius.circular(
                         5.0,
                       ),
                       borderSide: BorderSide(
-                        color: config.grayNonActiveColor,
+                        color: config.grayColor,
                         width: 1.5,
                       ),
                     ),
@@ -1724,19 +1726,19 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                 child: TextFormField(
                   enabled: false,
                   decoration: new InputDecoration(
-                    hintStyle: TextStyle(color: config.grayNonActiveColor),
-                    labelStyle: TextStyle(color: config.grayNonActiveColor),
+                    hintStyle: TextStyle(color: Colors.black),
+                    labelStyle: TextStyle(color: Colors.black),
                     floatingLabelBehavior: FloatingLabelBehavior.always,
                     labelText: "Status",
                     hintText:
                         resultObject[0]["disc"] + " | " + blockedTypeSelected,
-                    icon: Icon(Icons.list_alt),
+                    icon: Icon(Icons.list_alt, color: config.grayColor),
                     disabledBorder: OutlineInputBorder(
                       borderRadius: new BorderRadius.circular(
                         5.0,
                       ),
                       borderSide: BorderSide(
-                        color: config.grayNonActiveColor,
+                        color: config.grayColor,
                         width: 1.5,
                       ),
                     ),
@@ -1780,19 +1782,19 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                 child: TextFormField(
                   enabled: false,
                   decoration: new InputDecoration(
-                    hintStyle: TextStyle(color: config.grayNonActiveColor),
-                    labelStyle: TextStyle(color: config.grayNonActiveColor),
+                    hintStyle: TextStyle(color: Colors.black),
+                    labelStyle: TextStyle(color: Colors.black),
                     floatingLabelBehavior: FloatingLabelBehavior.always,
                     labelText: "Limit Saat Ini",
                     hintText: currencyFormatter
                         .format(int.parse(resultObject[0]["Limit"])),
-                    icon: TextView("Rp ", 5, color: config.grayNonActiveColor),
+                    icon: TextView("Rp ", 5, color: config.grayColor),
                     disabledBorder: OutlineInputBorder(
                       borderRadius: new BorderRadius.circular(
                         5.0,
                       ),
                       borderSide: BorderSide(
-                        color: config.grayNonActiveColor,
+                        color: config.grayColor,
                         width: 1.5,
                       ),
                     ),
@@ -1880,7 +1882,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
     if ((limitDMDController.text.isEmpty ||
             limitRequestController.text.isEmpty) ||
         (limitRequestController.text.isEmpty &&
-            int.parse(limitDMDController.text) == limit_dmd_lama)) {
+            int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')) == limit_dmd_lama)) {
       Alert(
           context: context,
           title: "Info,",
@@ -1888,20 +1890,20 @@ class AddLimitDetailState extends State<AddLimitDetail> {
           cancel: false,
           type: "warning");
     } else {
-      if (int.parse(limitDMDController.text) != 0 &&
-          int.parse(limitRequestController.text) >
-              int.parse(limitDMDController.text)) {
+      if (int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')) != 0 &&
+          int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) >
+              int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),''))) {
         Alert(
             context: context,
             title: "Info,",
             content: Text("Limit Baru melebihi Limit DMD!"),
             cancel: false,
             type: "warning");
-      } else if (int.parse(limitDMDController.text) == 0 ||
-          (int.parse(limitDMDController.text) != 0 &&
-              int.parse(limitRequestController.text) <=
-                  int.parse(limitDMDController.text))) {
-        if (int.parse(limitRequestController.text) > max_limit) {
+      } else if (int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')) == 0 ||
+          (int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')) != 0 &&
+              int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) <=
+                  int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')))) {
+        if (int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > max_limit) {
           Alert(
               context: context,
               title: "Konfirmasi,",
@@ -1941,7 +1943,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
 
     String getChangeLimit = await customerAPI.changeLimit(context,
         parameter:
-            'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"${prefs.getString('user_code')}","nama_cust":"${resultObject[0]['Name']}","limit_baru":"${limitRequestController.text}","old_limit":"${resultObject[0]['Limit']}","piutang":${resultObject[10]['piutang']},"limit_dmd_lama":"${prefs.getInt('limit_dmd')}","limit_dmd_baru":"${limitDMDController.text}"}');
+            'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"${prefs.getString('user_code')}","nama_cust":"${resultObject[0]['Name']}","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}","old_limit":"${resultObject[0]['Limit']}","piutang":${resultObject[10]['piutang']},"limit_dmd_lama":"${prefs.getInt('limit_dmd')}","limit_dmd_baru":"${limitDMDController.text.replaceAll(new RegExp('\\.'),'')}"}');
 
     Navigator.of(context).pop();
 
@@ -1978,7 +1980,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
 
     String getRequestLimit = await customerAPI.addRequestLimit(context,
         parameter:
-            'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"${prefs.getString('user_code')}","nama_cust":"${resultObject[0]['Name']}","limit_baru":"${limitRequestController.text}"}');
+            'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"${prefs.getString('user_code')}","nama_cust":"${resultObject[0]['Name']}","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}"}');
 
     Navigator.of(context).pop();
 
@@ -2004,13 +2006,5 @@ class AddLimitDetailState extends State<AddLimitDetail> {
   }
 
   showInformationDetail(Configuration config) {}
-
-  // formatDollar(num) {
-  //   num = num * 1;
-  //   var p = num.toStringAsFixed(2).split(".");
-  //   return  p[0].split("").reverse().reduce((acc, num, i, orig) {
-  //       return  num == "-" ? acc : num + (i && !(i % 3) ? "." : "") + acc;
-  //   }, "");
-  // }
 
 }

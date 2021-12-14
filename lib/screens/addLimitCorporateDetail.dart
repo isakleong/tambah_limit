@@ -89,18 +89,18 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
                   child: TextFormField(
                     enabled: false,
                     decoration: new InputDecoration(
-                      hintStyle: TextStyle(color: config.grayNonActiveColor),
-                      labelStyle: TextStyle(color: config.grayNonActiveColor),
+                      hintStyle: TextStyle(color: Colors.black),
+                      labelStyle: TextStyle(color: Colors.black),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Kode Corporate",
                       hintText: resultObject[0]["corporate_code"],
-                      icon: Icon(Icons.bookmark),
+                      icon: Icon(Icons.bookmark, color: config.grayColor),
                       disabledBorder: OutlineInputBorder(
                         borderRadius: new BorderRadius.circular(
                           5.0,
                         ),
                         borderSide: BorderSide(
-                          color: config.grayNonActiveColor,
+                          color: config.grayColor,
                           width: 1.5,
                         ),
                       ),
@@ -112,18 +112,18 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
                   child: TextFormField(
                     enabled: false,
                     decoration: new InputDecoration(
-                      hintStyle: TextStyle(color: config.grayNonActiveColor),
-                      labelStyle: TextStyle(color: config.grayNonActiveColor),
+                      hintStyle: TextStyle(color: Colors.black),
+                      labelStyle: TextStyle(color: Colors.black),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Nama Corporate",
                       hintText: resultObject[0]["corporate_name"],
-                      icon: Icon(Icons.person),
+                      icon: Icon(Icons.person, color: config.grayColor),
                       disabledBorder: OutlineInputBorder(
                         borderRadius: new BorderRadius.circular(
                           5.0,
                         ),
                         borderSide: BorderSide(
-                          color: config.grayNonActiveColor,
+                          color: config.grayColor,
                           width: 1.5,
                         ),
                       ),
@@ -135,18 +135,18 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
                   child: TextFormField(
                     enabled: false,
                     decoration: new InputDecoration(
-                      hintStyle: TextStyle(color: config.grayNonActiveColor),
-                      labelStyle: TextStyle(color: config.grayNonActiveColor),
+                      hintStyle: TextStyle(color: Colors.black),
+                      labelStyle: TextStyle(color: Colors.black),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Induk Pelanggan",
                       hintText: resultObject[0]["head_customer"],
-                      icon: Icon(Icons.group),
+                      icon: Icon(Icons.group, color: config.grayColor),
                       disabledBorder: OutlineInputBorder(
                         borderRadius: new BorderRadius.circular(
                           5.0,
                         ),
                         borderSide: BorderSide(
-                          color: config.grayNonActiveColor,
+                          color: config.grayColor,
                           width: 1.5,
                         ),
                       ),
@@ -158,18 +158,18 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
                   child: TextFormField(
                     enabled: false,
                     decoration: new InputDecoration(
-                      hintStyle: TextStyle(color: config.grayNonActiveColor),
-                      labelStyle: TextStyle(color: config.grayNonActiveColor),
+                      hintStyle: TextStyle(color: Colors.black),
+                      labelStyle: TextStyle(color: Colors.black),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Limit Saat Ini",
                       hintText: currencyFormatter.format(int.parse(resultObject[0]["old_limit"])),
-                      icon: TextView("Rp ", 4, color: config.grayNonActiveColor),
+                      icon: TextView("Rp ", 4, color: config.grayColor),
                       disabledBorder: OutlineInputBorder(
                         borderRadius: new BorderRadius.circular(
                           5.0,
                         ),
                         borderSide: BorderSide(
-                          color: config.grayNonActiveColor,
+                          color: config.grayColor,
                           width: 1.5,
                         ),
                       ),
@@ -190,11 +190,11 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
                     enabled: true,
                     controller: limitRequestController,
                     decoration: new InputDecoration(
-                      hintStyle: TextStyle(color: config.grayColor),
-                      labelStyle: TextStyle(color: config.grayColor),
+                      hintStyle: TextStyle(color: Colors.black),
+                      labelStyle: TextStyle(color: Colors.black),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Limit Yang Diajukan",
-                      icon: TextView("Rp ", 4),
+                      icon: TextView("Rp ", 4, color: config.grayColor),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: new BorderRadius.circular(
                           5.0,

@@ -72,6 +72,7 @@ class AddLimitState extends State<AddLimit> {
         bottomNavigationBar:Container(
           margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
           child: Button(
+            loading: searchLoading,
             backgroundColor: config.darkOpacityBlueColor,
             child: TextView("LANJUTKAN", 3, color: Colors.white, caps: true),
             onTap: () {
