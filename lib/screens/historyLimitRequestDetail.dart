@@ -85,6 +85,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     }
 
     request_limit = prefs.getInt("request_limit");
+    printHelp("cek cache "+request_limit.toString());
     user_code_request = prefs.getString("user_code_request");
 
     limitRequestController.value = TextEditingValue(

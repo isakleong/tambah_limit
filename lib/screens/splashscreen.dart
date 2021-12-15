@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'package:http/http.dart' show Client;
 import 'package:tambah_limit/models/resultModel.dart';
+import 'package:tambah_limit/resources/PushNotificationService.dart';
 import 'package:tambah_limit/resources/customerAPI.dart';
 
 import 'package:tambah_limit/screens/login.dart';
@@ -38,11 +39,158 @@ class SplashScreenState extends State<SplashScreen> {
   bool _error = false;
   bool isNotificationOpened = false;
 
-  Result notificationData;
-  String notificationRoute = "";
-
   String fcmToken = "";
   String user_code = "";
+
+  String notificationBody = '';
+  String notificationId = '';
+  String notificationCustomerCode = '';
+  String notificationUserCode = '';
+  String notificationLimit = '';
+
+  Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+    await Firebase.initializeApp();
+    print("Handling a background message: ${message.messageId}");
+    Result result_;
+
+    if (message.data['body'].toString().toLowerCase().contains("terdapat request tambah limit")) {
+      if(config.isAppLive == false){
+        while(config.isScreenAtDashboard == false){
+          await Future.delayed(Duration(milliseconds: 500));
+        }
+      }
+
+      if(message.data['customer_code'].toString().length > 11) {
+        Alert(context: context, loading: true, disableBackButton: true);
+
+        result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+        
+        final SharedPreferences sharedPreferences = await _sharedPreferences;
+        await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+        await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+        Navigator.of(context).pop();
+        
+        Navigator.pushNamed(
+          context,
+          "historyLimitRequestDetail/${message.data['id']}/4",
+          arguments: result_,
+        );
+      } else {
+        Alert(context: context, loading: true, disableBackButton: true);
+
+        result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+
+        final SharedPreferences sharedPreferences = await _sharedPreferences;
+        await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+        await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+
+        Navigator.pushNamed(
+          context,
+          "historyLimitRequestDetail/${message.data['id']}/1",
+          arguments: result_,
+        );
+      }
+
+    } else if(message.data['body'].toString().toLowerCase().contains("diterima")) {
+      if(config.isAppLive == false){
+        while(config.isScreenAtDashboard == false){
+          await Future.delayed(Duration(milliseconds: 500));
+        }
+      }
+
+      if(message.data['customer_code'].toString().length > 11) {
+        Alert(context: context, loading: true, disableBackButton: true);
+
+        result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+        
+        final SharedPreferences sharedPreferences = await _sharedPreferences;
+        await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+        await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+        Navigator.of(context).pop();
+        
+        Navigator.pushNamed(
+          context,
+          "historyLimitRequestDetail/${message.data['id']}/5",
+          arguments: result_,
+        );
+      } else {
+        Alert(
+          context: context,
+          title: message.data['body'].toString(),
+          content: Text("Kode Customer "+message.data['customer_code'] + " ---- " + "User Code " + message.data['user_code'] + " ---- " + "Request Limit " + message.data['limit'] +" --- "),
+          cancel: true,
+          type: "warning",
+          defaultAction: () {}
+        );
+
+        // Alert(context: context, loading: true, disableBackButton: true);
+
+        // result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+
+        // final SharedPreferences sharedPreferences = await _sharedPreferences;
+        // await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+        // await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+        // Navigator.of(context).pop();
+        // Navigator.of(context).pop();
+
+        // Navigator.popAndPushNamed(
+        //   context,
+        //   "historyLimitRequestDetail/${message.data['id']}/2",
+        //   arguments: result_,
+        // );
+      }
+
+    } else if(message.data['body'].toString().toLowerCase().contains("ditolak")) {
+      if(config.isAppLive == false){
+        while(config.isScreenAtDashboard == false){
+          await Future.delayed(Duration(milliseconds: 500));
+        }
+      }
+
+      if(message.data['customer_code'].toString().length > 11) {
+        Alert(context: context, loading: true, disableBackButton: true);
+
+        result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+        
+        final SharedPreferences sharedPreferences = await _sharedPreferences;
+        await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+        await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+        
+        Navigator.pushNamed(
+          context,
+          "historyLimitRequestDetail/${message.data['id']}/6",
+          arguments: result_,
+        );
+      } else {
+        Alert(context: context, loading: true, disableBackButton: true);
+
+        result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+
+        final SharedPreferences sharedPreferences = await _sharedPreferences;
+        await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+        await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+
+        Navigator.pushNamed(
+          context,
+          "historyLimitRequestDetail/${message.data['id']}/3",
+          arguments: result_,
+        );
+      }
+    }
+
+  }
 
   void initializeFlutterFire() async {
     try {
@@ -51,145 +199,159 @@ class SplashScreenState extends State<SplashScreen> {
       setState(() {
         _initialized = true;
       });
+      // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
       //handle notification in terminate state
-      RemoteMessage message =
-        await FirebaseMessaging.instance.getInitialMessage();
+      // RemoteMessage message =
+      //   await FirebaseMessaging.instance.getInitialMessage();
 
-      if (message != null) {
-        Result result_;
+      // if (message != null) {
+      //   printHelp("WHAT THE ");
+      //   Result result_;
       
-        if (message.data['body'].toString().toLowerCase().contains("terdapat request tambah limit")) {
-          if(config.isAppLive == false){
-            while(config.isScreenAtDashboard == false){
-              await Future.delayed(Duration(milliseconds: 500));
-            }
-          }
+      //   if (message.data['body'].toString().toLowerCase().contains("terdapat request tambah limit")) {
+      //     if(config.isAppLive == false){
+      //       while(config.isScreenAtDashboard == false){
+      //         await Future.delayed(Duration(milliseconds: 500));
+      //       }
+      //     }
 
-          if(message.data['customer_code'].toString().length > 11) {
-            Alert(context: context, loading: true, disableBackButton: true);
+      //     if(message.data['customer_code'].toString().length > 11) {
+      //       Alert(context: context, loading: true, disableBackButton: true);
 
-            result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+      //       result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
             
-            final SharedPreferences sharedPreferences = await _sharedPreferences;
-            await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
-            await sharedPreferences.setString("user_code_request", message.data['user_code']);
+      //       final SharedPreferences sharedPreferences = await _sharedPreferences;
+      //       await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+      //       await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
-            Navigator.of(context).pop();
+      //       Navigator.of(context).pop();
             
-            Navigator.pushNamed(
-              context,
-              "historyLimitRequestDetail/${message.data['id']}/4",
-              arguments: result_,
-            );
-          } else {
-            Alert(context: context, loading: true, disableBackButton: true);
+      //       Navigator.pushNamed(
+      //         context,
+      //         "historyLimitRequestDetail/${message.data['id']}/4",
+      //         arguments: result_,
+      //       );
+      //     } else {
+      //       Alert(context: context, loading: true, disableBackButton: true);
 
-            result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+      //       result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
 
-            final SharedPreferences sharedPreferences = await _sharedPreferences;
-            await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
-            await sharedPreferences.setString("user_code_request", message.data['user_code']);
+      //       final SharedPreferences sharedPreferences = await _sharedPreferences;
+      //       await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+      //       await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
-            Navigator.of(context).pop();
+      //       Navigator.of(context).pop();
+      //       Navigator.of(context).pop();
 
-            Navigator.pushNamed(
-              context,
-              "historyLimitRequestDetail/${message.data['id']}/1",
-              arguments: result_,
-            );
-          }
+      //       Navigator.pushNamed(
+      //         context,
+      //         "historyLimitRequestDetail/${message.data['id']}/1",
+      //         arguments: result_,
+      //       );
+      //     }
 
-        } else if(message.data['body'].toString().toLowerCase().contains("diterima")) {
-          if(config.isAppLive == false){
-            while(config.isScreenAtDashboard == false){
-              await Future.delayed(Duration(milliseconds: 500));
-            }
-          }
+      //   } else if(message.data['body'].toString().toLowerCase().contains("diterima")) {
+      //     if(config.isAppLive == false){
+      //       while(config.isScreenAtDashboard == false){
+      //         await Future.delayed(Duration(milliseconds: 500));
+      //       }
+      //     }
 
-          if(message.data['customer_code'].toString().length > 11) {
-            Alert(context: context, loading: true, disableBackButton: true);
+      //     if(message.data['customer_code'].toString().length > 11) {
+      //       Alert(context: context, loading: true, disableBackButton: true);
 
-            result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+      //       result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
             
-            final SharedPreferences sharedPreferences = await _sharedPreferences;
-            await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
-            await sharedPreferences.setString("user_code_request", message.data['user_code']);
+      //       final SharedPreferences sharedPreferences = await _sharedPreferences;
+      //       await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+      //       await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
-            Navigator.of(context).pop();
+      //       Navigator.of(context).pop();
             
-            Navigator.pushNamed(
-              context,
-              "historyLimitRequestDetail/${message.data['id']}/5",
-              arguments: result_,
-            );
-          } else {
-            Alert(context: context, loading: true, disableBackButton: true);
+      //       Navigator.pushNamed(
+      //         context,
+      //         "historyLimitRequestDetail/${message.data['id']}/5",
+      //         arguments: result_,
+      //       );
+      //     } else {
 
-            result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
-
-            final SharedPreferences sharedPreferences = await _sharedPreferences;
-            await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
-            await sharedPreferences.setString("user_code_request", message.data['user_code']);
-
-            Navigator.of(context).pop();
-
-            Navigator.pushNamed(
-              context,
-              "historyLimitRequestDetail/${message.data['id']}/2",
-              arguments: result_,
-            );
-          }
-
-        } else if(message.data['body'].toString().toLowerCase().contains("ditolak")) {
-          if(config.isAppLive == false){
-            while(config.isScreenAtDashboard == false){
-              await Future.delayed(Duration(milliseconds: 500));
-            }
-          }
-
-          if(message.data['customer_code'].toString().length > 11) {
-            Alert(context: context, loading: true, disableBackButton: true);
-
-            result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+      //       // Alert(
+      //       //   context: context,
+      //       //   title: message.data['body'].toString(),
+      //       //   content: Text("Kode Customer "+message.data['customer_code'] + " ---- " + "User Code " + message.data['user_code'] + " ---- " + "Request Limit " + message.data['limit'] +" --- "),
+      //       //   cancel: true,
+      //       //   type: "warning",
+      //       //   defaultAction: () {}
+      //       // );
             
-            final SharedPreferences sharedPreferences = await _sharedPreferences;
-            await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
-            await sharedPreferences.setString("user_code_request", message.data['user_code']);
+      //       Alert(context: context, loading: true, disableBackButton: true);
 
-            Navigator.of(context).pop();
+      //       result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+
+      //       final SharedPreferences sharedPreferences = await _sharedPreferences;
+      //       await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+      //       await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+      //       // Navigator.of(context).pop();
+      //       Navigator.of(context).pop();
+
+      //       Navigator.pushNamed(
+      //         context,
+      //         "historyLimitRequestDetail/${message.data['id']}/2",
+      //         arguments: result_,
+      //       );
+
+      //     }
+
+      //   } else if(message.data['body'].toString().toLowerCase().contains("ditolak")) {
+      //     if(config.isAppLive == false){
+      //       while(config.isScreenAtDashboard == false){
+      //         await Future.delayed(Duration(milliseconds: 500));
+      //       }
+      //     }
+
+      //     if(message.data['customer_code'].toString().length > 11) {
+      //       Alert(context: context, loading: true, disableBackButton: true);
+
+      //       result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
             
-            Navigator.pushNamed(
-              context,
-              "historyLimitRequestDetail/${message.data['id']}/6",
-              arguments: result_,
-            );
-          } else {
-            Alert(context: context, loading: true, disableBackButton: true);
+      //       final SharedPreferences sharedPreferences = await _sharedPreferences;
+      //       await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+      //       await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
-            result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+      //       Navigator.of(context).pop();
+      //       Navigator.of(context).pop();
+            
+      //       Navigator.pushNamed(
+      //         context,
+      //         "historyLimitRequestDetail/${message.data['id']}/6",
+      //         arguments: result_,
+      //       );
+      //     } else {
+      //       Alert(context: context, loading: true, disableBackButton: true);
 
-            final SharedPreferences sharedPreferences = await _sharedPreferences;
-            await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
-            await sharedPreferences.setString("user_code_request", message.data['user_code']);
+      //       result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
 
-            Navigator.of(context).pop();
+      //       final SharedPreferences sharedPreferences = await _sharedPreferences;
+      //       await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+      //       await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
-            Navigator.pushNamed(
-              context,
-              "historyLimitRequestDetail/${message.data['id']}/3",
-              arguments: result_,
-            );
-          }
+      //       Navigator.of(context).pop();
+      //       Navigator.of(context).pop();
 
-        }
-
-
-      }
-
+      //       Navigator.pushNamed(
+      //         context,
+      //         "historyLimitRequestDetail/${message.data['id']}/3",
+      //         arguments: result_,
+      //       );
+      //     }
+      //   }
+      // }
 
     } catch(e) {
       // Set `_error` state to true if Firebase initialization fails
+      printHelp("error firebase " + e.toString());
       setState(() {
         _error = true;
       });
@@ -200,15 +362,24 @@ class SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     initializeFlutterFire();
+
+    final firebaseMessaging = PushNotificationService();
+    firebaseMessaging.setNotifications();
+
+    firebaseMessaging.bodyCtlr.stream.listen(_changeBody);
+    firebaseMessaging.idCtlr.stream.listen(_changeId);
+    firebaseMessaging.customerCodeCtlr.stream.listen(_changeCustomerCode);
+    firebaseMessaging.userCodeCtlr.stream.listen(_changeUserCode);
+    firebaseMessaging.limitCtlr.stream.listen(_changeLimit);
+    
     super.initState();
-    messaging = FirebaseMessaging.instance;
-    messaging.getToken().then((value){
-        print("token: "+value);
-        setState(() {
-          fcmToken = value;
-        });
-    });
   }
+
+  _changeId(String msg) => setState(() => notificationId = msg);
+  _changeCustomerCode(String msg) => setState(() => notificationCustomerCode = msg);
+  _changeUserCode(String msg) => setState(() => notificationUserCode = msg);
+  _changeLimit(String msg) => setState(() => notificationLimit = msg);
+  _changeBody(String msg) => setState(() => notificationBody = msg);
 
   didChangeDependencies() async {
     super.didChangeDependencies();
@@ -220,68 +391,321 @@ class SplashScreenState extends State<SplashScreen> {
     });
 
     // final isPermissionStatusGranted = await checkAppsPermission();
-    doCheckVersion();
+    // doCheckVersion();
     // if(isPermissionStatusGranted) {
     //   doCheckVersion();
     // } else {
     //   // checkAppsPermission();
     // }
 
-    FirebaseMessaging.onMessageOpenedApp.listen((message) async {
-      printHelp('Message clicked -- splash !');
-      printHelp("CEK BODY NOTIF --splash  "+ message.data['body']);
-      Result result_;
+
+    // Result result_;
+    // printHelp("debug ya "+notificationBody);
+    // if (notificationBody.toLowerCase().contains("terdapat request tambah limit")) {
+    //   if(notificationCustomerCode.length > 11) {
+    //     Alert(context: context, loading: true, disableBackButton: true);
+
+    //     result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${notificationCustomerCode}","user_code":"${notificationUserCode}"}');
+        
+    //     final SharedPreferences sharedPreferences = await _sharedPreferences;
+    //     await sharedPreferences.setInt("request_limit", int.parse(notificationLimit));
+    //     await sharedPreferences.setString("user_code_request", notificationUserCode);
+
+    //     Navigator.of(context).pop();
+    //     Navigator.of(context).pop();
+
+    //     if(config.isAppLive == false){
+    //       while(config.isScreenAtDashboard == false){
+    //         await Future.delayed(Duration(milliseconds: 500));
+    //       }
+    //     }
+        
+    //     Navigator.pushNamed(
+    //       context,
+    //       "historyLimitRequestDetail/${notificationId}/4",
+    //       arguments: result_,
+    //     );
+    //   } else {
+    //     Alert(context: context, loading: true, disableBackButton: true);
+
+    //     result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"$notificationCustomerCode}","user_code":"${notificationUserCode}"}');
+
+    //     final SharedPreferences sharedPreferences = await _sharedPreferences;
+    //     await sharedPreferences.setInt("request_limit", int.parse(notificationLimit));
+    //     await sharedPreferences.setString("user_code_request", notificationUserCode);
+
+    //     Navigator.of(context).pop();
+    //     Navigator.of(context).pop();
+
+    //     if(config.isAppLive == false){
+    //       while(config.isScreenAtDashboard == false){
+    //         await Future.delayed(Duration(milliseconds: 500));
+    //       }
+    //     }
+
+    //     Navigator.pushNamed(
+    //       context,
+    //       "historyLimitRequestDetail/${notificationId}/1",
+    //       arguments: result_,
+    //     );
+    //   }
+
+    // } else if(notificationBody.toLowerCase().contains("diterima")) {
+    //   if(config.isAppLive == false){
+    //     while(config.isScreenAtDashboard == false){
+    //       await Future.delayed(Duration(milliseconds: 500));
+    //     }
+    //   }
+
+    //   if(notificationCustomerCode.length > 11) {
+    //     Alert(context: context, loading: true, disableBackButton: true);
+
+    //     result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${notificationCustomerCode}","user_code":"${notificationUserCode}"}');
+        
+    //     final SharedPreferences sharedPreferences = await _sharedPreferences;
+    //     await sharedPreferences.setInt("request_limit", int.parse(notificationLimit));
+    //     await sharedPreferences.setString("user_code_request", notificationUserCode);
+
+    //     Navigator.of(context).pop();
+    //     Navigator.of(context).pop();
+
+    //     if(config.isAppLive == false){
+    //       while(config.isScreenAtDashboard == false){
+    //         await Future.delayed(Duration(milliseconds: 5000));
+    //       }
+    //     }
+        
+    //     Navigator.pushNamed(
+    //       context,
+    //       "historyLimitRequestDetail/${notificationId}/5",
+    //       arguments: result_,
+    //     );
+    //   } else {
+    //     printHelp("MASUK SINI YA");
+    //     Alert(context: context, loading: true, disableBackButton: true);
+
+    //     result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${notificationCustomerCode}","user_code":"${notificationUserCode}"}');
+
+    //     final SharedPreferences sharedPreferences = await _sharedPreferences;
+    //     await sharedPreferences.setInt("request_limit", int.parse(notificationLimit));
+    //     await sharedPreferences.setString("user_code_request", notificationUserCode);
+
+    //     Navigator.of(context).pop();
+    //     Navigator.of(context).pop();
+
+    //     if(config.isAppLive == false){
+    //       while(config.isScreenAtDashboard == false){
+    //         await Future.delayed(Duration(milliseconds: 5000));
+    //       }
+    //     }
+
+    //     Navigator.pushNamed(
+    //       context,
+    //       "historyLimitRequestDetail/${notificationId}/2",
+    //       arguments: result_,
+    //     );
+    //   }
+
+    // } else if(notificationBody.toLowerCase().contains("ditolak")) {
+    //   if(config.isAppLive == false){
+    //     while(config.isScreenAtDashboard == false){
+    //       await Future.delayed(Duration(milliseconds: 500));
+    //     }
+    //   }
+
+    //   if(notificationCustomerCode.length > 11) {
+    //     Alert(context: context, loading: true, disableBackButton: true);
+
+    //     result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${notificationCustomerCode}","user_code":"${notificationUserCode}"}');
+        
+    //     final SharedPreferences sharedPreferences = await _sharedPreferences;
+    //     await sharedPreferences.setInt("request_limit", int.parse(notificationLimit));
+    //     await sharedPreferences.setString("user_code_request", notificationUserCode);
+
+    //     Navigator.of(context).pop();
+    //     Navigator.of(context).pop();
+
+    //     if(config.isAppLive == false){
+    //       while(config.isScreenAtDashboard == false){
+    //         await Future.delayed(Duration(milliseconds: 500));
+    //       }
+    //     }
+        
+    //     Navigator.pushNamed(
+    //       context,
+    //       "historyLimitRequestDetail/${notificationId}/6",
+    //       arguments: result_,
+    //     );
+    //   } else {
+    //     Alert(context: context, loading: true, disableBackButton: true);
+
+    //     result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${notificationCustomerCode}","user_code":"${notificationUserCode}"}');
+
+    //     final SharedPreferences sharedPreferences = await _sharedPreferences;
+    //     await sharedPreferences.setInt("request_limit", int.parse(notificationLimit));
+    //     await sharedPreferences.setString("user_code_request", notificationUserCode);
+
+    //     Navigator.of(context).pop();
+    //     Navigator.of(context).pop();
+
+    //     if(config.isAppLive == false){
+    //       while(config.isScreenAtDashboard == false){
+    //         await Future.delayed(Duration(milliseconds: 500));
+    //       }
+    //     }
+
+    //     Navigator.pushNamed(
+    //       context,
+    //       "historyLimitRequestDetail/${notificationId}/3",
+    //       arguments: result_,
+    //     );
+    //   }
+    // }
+
+    doCheckVersion();
+
+
+
+
+    //handle onresume notification
+    // FirebaseMessaging.onMessageOpenedApp.listen((message) async {
+    //   printHelp('Message clicked -- splash !');
+    //   printHelp("CEK BODY NOTIF --splash  "+ message.data['body']);
+    //   Result result_;
+
+    //   printHelp("MASUK NEW REQUEST -- splash ");
+    //   if (message.data['body'].toString().toLowerCase().contains("terdapat request tambah limit")) {
       
-      if (message.data['body'].toString().toLowerCase().contains("terdapat request tambah limit")) {
-        printHelp("MASUK NEW REQUEST -- splash ");
-        if(config.isAppLive == false){
-          while(config.isScreenAtDashboard == false){
-            await Future.delayed(Duration(milliseconds: 500));
-          }
-        }
-        if(message.data['customer_code'].toString().length > 11) {
-          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+    //   if(config.isAppLive == false){
+    //     while(config.isScreenAtDashboard == false){
+    //       await Future.delayed(Duration(milliseconds: 500));
+    //     }
+    //   }
+
+    //   if(message.data['customer_code'].toString().length > 11) {
+    //     Alert(context: context, loading: true, disableBackButton: true);
+
+    //     result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+        
+    //     final SharedPreferences sharedPreferences = await _sharedPreferences;
+    //     await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+    //     await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+    //     Navigator.of(context).pop();
+    //     Navigator.of(context).pop();
+        
+    //     Navigator.pushNamed(
+    //       context,
+    //       "historyLimitRequestDetail/${message.data['id']}/4",
+    //       arguments: result_,
+    //     );
+    //   } else {
+    //     Alert(context: context, loading: true, disableBackButton: true);
+
+    //     result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+
+    //     final SharedPreferences sharedPreferences = await _sharedPreferences;
+    //     await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+    //     await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+    //     Navigator.of(context).pop();
+    //     Navigator.of(context).pop();
+
+    //     Navigator.pushNamed(
+    //       context,
+    //       "historyLimitRequestDetail/${message.data['id']}/1",
+    //       arguments: result_,
+    //     );
+    //   }
+    // } else if(message.data['body'].toString().toLowerCase().contains("diterima")) {
+    //   if(config.isAppLive == false){
+    //     while(config.isScreenAtDashboard == false){
+    //       await Future.delayed(Duration(milliseconds: 5000));
+    //     }
+    //   }
+
+    //   if(message.data['customer_code'].toString().length > 11) {
+    //     Alert(context: context, loading: true, disableBackButton: true);
+
+    //     result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+        
+    //     final SharedPreferences sharedPreferences = await _sharedPreferences;
+    //     await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+    //     await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+    //     Navigator.of(context).pop();
+        
+    //     Navigator.pushNamed(
+    //       context,
+    //       "historyLimitRequestDetail/${message.data['id']}/5",
+    //       arguments: result_,
+    //     );
+    //   } else {
+    //     // Alert(context: context, loading: true, disableBackButton: true);
+    //     printHelp("cek masuk sini ");
+
+    //     result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+
+    //     final SharedPreferences sharedPreferences = await _sharedPreferences;
+    //     await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+    //     await sharedPreferences.setString("user_code_request", message.data['user_code']);
+
+    //     // Navigator.of(context).pop();
+    //     // Navigator.of(context).pop();
+
+    //     Navigator.pushNamed(
+    //       context,
+    //       "historyLimitRequestDetail/${message.data['id']}/2",
+    //       arguments: result_,
+    //     );
+    //   }
+
+    //   } else if(message.data['body'].toString().toLowerCase().contains("ditolak")) {
+    //     if(config.isAppLive == false){
+    //       while(config.isScreenAtDashboard == false){
+    //         await Future.delayed(Duration(milliseconds: 500));
+    //       }
+    //     }
+
+    //     if(message.data['customer_code'].toString().length > 11) {
+    //       Alert(context: context, loading: true, disableBackButton: true);
+
+    //       result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
           
-          final SharedPreferences sharedPreferences = await _sharedPreferences;
-          await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
-          await sharedPreferences.setString("user_code_request", message.data['user_code']);
+    //       final SharedPreferences sharedPreferences = await _sharedPreferences;
+    //       await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+    //       await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
-          setState(() {
-            isNotificationOpened = true;
-            notificationData = result_;
-            notificationRoute = "historyLimitRequestDetail/${message.data['id']}/4";
-          });
+    //       Navigator.of(context).pop();
+    //       Navigator.of(context).pop();
           
-          // Navigator.pushNamed(
-          //   context,
-          //   "historyLimitRequestDetail/${message.data['id']}/4",
-          //   arguments: result_,
-          // );
-        } else {
-          // Alert(context: context, loading: true, disableBackButton: true);
+    //       Navigator.pushNamed(
+    //         context,
+    //         "historyLimitRequestDetail/${message.data['id']}/6",
+    //         arguments: result_,
+    //       );
+    //     } else {
+    //       Alert(context: context, loading: true, disableBackButton: true);
 
-          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+    //       result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
 
-          final SharedPreferences sharedPreferences = await _sharedPreferences;
-          await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
-          await sharedPreferences.setString("user_code_request", message.data['user_code']);
+    //       final SharedPreferences sharedPreferences = await _sharedPreferences;
+    //       await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+    //       await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
-          setState(() {
-            isNotificationOpened = true;
-            notificationData = result_;
-            notificationRoute = "historyLimitRequestDetail/${message.data['id']}/1";
-          });
+    //       Navigator.of(context).pop();
+    //       Navigator.of(context).pop();
 
-          // Navigator.of(context).pop();
-
-          // Navigator.pushNamed(
-          //   context,
-          //   "historyLimitRequestDetail/${message.data['id']}/1",
-          //   arguments: result_,
-          // );
-        }
-      }
-    });
+    //       Navigator.pushNamed(
+    //         context,
+    //         "historyLimitRequestDetail/${message.data['id']}/3",
+    //         arguments: result_,
+    //       );
+    //     }
+    //   }
+      
+      
+    // });
     
   }
 

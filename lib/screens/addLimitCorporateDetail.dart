@@ -243,7 +243,7 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
         context: context,
         title: "Info,",
         content: Text(
-            "Kode Customer Gabungan harus diisi"),
+            "Limit Baru harus diisi"),
         cancel: false,
         type: "warning",
       );

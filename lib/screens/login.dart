@@ -49,13 +49,13 @@ class LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    messaging = FirebaseMessaging.instance;
-    messaging.getToken().then((value){
-        print("token: "+value);
-        setState(() {
-          fcmToken = value;
-        });
-    });
+    // messaging = FirebaseMessaging.instance;
+    // messaging.getToken().then((value){
+    //     print("token: "+value);
+    //     setState(() {
+    //       fcmToken = value;
+    //     });
+    // });
 
     // //get fcm token
     // String token = await FirebaseMessaging.instance.getToken();
@@ -95,8 +95,8 @@ class LoginState extends State<Login> {
   void didChangeDependencies() async {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    final SharedPreferences sharedPreferences = await _sharedPreferences;
-    await sharedPreferences.setString("fcmToken", fcmToken);
+    // final SharedPreferences sharedPreferences = await _sharedPreferences;
+    // await sharedPreferences.setString("fcmToken", fcmToken);
   }
   
   @override

@@ -12,11 +12,6 @@ import 'package:tambah_limit/tools/function.dart';
 
 import 'models/resultModel.dart';
 
-Future<void> _messageHandler(RemoteMessage message) async {
-  print('background message ${message.notification.body}');
-  // Messagehandler messagehandler = new Messagehandler();
-}
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
@@ -24,29 +19,6 @@ void main() async {
       DeviceOrientation.portraitDown,
     ]);
   await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(_messageHandler);
-
-  // FirebaseMessaging.onMessage.listen((RemoteMessage event) {
-  //     print("message recieved yaaa hehehe");
-  //     print(event.notification.body);
-  //     showDialog(
-  //       context: context,
-  //       builder: (BuildContext context) {
-  //         return AlertDialog(
-  //           title: Text("Notification"),
-  //           content: Text(event.notification.body),
-  //           actions: [
-  //             TextButton(
-  //               child: Text("Ok"),
-  //               onPressed: () {
-  //                 Navigator.of(context).pop();
-  //               },
-  //             )
-  //           ],
-  //         );
-  //       });
-  // });
-  
 
   HttpOverrides.global = MyHttpOverrides();
   runApp(
