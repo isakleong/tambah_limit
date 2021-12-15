@@ -35,6 +35,8 @@ class PushNotificationService {
   final limitCtlr = StreamController<String>.broadcast();
 
   setNotifications() async {
+    firebaseMessaging.setAutoInitEnabled(false);
+
     // With this token you can test it easily on your phone
     final SharedPreferences sharedPreferences = await _sharedPreferences;
     // final token = firebaseMessaging.getToken().then((value) async => await sharedPreferences.setString("fcmToken", value));

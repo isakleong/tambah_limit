@@ -59,13 +59,7 @@ class UserAPI {
       try {
         // final response = await client.get(url);
 
-        final response = await client.get(url).timeout(
-          Duration(seconds: 3),
-          onTimeout: () {
-            isLoginSuccess = "TIMEOUT";
-            return null;
-          },
-        );
+        final response = await client.get(url);
 
         var parsedJson = jsonDecode(response.body);
         if(response.body.toString() != "false") {

@@ -3,7 +3,6 @@ import 'package:tambah_limit/screens/addLimit.dart';
 import 'package:tambah_limit/screens/addLimitCorporate.dart';
 import 'package:tambah_limit/screens/addLimitCorporateDetail.dart';
 import 'package:tambah_limit/screens/addLimitDetail.dart';
-import 'package:tambah_limit/screens/chat.dart';
 import 'package:tambah_limit/screens/dashboard.dart';
 import 'package:tambah_limit/screens/historyLimitRequest.dart';
 import 'package:tambah_limit/screens/historyLimitRequestDetail.dart';
@@ -38,9 +37,6 @@ MaterialPageRoute routing(int mode, int id, List<String> pages, RouteSettings se
       break;
     case 'addLimitCorporateDetail':
       return MaterialPageRoute(builder: (context)=> AddLimitCorporateDetail(model: settings.arguments));
-      break;
-    case 'chat':
-      return MaterialPageRoute(builder: (context)=> Chat(result: settings.arguments));
       break;
     default:
       return MaterialPageRoute(builder: (_) {
