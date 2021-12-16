@@ -44,6 +44,8 @@ class Dashboard extends StatefulWidget {
 
 class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
+  String user_login = "";
+
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>(debugLabel: "snackBar");
 
   DateTime currentBackPressTime;
@@ -72,6 +74,24 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   final _bottomBarController = BottomBarWithSheetController(initialIndex: 0);
 
   final btnTitle = [ "Tambah Limit", "Tambah Limit Corporate", "Riwayat Permintaan Limit" ];
+
+  bool unlockOldPassword = true;
+  bool unlockNewPassword = true;
+  bool unlockConfirmPassword = true;
+
+  final oldPasswordController = TextEditingController();
+  final newPasswordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+  final FocusNode oldPasswordFocus = FocusNode();
+  final FocusNode newPasswordFocus = FocusNode();
+  final FocusNode confirmPasswordFocus = FocusNode();
+
+  bool oldPasswordValid = false;
+  bool newPasswordValid = false;
+  bool confirmPasswordValid = false;
+  String oldPasswordErrorMessage = "", newPasswordErrorMessage = "", confirmPasswordErrorMessage = "";
+
+  bool changePasswordLoading = false;
 
   void _selectedTab(int index) {
     setState(() {
@@ -566,9 +586,15 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     super.didChangeDependencies();
     config.isScreenAtDashboard = true;
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      user_login = prefs.getString("get_user_login");  
+    });
+    
   }
 
   @override
@@ -576,107 +602,305 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     List<Widget> blockInfoDetailWidgetList = showBlockInfoDetail(config);
 
     final List<Widget> menuList = [
-      RefreshIndicator(
-        onRefresh: refresh,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-                child: EditText(
-                  useIcon: true,
-                  key: Key("CustomerId"),
-                  controller: customerIdController,
-                  focusNode: customerIdFocus,
-                  validate: customerIdValid,
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.go,
-                  textCapitalization: TextCapitalization.characters,
-                  hintText: "Kode Pelanggan",
-                  onSubmitted: (value) {
-                    customerIdFocus.unfocus();
-                    getBlockInfo();
-                  },
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                width: MediaQuery.of(context).size.width,
-                child: Button(
-                  loading: searchLoading,
-                  backgroundColor: config.darkOpacityBlueColor,
-                  child: TextView("CARI", 3, color: Colors.white),
-                  onTap: () {
-                    getBlockInfo();
-                  },
-                ),
-              ),
-              blockInfoDetailWidgetList.length == 0
-              ? 
-              Container()
-              :
-              ListView(
-                scrollDirection: Axis.vertical,
-                padding: EdgeInsets.all(0),
-                physics: ScrollPhysics(),
-                shrinkWrap: true,
-                children: blockInfoDetailWidgetList,
-              ),
-            ],
+      Column(
+        children: [
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+            child: EditText(
+              useIcon: true,
+              key: Key("CustomerId"),
+              controller: customerIdController,
+              focusNode: customerIdFocus,
+              validate: customerIdValid,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.go,
+              textCapitalization: TextCapitalization.characters,
+              hintText: "Kode Pelanggan",
+              onSubmitted: (value) {
+                customerIdFocus.unfocus();
+                getBlockInfo();
+              },
+              onChanged: (value) {
+                setState(() {
+                  result = null;
+                });
+              },
+            ),
           ),
-        ),
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+            width: MediaQuery.of(context).size.width,
+            child: Button(
+              loading: searchLoading,
+              backgroundColor: config.darkOpacityBlueColor,
+              child: TextView("CARI", 3, color: Colors.white),
+              onTap: () {
+                getBlockInfo();
+              },
+            ),
+          ),
+          blockInfoDetailWidgetList.length == 0
+          ? 
+          Container()
+          :
+          ListView(
+            scrollDirection: Axis.vertical,
+            padding: EdgeInsets.all(0),
+            physics: ScrollPhysics(),
+            shrinkWrap: true,
+            children: blockInfoDetailWidgetList,
+          ),
+        ],
       ),
-      // ProfilePage(model: config.user, mode: 3)
-      Profile(),
-      // AddLimit(),
-      // AddLimitCorporate(),
-      // HistoryLimitRequest()
+      Container(
+        child: Column(
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+              child: EditText(
+                useIcon: true,
+                key: Key("OldPassword"),
+                controller: oldPasswordController,
+                focusNode: oldPasswordFocus,
+                obscureText: unlockOldPassword,
+                validate: oldPasswordValid,
+                keyboardType: TextInputType.text,
+                textInputAction: TextInputAction.next,
+                textCapitalization: TextCapitalization.characters,
+                hintText: "Password Lama",
+                alertMessage: oldPasswordErrorMessage,
+                suffixIcon:
+                InkWell(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 5),
+                    child: Icon(
+                      Icons.remove_red_eye,
+                      color:  unlockOldPassword ? config.lightGrayColor : config.grayColor,
+                      size: 18,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      unlockOldPassword = !unlockOldPassword;
+                    });
+                  },
+                ),
+                onSubmitted: (value) {
+                  _fieldFocusChange(context, oldPasswordFocus, newPasswordFocus);
+                },
+                onChanged: (value) {
+                  
+                },
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+              child: EditText(
+                useIcon: true,
+                key: Key("NewPassword"),
+                controller: newPasswordController,
+                focusNode: newPasswordFocus,
+                validate:  newPasswordValid,
+                obscureText: unlockNewPassword,
+                keyboardType: TextInputType.text,
+                textInputAction: TextInputAction.next,
+                textCapitalization: TextCapitalization.characters,
+                hintText: "Password Baru",
+                alertMessage: newPasswordErrorMessage,
+                suffixIcon:
+                  InkWell(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 5),
+                      child: Icon(
+                        Icons.remove_red_eye,
+                        color:  unlockNewPassword ? config.lightGrayColor : config.grayColor,
+                        size: 18,
+                      ),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        unlockNewPassword = !unlockNewPassword;
+                      });
+                    },
+                  ),
+                onSubmitted: (value) {
+                  _fieldFocusChange(context, newPasswordFocus, confirmPasswordFocus);
+                },
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+              child: EditText(
+                useIcon: true,
+                key: Key("ConfirmPassword"),
+                controller: confirmPasswordController,
+                focusNode: confirmPasswordFocus,
+                validate: confirmPasswordValid,
+                keyboardType: TextInputType.text,
+                obscureText: unlockConfirmPassword,
+                textInputAction: TextInputAction.done,
+                textCapitalization: TextCapitalization.characters,
+                hintText: "Konfirmasi Password Baru",
+                alertMessage: confirmPasswordErrorMessage,
+                suffixIcon:
+                  InkWell(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 5),
+                      child: Icon(
+                        Icons.remove_red_eye,
+                        color:  unlockConfirmPassword ? config.lightGrayColor : config.grayColor,
+                        size: 18,
+                      ),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        unlockConfirmPassword = !unlockConfirmPassword;
+                      });
+                    },
+                  ),
+                onSubmitted: (value) {
+                  confirmPasswordFocus.unfocus();
+                },
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+              width: MediaQuery.of(context).size.width,
+              child: Button(
+                loading: changePasswordLoading,
+                backgroundColor: config.darkOpacityBlueColor,
+                child: TextView("UBAH", 3, color: Colors.white),
+                onTap: () {
+                  submitValidation();
+                },
+              ),
+            ),
+          ],
+        ),
+      )
+
+
+      // Profile(),
+      
     ].where((c) => c != null).toList();
 
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: TextView(dashboardTitle, 1),
-        automaticallyImplyLeading: false,
-        actions: [
-          InkWell(
-            onTap: () {
-              Alert(
-                context: context,
-                title: "Konfirmasi,",
-                content: Text("Apakah Anda yakin ingin keluar dari aplikasi?"),
-                cancel: true,
-                type: "warning",
-                defaultAction: () async {
-                  SharedPreferences prefs = await SharedPreferences.getInstance();
-                  await prefs.remove("limit_dmd");
-                  await prefs.remove("request_limit");
-                  await prefs.remove("user_code_request");
-                  await prefs.remove("user_code");
-                  await prefs.remove("max_limit");
-                  await prefs.remove("fcmToken");
-                  await FirebaseMessaging.instance.deleteToken();
-                  await prefs.clear();
-                  Navigator.pushReplacementNamed(
-                    context,
-                    "login",
-                  );
-              });
+      // appBar: AppBar(
+      //   title: TextView(dashboardTitle, 1),
+      //   automaticallyImplyLeading: false,
+      //   actions: [
+          // InkWell(
+          //   onTap: () {
+          //     Alert(
+          //       context: context,
+          //       title: "Konfirmasi,",
+          //       content: Text("Apakah Anda yakin ingin keluar dari aplikasi?"),
+          //       cancel: true,
+          //       type: "warning",
+          //       defaultAction: () async {
+          //         SharedPreferences prefs = await SharedPreferences.getInstance();
+          //         await prefs.remove("limit_dmd");
+          //         await prefs.remove("request_limit");
+          //         await prefs.remove("user_code_request");
+          //         await prefs.remove("user_code");
+          //         await prefs.remove("max_limit");
+          //         await prefs.remove("fcmToken");
+          //         await FirebaseMessaging.instance.deleteToken();
+          //         await prefs.clear();
+          //         Navigator.pushReplacementNamed(
+          //           context,
+          //           "login",
+          //         );
+          //     });
               
-            },
-            child: Container(
-              margin: EdgeInsets.only(right: 10),
-              child:Icon (Icons.logout, size: 28),
-            ),
-          ),
+          //   },
+          //   child: Container(
+          //     margin: EdgeInsets.only(right: 10),
+          //     child:Icon (Icons.logout, size: 28),
+          //   ),
+          // ),
           
-        ],
-      ),
+      //   ],
+      // ),
       body: WillPopScope(
         onWillPop: willPopScope,
-        child: Container(
-          child: menuList[currentIndex]
+        child: CustomScrollView(
+          slivers: <Widget>[
+            SliverAppBar(
+              pinned: true,
+              expandedHeight: 140,
+              flexibleSpace: FlexibleSpaceBar(
+                title: TextView(dashboardTitle, 3),
+                centerTitle: true,
+              ),
+              title: Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextView("Selamat Datang, " + user_login.toUpperCase(), 3),
+                    InkWell(
+                      onTap: () {
+                        Alert(
+                          context: context,
+                          title: "Konfirmasi,",
+                          content: Text("Apakah Anda yakin ingin keluar dari aplikasi?"),
+                          cancel: true,
+                          type: "warning",
+                          defaultAction: () async {
+                            SharedPreferences prefs = await SharedPreferences.getInstance();
+                            await prefs.remove("limit_dmd");
+                            await prefs.remove("request_limit");
+                            await prefs.remove("user_code_request");
+                            await prefs.remove("user_code");
+                            await prefs.remove("max_limit");
+                            await prefs.remove("fcmToken");
+                            await prefs.remove("get_user_login");
+                            await FirebaseMessaging.instance.deleteToken();
+                            await prefs.clear();
+                            Navigator.pushReplacementNamed(
+                              context,
+                              "login",
+                            );
+                          }
+                        );
+                    },
+                    child: Container(
+                      child:Icon (Icons.logout, size: 30),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // SliverToBoxAdapter(
+            //   child: Container(
+            //     child: menuList[currentIndex]
+            //   ),
+            // ),
+
+            // SliverList(
+            //   delegate: SliverChildBuilderDelegate(
+            //     (BuildContext context, int index) {
+            //       return Container(
+            //         child: menuList[currentIndex]
+            //       );
+            //     },
+            //   ),
+            // ),
+
+            SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                return Container(
+                  margin: EdgeInsets.symmetric(vertical: 30),
+                  child: menuList[currentIndex]
+                );
+              },  
+              childCount: 1),
+            ),
+
+          ]
         ),
       ),
       bottomNavigationBar: BottomBarWithSheet(
@@ -740,7 +964,6 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                   child: Button(
-                    loading: searchLoading,
                     backgroundColor: config.darkOpacityBlueColor,
                     child: TextView("Tambah Limit", 3, color: Colors.white),
                     onTap: () {
@@ -759,7 +982,6 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                   child: Button(
-                    loading: searchLoading,
                     backgroundColor: config.darkOpacityBlueColor,
                     child: TextView("Tambah Limit Corporate", 3, color: Colors.white),
                     onTap: () {
@@ -778,7 +1000,6 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                   child: Button(
-                    loading: searchLoading,
                     backgroundColor: config.darkOpacityBlueColor,
                     child: TextView("Riwayat Permintaan Limit", 3, color: Colors.white),
                     onTap: () {
@@ -865,6 +1086,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
       tempWidgetList.add(
         Container(
+          margin: EdgeInsets.only(top:30),
           child: Form(
             key: _ChangeBlockedStatusFormKey,
             child: Column(
@@ -1164,6 +1386,157 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         result = null;
       });
     }
+  }
+
+  void submitValidation() {
+
+    setState(() {
+
+      if(oldPasswordController.text.isEmpty){
+        oldPasswordValid = true;
+        oldPasswordErrorMessage = "tidak boleh kosong";
+      } else {
+        oldPasswordValid = false;
+      }
+
+      if(newPasswordController.text.isEmpty){
+        newPasswordValid = true;
+        newPasswordErrorMessage = "tidak boleh kosong";
+      } else {
+        newPasswordValid = false;
+      }
+
+      if(confirmPasswordController.text.isEmpty){
+        confirmPasswordValid = true;
+        confirmPasswordErrorMessage = "tidak boleh kosong";
+      } else {
+        confirmPasswordValid = false;
+      }
+
+      if(oldPasswordController.text.isEmpty){
+        oldPasswordValid = true;
+        oldPasswordErrorMessage = "tidak boleh kosong";
+      } else {
+        oldPasswordValid = false;
+      }
+
+      if (newPasswordController.text != confirmPasswordController.text){
+        newPasswordValid = true;
+        confirmPasswordValid = true;
+
+        newPasswordErrorMessage = "tidak sama dengan Konfirmasi Password Baru";
+        confirmPasswordErrorMessage = "tidak sama dengan Password Baru";
+
+      }
+
+    });
+
+    if(!oldPasswordValid && !newPasswordValid && !confirmPasswordValid){
+      Alert(
+        context: context,
+        title: "Konfirmasi,",
+        content: Text("Apakah Anda yakin ingin mengubah password?"),
+        cancel: true,
+        type: "warning",
+        defaultAction: () async {
+          doChangePassword();
+      });
+      
+      
+    }
+
+  }
+  
+  void doChangePassword() async {
+    FocusScope.of(context).requestFocus(FocusNode());
+    setState(() {
+      changePasswordLoading = true;
+    });
+
+    Alert(context: context, loading: true, disableBackButton: true);
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String getOldPassword = await userAPI.getPassword(context, parameter: 'user_code=${prefs.getString('user_code')}&old_pass=${oldPasswordController.text}');
+
+    Navigator.of(context).pop();
+
+    if(getOldPassword == "OK"){
+
+      String getChangePassword = await userAPI.changePassword(context, parameter: 'json={"new_pass":"${newPasswordController.text}","user_code":"${prefs.getString('user_code')}"}');
+
+      if(getChangePassword == "OK"){
+        Alert(
+          context: context,
+          title: "Terima kasih,",
+          content: Text("Password berhasil diubah, silahkan lakukan login ulang"),
+          cancel: false,
+          type: "success",
+          defaultAction: () async {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.remove("limit_dmd");
+              await prefs.remove("request_limit");
+              await prefs.remove("user_code_request");
+              await prefs.remove("user_code");
+              await prefs.remove("max_limit");
+              await prefs.remove("fcmToken");
+              await prefs.remove("get_user_login");
+              await FirebaseMessaging.instance.deleteToken();
+              await prefs.clear();
+              Navigator.pushReplacementNamed(
+                context,
+                "login",
+              );
+            // if (mounted) {
+            //   SharedPreferences prefs = await SharedPreferences.getInstance();
+            //   await prefs.remove("limit_dmd");
+            //   await prefs.remove("request_limit");
+            //   await prefs.remove("user_code_request");
+            //   await prefs.remove("user_code");
+            //   await prefs.remove("max_limit");
+            //   await prefs.clear();
+            //   Navigator.pushReplacementNamed(
+            //     context,
+            //     "login",
+            //   );
+            // }
+          } 
+        );
+        
+      } else {
+        Alert(
+          context: context,
+          title: "Maaf,",
+          content: Text(getChangePassword),
+          cancel: false,
+          type: "error"
+        );
+      }
+
+      setState(() {
+        changePasswordLoading = false;
+      });
+
+    } else {
+      Alert(
+          context: context,
+          title: "Maaf,",
+          content: Text(getOldPassword),
+          cancel: false,
+          type: "error"
+        );
+    }
+
+    setState(() {
+      changePasswordLoading = false;
+    });
+    
+
+  }
+
+  _fieldFocusChange(BuildContext context, FocusNode currentFocus,FocusNode nextFocus) {
+    currentFocus.unfocus();
+    FocusScope.of(context).requestFocus(nextFocus); 
   }
 
   Future<bool> willPopScope() async {

@@ -462,6 +462,8 @@ class SplashScreenState extends State<SplashScreen> {
   void navigate() async {
     final SharedPreferences sharedPreferences = await _sharedPreferences;
     if(sharedPreferences.containsKey("user_code")) {
+      final SharedPreferences sharedPreferences = await _sharedPreferences;
+      await sharedPreferences.setString("get_user_login", sharedPreferences.getString("user_code"));
       Navigator.pushReplacementNamed(
         context,
         'dashboard'

@@ -222,6 +222,8 @@ class LoginState extends State<Login> {
     Navigator.of(context).pop();
 
     if(getLogin == "OK"){
+      final SharedPreferences sharedPreferences = await _sharedPreferences;
+      await sharedPreferences.setString("get_user_login", usernameController.text);
       Navigator.pushReplacementNamed(
           context,
           "dashboard"

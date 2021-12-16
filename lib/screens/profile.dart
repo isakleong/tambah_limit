@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' show Client;
 
 import 'package:flutter/cupertino.dart';
@@ -49,9 +50,7 @@ class ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Container(
+    return Container(
         child: Column(
           children: [
             Container(
@@ -176,8 +175,7 @@ class ProfileState extends State<Profile> {
             ),
           ],
         ),
-      ),
-    );
+      );
   }
 
   void submitValidation() {
@@ -271,6 +269,9 @@ class ProfileState extends State<Profile> {
               await prefs.remove("user_code_request");
               await prefs.remove("user_code");
               await prefs.remove("max_limit");
+              await prefs.remove("fcmToken");
+              await prefs.remove("get_user_login");
+              await FirebaseMessaging.instance.deleteToken();
               await prefs.clear();
               Navigator.pushReplacementNamed(
                 context,
