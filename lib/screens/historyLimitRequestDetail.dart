@@ -29,6 +29,7 @@ class HistoryLimitRequestDetail extends StatefulWidget {
 
 
 class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
+
   Result result;
   var resultObject;
   int historyLimitId, pageType;
@@ -65,11 +66,11 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
   }
 
   @override
-  void didChangeDependencies() async {
+  void didChangeDependencies() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     setState(() {
-      user_login = prefs.getString("get_user_login");  
+      user_login = prefs.getString("get_user_login");
     });
 
     user_code = prefs.getString('user_code');
@@ -94,23 +95,29 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
             );
     }
 
-    request_limit = prefs.getInt("request_limit");
-    request_limit_dmd = prefs.getInt("request_limit_dmd");
+    if(prefs.containsKey("request_limit")) {
+      request_limit = prefs.getInt("request_limit");
+      
+      limitRequestController.value = TextEditingValue(
+        text: currencyFormatter.format(request_limit).toString(),
+        selection: TextSelection.fromPosition(
+          TextPosition(offset: request_limit.toString().length),
+        ),
+      );
+    }
+
+    if(prefs.containsKey("request_limit_dmd")) {
+      request_limit_dmd = prefs.getInt("request_limit_dmd");
+
+      limitDMDController.value = TextEditingValue(
+        text: currencyFormatter.format(request_limit_dmd).toString(),
+        selection: TextSelection.fromPosition(
+          TextPosition(offset: request_limit_dmd.toString().length),
+        ),
+      );
+    }
+    
     user_code_request = prefs.getString("user_code_request");
-
-    limitRequestController.value = TextEditingValue(
-      text: currencyFormatter.format(request_limit).toString(),
-      selection: TextSelection.fromPosition(
-        TextPosition(offset: request_limit.toString().length),
-      ),
-    );
-
-    limitDMDController.value = TextEditingValue(
-      text: currencyFormatter.format(request_limit_dmd).toString(),
-      selection: TextSelection.fromPosition(
-        TextPosition(offset: request_limit_dmd.toString().length),
-      ),
-    );
     
     setState(() {
       resultObject = _resultObject;
