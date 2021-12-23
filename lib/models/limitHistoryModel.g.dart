@@ -12,6 +12,7 @@ LimitHistory _$LimitHistoryFromJson(Map<String, dynamic> json) {
     customer_code: json['customer_code'] as String,
     customer_name: json['customer_name'] as String,
     limit: json['limit'] as String,
+    limit_dmd: json['limit_dmd'] as String,
     status: json['status'] as int,
     request_date: json['request_date'] == null
         ? null
@@ -29,6 +30,7 @@ Map<String, dynamic> _$LimitHistoryToJson(LimitHistory instance) =>
       'customer_code': instance.customer_code,
       'customer_name': instance.customer_name,
       'limit': instance.limit,
+      'limit_dmd': instance.limit_dmd,
       'status': instance.status,
       'request_date': instance.request_date?.toIso8601String(),
       'confirm_date': instance.confirm_date?.toIso8601String(),

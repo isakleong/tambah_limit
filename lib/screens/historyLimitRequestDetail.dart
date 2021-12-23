@@ -19,8 +19,9 @@ class HistoryLimitRequestDetail extends StatefulWidget {
   final Result model;
   final int id;
   final int mode;
+  final int notificationType;
 
-  HistoryLimitRequestDetail({Key key, this.model, this.id, this.mode}) : super(key: key);
+  HistoryLimitRequestDetail({Key key, this.model, this.id, this.mode, this.notificationType}) : super(key: key);
 
   @override
   HistoryLimitRequestDetailState createState() => HistoryLimitRequestDetailState();
@@ -31,9 +32,13 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
   Result result;
   var resultObject;
   int historyLimitId, pageType;
+  int notificationType;
+
+  String user_login = "";
 
   String user_code = "";
   int request_limit = 0;
+  int request_limit_dmd = 0;
   String user_code_request = "";
 
   bool acceptLimitRequestLoading = false;
@@ -56,11 +61,16 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     result = widget.model;
     historyLimitId = widget.id;
     pageType = widget.mode;
+    notificationType = widget.notificationType;
   }
 
   @override
   void didChangeDependencies() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      user_login = prefs.getString("get_user_login");  
+    });
 
     user_code = prefs.getString('user_code');
 
@@ -85,13 +95,20 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     }
 
     request_limit = prefs.getInt("request_limit");
-    printHelp("cek cache "+request_limit.toString());
+    request_limit_dmd = prefs.getInt("request_limit_dmd");
     user_code_request = prefs.getString("user_code_request");
 
     limitRequestController.value = TextEditingValue(
       text: currencyFormatter.format(request_limit).toString(),
       selection: TextSelection.fromPosition(
         TextPosition(offset: request_limit.toString().length),
+      ),
+    );
+
+    limitDMDController.value = TextEditingValue(
+      text: currencyFormatter.format(request_limit_dmd).toString(),
+      selection: TextSelection.fromPosition(
+        TextPosition(offset: request_limit_dmd.toString().length),
       ),
     );
     
@@ -1238,213 +1255,199 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
 
 
     }  else {
-      return WillPopScope(
-        onWillPop: () async {
-          Navigator.pop(context);
-          return false;
-        },
-        child: Scaffold(
-          resizeToAvoidBottomInset: true,
-          appBar: AppBar(
-            title: pageType == 1 || pageType == 4 ?
-            TextView("Limit Yang Diminta", 1)
-            :
-            pageType == 2 || pageType == 5 ?
-            TextView("Limit Yang Disetujui", 1)
-            :
-            TextView("Limit Yang Ditolak", 1),
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.of(context).pop()
-              // onPressed: () => Navigator.popAndPushNamed(
-              //   context,
-              //   "historyLimitRequest"
-              // )
-            ),
-          ),
-          body: Container(
-            margin: EdgeInsets.symmetric(vertical: 20, horizontal: 5),
-            child: Form(
-              key: _HistoryLimitFormKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                  child: TextFormField(
-                    enabled: false,
-                    decoration: new InputDecoration(
-                      hintStyle: TextStyle(color: config.grayNonActiveColor),
-                      labelStyle: TextStyle(color: config.grayNonActiveColor),
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      labelText: "Kode Corporate",
-                      hintText: resultObject[0]["corporate_code"],
-                      icon: Icon(Icons.bookmark),
-                      disabledBorder: OutlineInputBorder(
-                        borderRadius: new BorderRadius.circular(
-                          5.0,
-                        ),
-                        borderSide: BorderSide(
-                          color: config.grayNonActiveColor,
-                          width: 1.5,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+      return Scaffold(
+        resizeToAvoidBottomInset: true,
+        appBar: AppBar(
+          title: pageType == 1 || pageType == 4 ?
+          TextView("Limit Yang Diminta", 1)
+          :
+          pageType == 2 || pageType == 5 ?
+          TextView("Limit Yang Disetujui", 1)
+          :
+          TextView("Limit Yang Ditolak", 1),
+        ),
+        body: Container(
+          margin: EdgeInsets.symmetric(vertical: 20, horizontal: 5),
+          child: Form(
+            key: _HistoryLimitFormKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Container(
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                  child: TextFormField(
-                    enabled: false,
-                    decoration: new InputDecoration(
-                      hintStyle: TextStyle(color: config.grayNonActiveColor),
-                      labelStyle: TextStyle(color: config.grayNonActiveColor),
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      labelText: "Nama Corporate",
-                      hintText: resultObject[0]["corporate_name"],
-                      icon: Icon(Icons.person),
-                      disabledBorder: OutlineInputBorder(
-                        borderRadius: new BorderRadius.circular(
-                          5.0,
-                        ),
-                        borderSide: BorderSide(
-                          color: config.grayNonActiveColor,
-                          width: 1.5,
-                        ),
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                child: TextFormField(
+                  enabled: false,
+                  decoration: new InputDecoration(
+                    hintStyle: TextStyle(color: config.grayNonActiveColor),
+                    labelStyle: TextStyle(color: config.grayNonActiveColor),
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    labelText: "Kode Corporate",
+                    hintText: resultObject[0]["corporate_code"],
+                    icon: Icon(Icons.bookmark),
+                    disabledBorder: OutlineInputBorder(
+                      borderRadius: new BorderRadius.circular(
+                        5.0,
+                      ),
+                      borderSide: BorderSide(
+                        color: config.grayNonActiveColor,
+                        width: 1.5,
                       ),
                     ),
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                  child: TextFormField(
-                    enabled: false,
-                    decoration: new InputDecoration(
-                      hintStyle: TextStyle(color: config.grayNonActiveColor),
-                      labelStyle: TextStyle(color: config.grayNonActiveColor),
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      labelText: "Induk Pelanggan",
-                      hintText: resultObject[0]["head_customer"],
-                      icon: Icon(Icons.group),
-                      disabledBorder: OutlineInputBorder(
-                        borderRadius: new BorderRadius.circular(
-                          5.0,
-                        ),
-                        borderSide: BorderSide(
-                          color: config.grayNonActiveColor,
-                          width: 1.5,
-                        ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                child: TextFormField(
+                  enabled: false,
+                  decoration: new InputDecoration(
+                    hintStyle: TextStyle(color: config.grayNonActiveColor),
+                    labelStyle: TextStyle(color: config.grayNonActiveColor),
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    labelText: "Nama Corporate",
+                    hintText: resultObject[0]["corporate_name"],
+                    icon: Icon(Icons.person),
+                    disabledBorder: OutlineInputBorder(
+                      borderRadius: new BorderRadius.circular(
+                        5.0,
+                      ),
+                      borderSide: BorderSide(
+                        color: config.grayNonActiveColor,
+                        width: 1.5,
                       ),
                     ),
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                  child: TextFormField(
-                    enabled: false,
-                    decoration: new InputDecoration(
-                      hintStyle: TextStyle(color: config.grayNonActiveColor),
-                      labelStyle: TextStyle(color: config.grayNonActiveColor),
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      labelText: "Limit Saat Ini",
-                      hintText: currencyFormatter.format(int.parse(resultObject[0]["old_limit"])),
-                      icon: TextView("Rp ", 4, color: config.grayNonActiveColor),
-                      disabledBorder: OutlineInputBorder(
-                        borderRadius: new BorderRadius.circular(
-                          5.0,
-                        ),
-                        borderSide: BorderSide(
-                          color: config.grayNonActiveColor,
-                          width: 1.5,
-                        ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                child: TextFormField(
+                  enabled: false,
+                  decoration: new InputDecoration(
+                    hintStyle: TextStyle(color: config.grayNonActiveColor),
+                    labelStyle: TextStyle(color: config.grayNonActiveColor),
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    labelText: "Induk Pelanggan",
+                    hintText: resultObject[0]["head_customer"],
+                    icon: Icon(Icons.group),
+                    disabledBorder: OutlineInputBorder(
+                      borderRadius: new BorderRadius.circular(
+                        5.0,
+                      ),
+                      borderSide: BorderSide(
+                        color: config.grayNonActiveColor,
+                        width: 1.5,
                       ),
                     ),
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                  child: TextFormField(
-                    style: TextStyle(color: config.grayNonActiveColor),
-                    inputFormatters: <TextInputFormatter>[
-                      CurrencyTextInputFormatter(
-                        locale: 'IDR',
-                        decimalDigits: 0,
-                        symbol: '',
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                child: TextFormField(
+                  enabled: false,
+                  decoration: new InputDecoration(
+                    hintStyle: TextStyle(color: config.grayNonActiveColor),
+                    labelStyle: TextStyle(color: config.grayNonActiveColor),
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    labelText: "Limit Saat Ini",
+                    hintText: currencyFormatter.format(int.parse(resultObject[0]["old_limit"])),
+                    icon: TextView("Rp ", 4, color: config.grayNonActiveColor),
+                    disabledBorder: OutlineInputBorder(
+                      borderRadius: new BorderRadius.circular(
+                        5.0,
                       ),
-                    ],
-                    keyboardType: TextInputType.number,
-                    enabled: false,
-                    controller: limitRequestController,
-                    decoration: new InputDecoration(
-                      hintStyle: TextStyle(
-                        color: config.grayNonActiveColor
-                      ),
-                      labelStyle: TextStyle(
-                        color: config.grayNonActiveColor
-                      ),
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      labelText: "Limit Yang Diajukan",
-                      icon: TextView("Rp ", 4, color: config.grayNonActiveColor),
-                      disabledBorder: OutlineInputBorder(
-                          borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
+                      borderSide: BorderSide(
+                        color: config.grayNonActiveColor,
+                        width: 1.5,
                       ),
                     ),
                   ),
                 ),
-                (pageType== 1 || pageType == 4) && (user_code.toLowerCase() == "tanto" || user_code.toLowerCase() == "hermawan") ?
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                        child: Button(
-                          key: Key("submit"),
-                          loading: acceptLimitRequestLoading,
-                          backgroundColor: config.darkOpacityBlueColor,
-                          child: TextView(
-                            "terima",
-                            3,
-                            caps: true,
-                          ),
-                          onTap: () {
-                            updateLimitGabunganRequest(1);
-                          },
-                        ),
-                      ),
-                    ),
-
-                    Expanded(
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                        child: Button(
-                          key: Key("submit"),
-                          loading: rejectLimitRequestLoading,
-                          backgroundColor: config.darkOpacityBlueColor,
-                          child: TextView(
-                            "tolak",
-                            3,
-                            caps: true,
-                          ),
-                          onTap: () {
-                            updateLimitGabunganRequest(0);
-                          },
-                        ),
-                      ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                child: TextFormField(
+                  style: TextStyle(color: config.grayNonActiveColor),
+                  inputFormatters: <TextInputFormatter>[
+                    CurrencyTextInputFormatter(
+                      locale: 'IDR',
+                      decimalDigits: 0,
+                      symbol: '',
                     ),
                   ],
-                )
-                :
-                Container(),
-                ],
+                  keyboardType: TextInputType.number,
+                  enabled: false,
+                  controller: limitRequestController,
+                  decoration: new InputDecoration(
+                    hintStyle: TextStyle(
+                      color: config.grayNonActiveColor
+                    ),
+                    labelStyle: TextStyle(
+                      color: config.grayNonActiveColor
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    labelText: "Limit Yang Diajukan",
+                    icon: TextView("Rp ", 4, color: config.grayNonActiveColor),
+                    disabledBorder: OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(5.0,),
+                        borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
+                    ),
+                  ),
+                ),
               ),
+              (pageType== 1 || pageType == 4) && (user_login.toLowerCase() == "tanto" || user_login.toLowerCase() == "hermawan") ?
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                      child: Button(
+                        key: Key("submit"),
+                        loading: acceptLimitRequestLoading,
+                        backgroundColor: config.darkOpacityBlueColor,
+                        child: TextView(
+                          "terima",
+                          3,
+                          caps: true,
+                        ),
+                        onTap: () {
+                          updateLimitGabunganRequest(1);
+                        },
+                      ),
+                    ),
+                  ),
+
+                  Expanded(
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                      child: Button(
+                        key: Key("submit"),
+                        loading: rejectLimitRequestLoading,
+                        backgroundColor: config.darkOpacityBlueColor,
+                        child: TextView(
+                          "tolak",
+                          3,
+                          caps: true,
+                        ),
+                        onTap: () {
+                          updateLimitGabunganRequest(0);
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              )
+              :
+              Container(),
+              ],
             ),
           ),
-        )
+        ),
       );
     }
 
@@ -1635,7 +1638,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                   ),
                 ),
 
-                (pageType == 1 || pageType == 4) && (user_code.toLowerCase() == "tanto" || user_code.toLowerCase() == "hermawan") ?
+                (pageType == 1 || pageType == 4) && (user_login.toLowerCase() == "tanto" || user_login.toLowerCase() == "hermawan") ?
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -1724,7 +1727,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     String getChangeLimit = "";
 
     if(command == 1) {
-      getChangeLimit = await customerAPI.updateLimitGabunganRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['corporate_code']}","user_code":"$user_code_request","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}","old_limit":"${limitDMDController.text.replaceAll(new RegExp('\\.'),'')}","user_login":"$user_code","id":"${widget.id}"}');
+      getChangeLimit = await customerAPI.updateLimitGabunganRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['corporate_code']}","user_code":"$user_code_request","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}","old_limit":"${resultObject[0]["old_limit"]}","user_login":"$user_code","id":"${widget.id}"}');
     } else {
       getChangeLimit = await customerAPI.updateLimitGabunganRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['corporate_code']}","user_code":"$user_code_request","id":"${widget.id}"}');
     }
@@ -1740,10 +1743,15 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
           cancel: false,
           type: "success",
           defaultAction: () {
-            Navigator.popAndPushNamed(
-              context,
-              "historyLimitRequest"
-            );
+            if(notificationType == 0) {
+              Navigator.pop(context);  
+            } else {
+              Navigator.pop(context);
+              Navigator.popAndPushNamed(
+                context,
+                "dashboard/1"
+              );
+            }
           }
         );
       } else {
@@ -1764,10 +1772,15 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
           cancel: false,
           type: "success",
           defaultAction: () {
-            Navigator.popAndPushNamed(
-              context,
-              "historyLimitRequest"
-            );
+            if(notificationType == 0) {
+              Navigator.pop(context);  
+            } else {
+              Navigator.pop(context);
+              Navigator.popAndPushNamed(
+                context,
+                "dashboard/1"
+              );
+            }
           }
         );
       }
@@ -1806,8 +1819,15 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
 
     String getChangeLimit = "";
 
+    // printHelp("cek params kode customer "+resultObject[0]['No_']);
+    // printHelp("cek params user_code "+user_code_request);
+    // printHelp("cek params limit_baru "+limitRequestController.text.replaceAll(new RegExp('\\.'),''));
+    // printHelp("cek params limit_dmd_baru "+limitDMDController.text.replaceAll(new RegExp('\\.'),''));
+    // printHelp("cek params user_login "+user_login);
+    // printHelp("cek params id "+widget.id.toString());
+
     if(command == 1) {
-      getChangeLimit = await customerAPI.updateLimitRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"$user_code_request","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}","user_login":"$user_code","id":"${widget.id}"}');
+      getChangeLimit = await customerAPI.updateLimitRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"$user_code_request","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}","limit_dmd_baru":"${limitDMDController.text.replaceAll(new RegExp('\\.'),'')}","user_login":"$user_code","id":"${widget.id}"}');
     } else {
       getChangeLimit = await customerAPI.updateLimitRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"$user_code_request","id":"${widget.id}"}');
     }
@@ -1823,10 +1843,15 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
           cancel: false,
           type: "success",
           defaultAction: () {
-            Navigator.popAndPushNamed(
-              context,
-              "historyLimitRequest"
-            );
+            if(notificationType == 0) {
+              Navigator.pop(context);  
+            } else {
+              Navigator.pop(context);
+              Navigator.popAndPushNamed(
+                context,
+                "dashboard/1"
+              );
+            }
           }
         );
       } else {
@@ -1847,10 +1872,15 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
           cancel: false,
           type: "success",
           defaultAction: () {
-            Navigator.popAndPushNamed(
-              context,
-              "historyLimitRequest"
-            );
+            if(notificationType == 0) {
+              Navigator.pop(context);  
+            } else {
+              Navigator.pop(context);
+              Navigator.popAndPushNamed(
+                context,
+                "dashboard/1"
+              );
+            }
           }
         );
       }

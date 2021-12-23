@@ -10,83 +10,83 @@ import 'package:tambah_limit/tools/function.dart';
 class LimitHistoryAPI {
   Client client = Client();
 
-  Future<Result> getLimitRequestHistory(final context, {String parameter=""}) async {
-    Result result;
-    String getLimitRequestHistorySuccess = "";
-    LimitHistory limitHistory;
-    String url = "";
+  // Future<Result> getLimitRequestHistory(final context, {String parameter=""}) async {
+  //   Result result;
+  //   String getLimitRequestHistorySuccess = "";
+  //   LimitHistory limitHistory;
+  //   String url = "";
 
-    bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    String url_address_1 = config.baseUrl + "/" + "getLimitReqHist.php" + (parameter == "" ? "" : "?" + parameter);
-    String url_address_2 = config.baseUrlAlt + "/" + "getLimitReqHist.php" + (parameter == "" ? "" : "?" + parameter);
+  //   bool isUrlAddress_1 = false, isUrlAddress_2 = false;
+  //   String url_address_1 = config.baseUrl + "/" + "getLimitReqHist.php" + (parameter == "" ? "" : "?" + parameter);
+  //   String url_address_2 = config.baseUrlAlt + "/" + "getLimitReqHist.php" + (parameter == "" ? "" : "?" + parameter);
 
-    try {
-		  final conn_1 = await ConnectionTest(url_address_1, context);
-      if(conn_1 == "OK"){
-        isUrlAddress_1 = true;
-      }
-	  } on SocketException {
-      isUrlAddress_1 = false;
-      getLimitRequestHistorySuccess = "Gagal terhubung dengan server";
-      result = new Result(success: -1, message: "Gagal terhubung dengan server");
-    }
+  //   try {
+	// 	  final conn_1 = await ConnectionTest(url_address_1, context);
+  //     if(conn_1 == "OK"){
+  //       isUrlAddress_1 = true;
+  //     }
+	//   } on SocketException {
+  //     isUrlAddress_1 = false;
+  //     getLimitRequestHistorySuccess = "Gagal terhubung dengan server";
+  //     result = new Result(success: -1, message: "Gagal terhubung dengan server");
+  //   }
 
-    if(isUrlAddress_1) {
-      url = url_address_1;
-    } else {
-      try {
-        final conn_2 = await ConnectionTest(url_address_2, context);
-        if(conn_2 == "OK"){
-          isUrlAddress_2 = true;
-        }
-      } on SocketException {
-        isUrlAddress_2 = false;
-        getLimitRequestHistorySuccess = "Gagal terhubung dengan server";
-        result = new Result(success: -1, message: "Gagal terhubung dengan server");
-      }
-    }
-    if(isUrlAddress_2){
-      url = url_address_2;
-    }
+  //   if(isUrlAddress_1) {
+  //     url = url_address_1;
+  //   } else {
+  //     try {
+  //       final conn_2 = await ConnectionTest(url_address_2, context);
+  //       if(conn_2 == "OK"){
+  //         isUrlAddress_2 = true;
+  //       }
+  //     } on SocketException {
+  //       isUrlAddress_2 = false;
+  //       getLimitRequestHistorySuccess = "Gagal terhubung dengan server";
+  //       result = new Result(success: -1, message: "Gagal terhubung dengan server");
+  //     }
+  //   }
+  //   if(isUrlAddress_2){
+  //     url = url_address_2;
+  //   }
 
-    if(url != "") {
-      try {
-        final response = await client.get(url);
+  //   if(url != "") {
+  //     try {
+  //       final response = await client.get(url);
 
-        printHelp("status code "+response.statusCode.toString());
+  //       printHelp("status code "+response.statusCode.toString());
 
-        printHelp("cek body "+response.body);
-        var parsedJson = jsonDecode(response.body);
+  //       printHelp("cek body "+response.body);
+  //       var parsedJson = jsonDecode(response.body);
 
-        if(response.body.toString() != "false") {
-          limitHistory = LimitHistory.fromJson(parsedJson[0]);
+  //       if(response.body.toString() != "false") {
+  //         limitHistory = LimitHistory.fromJson(parsedJson[0]);
 
-          if(limitHistory.customer_code != ""){
-            getLimitRequestHistorySuccess = "OK";
-          }
+  //         if(limitHistory.customer_code != ""){
+  //           getLimitRequestHistorySuccess = "OK";
+  //         }
 
-          var resultObject = jsonEncode(response.body);
-          result = new Result(success: 1, message: "OK", data: response.body.toString());
+  //         var resultObject = jsonEncode(response.body);
+  //         result = new Result(success: 1, message: "OK", data: response.body.toString());
 
-        } else {
-          getLimitRequestHistorySuccess = "Data tidak ditemukan";
-          result = new Result(success: 0, message: "Data tidak ditemukan");
-        }
+  //       } else {
+  //         getLimitRequestHistorySuccess = "Data tidak ditemukan";
+  //         result = new Result(success: 0, message: "Data tidak ditemukan");
+  //       }
 
-      } catch (e) {
-        getLimitRequestHistorySuccess = "Gagal terhubung dengan server";
-        result = new Result(success: -1, message: "Gagal terhubung dengan server");
-        print(e);
-      }
+  //     } catch (e) {
+  //       getLimitRequestHistorySuccess = "Gagal terhubung dengan server";
+  //       result = new Result(success: -1, message: "Gagal terhubung dengan server");
+  //       print(e);
+  //     }
 
-    } else {
-      getLimitRequestHistorySuccess = "Gagal terhubung dengan server";
-      result = new Result(success: -1, message: "Gagal terhubung dengan server");
-    }
+  //   } else {
+  //     getLimitRequestHistorySuccess = "Gagal terhubung dengan server";
+  //     result = new Result(success: -1, message: "Gagal terhubung dengan server");
+  //   }
 
-    return result;
+  //   return result;
 
-  }
+  // }
 
   Future<List<LimitHistory>> getLimitRequestHistoryList(final context, int type, {String parameter = ""}) async {
     

@@ -327,10 +327,7 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
         cancel: false,
         type: "success",
         defaultAction: () {
-          Navigator.popAndPushNamed(
-              context,
-              "addLimitCorporate"
-          );
+          Navigator.pop(context);
         }
       );
 
@@ -377,10 +374,7 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
         cancel: false,
         type: "success",
         defaultAction: () {
-          Navigator.popAndPushNamed(
-              context,
-              "addLimitCorporate"
-          );
+          Navigator.pop(context);
         }
       );
     } else {

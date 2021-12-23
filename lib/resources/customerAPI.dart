@@ -16,8 +16,8 @@ class CustomerAPI {
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    String url_address_1 = config.baseUrl + "/" + "getBlock.php" + (parameter == "" ? "" : "?" + parameter);
-    String url_address_2 = config.baseUrlAlt + "/" + "getBlock.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_1 = config.baseUrl + "/" + "getBlockCoba.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_2 = config.baseUrlAlt + "/" + "getBlockCoba.php" + (parameter == "" ? "" : "?" + parameter);
 
     try {
 		  final conn_1 = await ConnectionTest(url_address_1, context);
@@ -73,9 +73,9 @@ class CustomerAPI {
         printHelp("status code "+response.statusCode.toString());
 
         printHelp("cek body "+response.body);
-        var parsedJson = jsonDecode(response.body);
 
-        if(response.body.toString() != "false") {
+        if(response.body.toString() != "false" && response.body.toString() != "otoritas") {
+          var parsedJson = jsonDecode(response.body);
           customer = Customer.fromJson(parsedJson[0]);
 
           if(customer.No_ != ""){
@@ -86,8 +86,12 @@ class CustomerAPI {
           result = new Result(success: 1, message: "OK", data: response.body.toString());
 
         } else {
-          getBlockInfoSuccess = "Data Customer tidak ditemukan";
-          result = new Result(success: 0, message: "Data Customer tidak ditemukan");
+          if(response.body.toString() == "false") {
+            getBlockInfoSuccess = "Data Customer tidak ditemukan";
+            result = new Result(success: 0, message: "Data Customer tidak ditemukan");
+          } else if(response.body.toString()== "otoritas") {
+            result = new Result(success: 0, message: "Anda tidak mempunyai otoritas untuk melihat status blocked pelanggan ini");
+          }
         }
 
       } catch (e) {
@@ -129,7 +133,7 @@ class CustomerAPI {
     }
 
     if(isUrlAddress_1) {
-      url = url_address_1;
+      url = config.baseUrl + "/" + "getLimitCoba.php" + (parameter == "" ? "" : "?" + parameter);
     } else {
       try {
         final conn_2 = await ConnectionTest(url_address_2, context);
@@ -142,10 +146,8 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = url_address_2;
+      url = config.baseUrlAlt + "/" + "getLimitCoba.php" + (parameter == "" ? "" : "?" + parameter);
     }
-
-    url = config.baseUrl + "/" + "getLimit.php" + (parameter == "" ? "" : "?" + parameter);
 
     if(url != "") {
 
@@ -160,25 +162,21 @@ class CustomerAPI {
 
         printHelp(url);
 
-        var parsedJson = jsonDecode(response.body);
-
         if(response.body.toString() != "false" && response.body.toString() != "otoritas") {
+          var parsedJson = jsonDecode(response.body);
+
           customer = Customer.fromJson(parsedJson[0]);
           result = new Result(success: 1, message: "OK", data: response.body.toString());
         } else {
           if(response.body.toString() == "false") {
             result = new Result(success: 0, message: "Data Customer tidak ditemukan");
-          } else if(jsonDecode(jsonEncode(response.body)).toString().trim() == "otoritas") {
+          } else if(response.body.toString() == "otoritas") {
             result = new Result(success: 0, message: "Anda tidak mempunyai otoritas untuk merubah limit pada pelanggan ini");
           }
         }
           
       } catch (e) {
-        if(response.body.toString() == "otoritas") {
-          result = new Result(success: 0, message: "Anda tidak mempunyai otoritas untuk merubah limit pada pelanggan ini");
-        } else {
-          result = new Result(success: -1, message: "Data Customer tidak ditemukan");
-        }
+        result = new Result(success: -1, message: "Gagal terhubung dengan server");
         print(e);
       }
 
@@ -213,7 +211,7 @@ class CustomerAPI {
     }
 
     if(isUrlAddress_1) {
-      url = url_address_1;
+      url = config.baseUrl + "/" + "getLimitGabunganCoba.php" + (parameter == "" ? "" : "?" + parameter);
     } else {
       try {
         final conn_2 = await ConnectionTest(url_address_2, context);
@@ -226,10 +224,8 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = url_address_2;
+      url = config.baseUrlAlt + "/" + "getLimitGabunganCoba.php" + (parameter == "" ? "" : "?" + parameter);
     }
-
-    url = config.baseUrl + "/" + "getLimitGabungan.php" + (parameter == "" ? "" : "?" + parameter);
 
     if(url != "") {
       try {
@@ -288,7 +284,7 @@ class CustomerAPI {
     }
 
     if(isUrlAddress_1) {
-      url = config.baseUrl + "/" + "updateBlock.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrl + "/" + "updateBlockCoba.php" + (parameter == "" ? "" : "?" + parameter);
     } else {
       try {
         final conn_2 = await ConnectionTest(url_address_2, context);
@@ -301,7 +297,7 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = config.baseUrlAlt + "/" + "updateBlock.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrlAlt + "/" + "updateBlockCoba.php" + (parameter == "" ? "" : "?" + parameter);
     }
 
     if(url != "") {
@@ -437,7 +433,7 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = config.baseUrlAlt + "/" + "addRequestLimitsdsdGCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrlAlt + "/" + "addRequestLimitGCoba.php" + (parameter == "" ? "" : "?" + parameter);
     }
 
     if(url != "") {

@@ -35,6 +35,7 @@ void main() async {
           List<String> pages = [];
           int mode = 0;
           int id = 0;
+          int notificationType = 0;
     
           pages = settings.name.split("/");
     
@@ -45,6 +46,9 @@ void main() async {
           // mode 1 = api
           // mode 2 = local storage
           // mode 3 = dari model
+          
+          // notificationType 0 = onbackground / terminate
+          // notificationType 1 = in-app
           // customNavigator(context, "quizInfo/${item.id}/3", arguments: item);
           if (pages.length > 1) {
             id = int.tryParse(pages[1]);
@@ -52,8 +56,11 @@ void main() async {
           if (pages.length > 2) {
             mode = int.tryParse(pages[2]);
           }
+          if (pages.length > 3) {
+            notificationType = int.tryParse(pages[3]);
+          }
     
-          return routing(mode, id, pages, settings);
+          return routing(mode, id, pages, notificationType, settings);
         },
       ),
     )

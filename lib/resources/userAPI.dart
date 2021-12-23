@@ -23,8 +23,8 @@ class UserAPI {
     final SharedPreferences sharedPreferences = _sharedPreferences;
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    String url_address_1 = config.baseUrl + "/" + "getUser.php" + (parameter == "" ? "" : "?" + parameter);
-    String url_address_2 = config.baseUrlAlt + "/" + "getUser.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_1 = config.baseUrl + "/" + "getUserCoba.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_2 = config.baseUrlAlt + "/" + "getUserCoba.php" + (parameter == "" ? "" : "?" + parameter);
 
     try {
 		  final conn_1 = await ConnectionTest(url_address_1, context);
@@ -90,8 +90,8 @@ class UserAPI {
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    String url_address_1 = config.baseUrl + "/" + "updatePassword.php" + (parameter == "" ? "" : "?" + parameter);
-    String url_address_2 = config.baseUrlAlt + "/" + "updatePassword.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_1 = config.baseUrl + "/" + "updatePasswordCoba.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_2 = config.baseUrlAlt + "/" + "updatePasswordCoba.php" + (parameter == "" ? "" : "?" + parameter);
 
     try {
 		  final conn_1 = await ConnectionTest(url_address_1, context);
@@ -149,8 +149,8 @@ class UserAPI {
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    String url_address_1 = config.baseUrl + "/" + "getPass.php" + (parameter == "" ? "" : "?" + parameter);
-    String url_address_2 = config.baseUrlAlt + "/" + "getPass.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_1 = config.baseUrl + "/" + "getPassCoba.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_2 = config.baseUrlAlt + "/" + "getPassCoba.php" + (parameter == "" ? "" : "?" + parameter);
 
     try {
 		  final conn_1 = await ConnectionTest(url_address_1, context);

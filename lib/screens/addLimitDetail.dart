@@ -1953,7 +1953,11 @@ class AddLimitDetailState extends State<AddLimitDetail> {
           title: "Terima kasih,",
           content: Text("Ubah limit sukses"),
           cancel: false,
-          type: "success");
+          type: "success",
+          defaultAction: () {
+            Navigator.pop(context);
+          }
+        );
     } else {
       Alert(
           context: context,
@@ -1980,7 +1984,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
 
     String getRequestLimit = await customerAPI.addRequestLimit(context,
         parameter:
-            'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"${prefs.getString('user_code')}","nama_cust":"${resultObject[0]['Name']}","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}"}');
+            'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"${prefs.getString('user_code')}","nama_cust":"${resultObject[0]['Name']}","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}","limit_dmd_baru":"${limitDMDController.text.replaceAll(new RegExp('\\.'),'')}"}');
 
     Navigator.of(context).pop();
 
@@ -1990,7 +1994,11 @@ class AddLimitDetailState extends State<AddLimitDetail> {
           title: "Terima kasih,",
           content: Text("Permintaan sudah dikirim"),
           cancel: false,
-          type: "success");
+          type: "success",
+          defaultAction: () {
+            Navigator.pop(context);
+          }
+        );
     } else {
       Alert(
           context: context,

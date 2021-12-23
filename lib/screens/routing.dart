@@ -9,7 +9,7 @@ import 'package:tambah_limit/screens/historyLimitRequestDetail.dart';
 import 'package:tambah_limit/screens/login.dart';
 import 'package:tambah_limit/screens/splashscreen.dart';
 
-MaterialPageRoute routing(int mode, int id, List<String> pages, RouteSettings settings) {
+MaterialPageRoute routing(int mode, int id, List<String> pages, int notificationType, RouteSettings settings) {
   switch (pages[0]) {
     case '':
       return MaterialPageRoute(builder: (context)=> SplashScreen());
@@ -18,7 +18,7 @@ MaterialPageRoute routing(int mode, int id, List<String> pages, RouteSettings se
       return MaterialPageRoute(builder: (context)=> Login(result: settings.arguments));
       break;
     case 'dashboard':
-      return MaterialPageRoute(builder: (context)=> Dashboard());
+      return MaterialPageRoute(builder: (context)=> Dashboard(indexMenu: id));
       break;
     case 'addLimit':
       return MaterialPageRoute(builder: (context)=> AddLimit());
@@ -30,7 +30,7 @@ MaterialPageRoute routing(int mode, int id, List<String> pages, RouteSettings se
       return MaterialPageRoute(builder: (context)=> HistoryLimitRequest());
       break;
     case 'historyLimitRequestDetail':
-      return MaterialPageRoute(builder: (context)=> HistoryLimitRequestDetail(mode: mode, id: id, model: settings.arguments));
+      return MaterialPageRoute(builder: (context)=> HistoryLimitRequestDetail(mode: mode, id: id, model: settings.arguments, notificationType: notificationType));
       break;
     case 'addLimitDetail':
       return MaterialPageRoute(builder: (context)=> AddLimitDetail(model: settings.arguments, callMode: "addLimitDetail"));

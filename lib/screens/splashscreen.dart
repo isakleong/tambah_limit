@@ -73,20 +73,20 @@ class SplashScreenState extends State<SplashScreen> {
     final firebaseMessaging = PushNotificationService();
     firebaseMessaging.setNotifications();
 
-    firebaseMessaging.bodyCtlr.stream.listen(_changeBody);
-    firebaseMessaging.idCtlr.stream.listen(_changeId);
-    firebaseMessaging.customerCodeCtlr.stream.listen(_changeCustomerCode);
-    firebaseMessaging.userCodeCtlr.stream.listen(_changeUserCode);
-    firebaseMessaging.limitCtlr.stream.listen(_changeLimit);
+    // firebaseMessaging.bodyCtlr.stream.listen(_changeBody);
+    // firebaseMessaging.idCtlr.stream.listen(_changeId);
+    // firebaseMessaging.customerCodeCtlr.stream.listen(_changeCustomerCode);
+    // firebaseMessaging.userCodeCtlr.stream.listen(_changeUserCode);
+    // firebaseMessaging.limitCtlr.stream.listen(_changeLimit);
     
     super.initState();
   }
 
-  _changeId(String msg) => setState(() => notificationId = msg);
-  _changeCustomerCode(String msg) => setState(() => notificationCustomerCode = msg);
-  _changeUserCode(String msg) => setState(() => notificationUserCode = msg);
-  _changeLimit(String msg) => setState(() => notificationLimit = msg);
-  _changeBody(String msg) => setState(() => notificationBody = msg);
+  // _changeId(String msg) => setState(() => notificationId = msg);
+  // _changeCustomerCode(String msg) => setState(() => notificationCustomerCode = msg);
+  // _changeUserCode(String msg) => setState(() => notificationUserCode = msg);
+  // _changeLimit(String msg) => setState(() => notificationLimit = msg);
+  // _changeBody(String msg) => setState(() => notificationBody = msg);
 
   didChangeDependencies() async {
     super.didChangeDependencies();

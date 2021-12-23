@@ -38,11 +38,16 @@ Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstance();
 enum CustomerBlockedType { NotBlocked, BlockedShip, BlockedInvoice, BlockedAll }  
 
 class Dashboard extends StatefulWidget {
+  final int indexMenu;
+
+  Dashboard({Key key, this.indexMenu}) : super(key: key);
+
   @override
   DashboardState createState() => DashboardState();
 }
 
 class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
+  PersistentTabController tabController;
 
   String user_login = "";
 
@@ -54,26 +59,31 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   CustomerBlockedType customerBlockedType = CustomerBlockedType.NotBlocked;
 
-  Result result;
+  Result resultLimit, resultBlocked;
   
   String _lastSelected = 'TAB: 0';
   List<Color> backgroundActiveColor = [ config.grayColor, config.grayColor, config.grayColor ];
-  String dashboardTitle = "Blok Pelanggan";
+  String dashboardTitle = "Tambah Limit";
   int currentIndex = 0;
 
   String blockedTypeSelected = "";
   int selectedRadio = -1;
 
   bool customerIdValid = false;
+  bool customerIdBlockedValid = false;
   bool searchLoading = false;
+  bool searchBlockedLoading = false;
   bool updateLoading = false;
 
   final customerIdController = TextEditingController();
   final FocusNode customerIdFocus = FocusNode();
 
+  final customerIdBlockedController = TextEditingController();
+  final FocusNode customerIdBlockedFocus = FocusNode();
+
   final _bottomBarController = BottomBarWithSheetController(initialIndex: 0);
 
-  final btnTitle = [ "Tambah Limit", "Tambah Limit Corporate", "Riwayat Permintaan Limit" ];
+  final btnTitle = [ "Ubah Status Blocked", "Ubah Password", "Riwayat Permintaan Limit" ];
 
   bool unlockOldPassword = true;
   bool unlockNewPassword = true;
@@ -93,11 +103,28 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   bool changePasswordLoading = false;
 
+  bool isLimitCustomerSelected = true;
+  bool isLimitCorporateSelected = false;
+  
+  Color borderCardColor_1 = config.darkOpacityBlueColor;
+  Color backgroundCardColor_1 = config.lightBlueColor;
+  Color textCardColor_1 = config.grayColor;
+  Color borderCardColor_2 = config.grayNonActiveColor;
+  Color backgroundCardColor_2 = config.lighterGrayColor;
+  Color textCardColor_2 = config.grayNonActiveColor;
+
+  bool isHomePage = true;
+  int currentMenuIndex = 0;
+
   void _selectedTab(int index) {
     setState(() {
       if(index == 0){
-        dashboardTitle = "Blok Pelanggan";
+        dashboardTitle = "Tambah Limit";
       } else if(index == 1) {
+        dashboardTitle = "Riwayat Permintaan Limit";
+      } else if(index == 2) {
+        dashboardTitle = "Ubah Status Blocked";
+      } else if(index == 3) {
         dashboardTitle = "Ubah Password";
       }
       _lastSelected = 'TAB: $index';
@@ -150,7 +177,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             
             Navigator.pushNamed(
               context,
-              "historyLimitRequestDetail/${message.data['id']}/4",
+              "historyLimitRequestDetail/${message.data['id']}/4/0",
               arguments: result_,
             );
           } else {
@@ -160,13 +187,14 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
             final SharedPreferences sharedPreferences = await _sharedPreferences;
             await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+            await sharedPreferences.setInt("request_limit_dmd", int.parse(message.data['limit_dmd']));
             await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
             Navigator.of(context).pop();
 
             Navigator.pushNamed(
               context,
-              "historyLimitRequestDetail/${message.data['id']}/1",
+              "historyLimitRequestDetail/${message.data['id']}/1/0",
               arguments: result_,
             );
           }
@@ -191,7 +219,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             
             Navigator.pushNamed(
               context,
-              "historyLimitRequestDetail/${message.data['id']}/5",
+              "historyLimitRequestDetail/${message.data['id']}/5/0",
               arguments: result_,
             );
           } else {
@@ -201,13 +229,14 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
             final SharedPreferences sharedPreferences = await _sharedPreferences;
             await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+            await sharedPreferences.setInt("request_limit_dmd", int.parse(message.data['limit_dmd']));
             await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
             Navigator.of(context).pop();
 
             Navigator.pushNamed(
               context,
-              "historyLimitRequestDetail/${message.data['id']}/2",
+              "historyLimitRequestDetail/${message.data['id']}/2/0",
               arguments: result_,
             );
 
@@ -233,7 +262,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             
             Navigator.pushNamed(
               context,
-              "historyLimitRequestDetail/${message.data['id']}/6",
+              "historyLimitRequestDetail/${message.data['id']}/6/0",
               arguments: result_,
             );
           } else {
@@ -243,13 +272,14 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
             final SharedPreferences sharedPreferences = await _sharedPreferences;
             await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+            await sharedPreferences.setInt("request_limit_dmd", int.parse(message.data['limit_dmd']));
             await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
             Navigator.of(context).pop();
 
             Navigator.pushNamed(
               context,
-              "historyLimitRequestDetail/${message.data['id']}/3",
+              "historyLimitRequestDetail/${message.data['id']}/3/0",
               arguments: result_,
             );
           }
@@ -259,21 +289,30 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    tabController = PersistentTabController(initialIndex: 0);
+
     _bottomBarController.itemsStream.listen((i) {
       setState(() {
         currentIndex = i;
         if(i == 0){
-          dashboardTitle = "Blok Pelanggan";
+          dashboardTitle = "Tambah Limit";
         } else if(i == 1) {
           dashboardTitle = "Ubah Password";
         }
       });
     });
 
+    if(widget.indexMenu != null){
+      setState(() {
+        currentIndex = widget.indexMenu;
+      });
+    }
+
     // initializeNotification();
 
     //handling onbackground notification
     FirebaseMessaging.onMessageOpenedApp.listen((message) async {
+      printHelp("MASUK ONRESUME NOTIFICATION");
       Result result_;
 
       if (message.data['body'].toString().toLowerCase().contains("terdapat request tambah limit")) {
@@ -287,7 +326,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       if(message.data['customer_code'].toString().length > 11) {
         Alert(context: context, loading: true, disableBackButton: true);
 
-        result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+        result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"$user_login"}');
         
         final SharedPreferences sharedPreferences = await _sharedPreferences;
         await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -297,23 +336,24 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         
         Navigator.pushNamed(
           context,
-          "historyLimitRequestDetail/${message.data['id']}/4",
+          "historyLimitRequestDetail/${message.data['id']}/4/0",
           arguments: result_,
         );
       } else {
         Alert(context: context, loading: true, disableBackButton: true);
 
-        result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+        result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"$user_login"}');
 
         final SharedPreferences sharedPreferences = await _sharedPreferences;
         await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+        await sharedPreferences.setInt("request_limit_dmd", int.parse(message.data['limit_dmd']));
         await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
         Navigator.of(context).pop();
 
         Navigator.pushNamed(
           context,
-          "historyLimitRequestDetail/${message.data['id']}/1",
+          "historyLimitRequestDetail/${message.data['id']}/1/0",
           arguments: result_,
         );
       }
@@ -327,7 +367,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       if(message.data['customer_code'].toString().length > 11) {
         Alert(context: context, loading: true, disableBackButton: true);
 
-        result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+        result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"$user_login"}');
         
         final SharedPreferences sharedPreferences = await _sharedPreferences;
         await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -337,24 +377,25 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         
         Navigator.pushNamed(
           context,
-          "historyLimitRequestDetail/${message.data['id']}/5",
+          "historyLimitRequestDetail/${message.data['id']}/5/0",
           arguments: result_,
         );
       } else {
         Alert(context: context, loading: true, disableBackButton: true);
         printHelp("cek masuk sini ");
 
-        result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+        result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"$user_login"}');
 
         final SharedPreferences sharedPreferences = await _sharedPreferences;
         await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+        await sharedPreferences.setInt("request_limit_dmd", int.parse(message.data['limit_dmd']));
         await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
         Navigator.of(context).pop();
 
         Navigator.pushNamed(
           context,
-          "historyLimitRequestDetail/${message.data['id']}/2",
+          "historyLimitRequestDetail/${message.data['id']}/2/0",
           arguments: result_,
         );
       }
@@ -369,7 +410,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         if(message.data['customer_code'].toString().length > 11) {
           Alert(context: context, loading: true, disableBackButton: true);
 
-          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"$user_login"}');
           
           final SharedPreferences sharedPreferences = await _sharedPreferences;
           await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -379,23 +420,24 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           
           Navigator.pushNamed(
             context,
-            "historyLimitRequestDetail/${message.data['id']}/6",
+            "historyLimitRequestDetail/${message.data['id']}/6/0",
             arguments: result_,
           );
         } else {
           Alert(context: context, loading: true, disableBackButton: true);
 
-          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"$user_login"}');
 
           final SharedPreferences sharedPreferences = await _sharedPreferences;
           await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+          await sharedPreferences.setInt("request_limit_dmd", int.parse(message.data['limit_dmd']));
           await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
           Navigator.of(context).pop();
 
           Navigator.pushNamed(
             context,
-            "historyLimitRequestDetail/${message.data['id']}/3",
+            "historyLimitRequestDetail/${message.data['id']}/3/0",
             arguments: result_,
           );
         }
@@ -448,7 +490,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         if(message.data['customer_code'].toString().length > 11) {
                           Alert(context: context, loading: true, disableBackButton: true);
                           
-                          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+                          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"$user_login"}');
                           
                           final SharedPreferences sharedPreferences = await _sharedPreferences;
                           await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -464,16 +506,18 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                           );
 
                         } else {
+                          //ontesting
                           Alert(context: context, loading: true, disableBackButton: true);
 
                           printHelp("message cust code "+message.data['customer_code']);
                           printHelp("message user code "+message.data['user_code']);
                           printHelp("message limit "+message.data['limit']);
 
-                          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+                          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"$user_login"}');
 
                           final SharedPreferences sharedPreferences = await _sharedPreferences;
                           await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+                          await sharedPreferences.setInt("request_limit_dmd", int.parse(message.data['limit_dmd']));
                           await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
                           Navigator.of(context).pop();
@@ -492,7 +536,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         if(message.data['customer_code'].toString().length > 11) {
                           Alert(context: context, loading: true, disableBackButton: true);
                           
-                          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+                          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"$user_login"}');
                           
                           final SharedPreferences sharedPreferences = await _sharedPreferences;
                           await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -510,10 +554,11 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         } else {
                           Alert(context: context, loading: true, disableBackButton: true);
 
-                          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+                          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"$user_login"}');
 
                           final SharedPreferences sharedPreferences = await _sharedPreferences;
                           await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+                          await sharedPreferences.setInt("request_limit_dmd", int.parse(message.data['limit_dmd']));
                           await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
                           Navigator.of(context).pop();
@@ -533,7 +578,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         if(message.data['customer_code'].toString().length > 11) {
                           Alert(context: context, loading: true, disableBackButton: true);
                           
-                          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+                          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"$user_login"}');
                           
                           final SharedPreferences sharedPreferences = await _sharedPreferences;
                           await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -551,10 +596,11 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         } else {
                           Alert(context: context, loading: true, disableBackButton: true);
 
-                          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+                          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"$user_login"}');
 
                           final SharedPreferences sharedPreferences = await _sharedPreferences;
                           await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
+                          await sharedPreferences.setInt("request_limit_dmd", int.parse(message.data['limit_dmd']));
                           await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
                           Navigator.of(context).pop();
@@ -603,165 +649,321 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
     final List<Widget> menuList = [
       Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-            child: EditText(
-              useIcon: true,
-              key: Key("CustomerId"),
-              controller: customerIdController,
-              focusNode: customerIdFocus,
-              validate: customerIdValid,
-              keyboardType: TextInputType.text,
-              textInputAction: TextInputAction.go,
-              textCapitalization: TextCapitalization.characters,
-              hintText: "Kode Pelanggan",
-              onSubmitted: (value) {
-                customerIdFocus.unfocus();
-                getBlockInfo();
-              },
-              onChanged: (value) {
-                setState(() {
-                  result = null;
-                });
-              },
-            ),
+          Column(
+            children: [
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 5,
+                        child: InkWell(
+                          onTap: (){
+                            setState(() {
+                              // customerIdController.clear();
+
+                              isLimitCustomerSelected = true;
+                              isLimitCorporateSelected = false;
+
+                              borderCardColor_1 = config.darkOpacityBlueColor;
+                              backgroundCardColor_1 = config.lightBlueColor;
+                              textCardColor_1 = config.grayColor;
+                              borderCardColor_2 = config.grayNonActiveColor;
+                              backgroundCardColor_2 = config.lighterGrayColor;
+                              textCardColor_2 = config.grayNonActiveColor;
+                            });
+                          },
+                          child: ClipPath(
+                            clipper: ShapeBorderClipper(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8))),
+                            child: Container(
+                              height: 100,
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                      right: BorderSide(color: borderCardColor_1, width: 10)),
+                                  color: backgroundCardColor_1,
+                                ),
+                                padding: EdgeInsets.all(20.0),
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                 child: TextView("Limit Customer", 3, color: textCardColor_1),
+                                )
+                              ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 5,
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              // customerIdController.clear();
+
+                              isLimitCustomerSelected = false;
+                              isLimitCorporateSelected = true;
+
+                              borderCardColor_2 = config.darkOpacityBlueColor;
+                              backgroundCardColor_2 = config.lightBlueColor;
+                              textCardColor_2 = config.grayColor;
+                              borderCardColor_1 = config.grayNonActiveColor;
+                              backgroundCardColor_1 = config.lighterGrayColor;
+                              textCardColor_1 = config.grayNonActiveColor;
+                            });
+                          },
+                          child: ClipPath(
+                            clipper: ShapeBorderClipper(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8))),
+                            child: Container(
+                              height: 100,
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                      right: BorderSide(color: borderCardColor_2, width: 10)),
+                                  color: backgroundCardColor_2,
+                                ),
+                                padding: EdgeInsets.all(20.0),
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  child: TextView("Limit Corporate", 3, color: textCardColor_2),
+                                )
+                              ),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                child: EditText(
+                  useIcon: true,
+                  key: Key("CustomerId"),
+                  controller: customerIdController,
+                  focusNode: customerIdFocus,
+                  validate: customerIdValid,
+                  keyboardType: TextInputType.text,
+                  textInputAction: TextInputAction.go,
+                  textCapitalization: TextCapitalization.characters,
+                  hintText: isLimitCustomerSelected ? "Kode Pelanggan" : "Kode Corporate",
+                  onSubmitted: (value) {
+                    customerIdFocus.unfocus();
+                    if(isLimitCustomerSelected) {
+                      getLimit();
+                    } else {
+                      getLimitCorporate();
+                    }
+                  },
+                  onChanged: (value) {
+                    setState(() {
+                      resultLimit = null;
+                    });
+                  },
+                ),
+              ),
+            ],
           ),
+          
           Container(
             margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
             width: MediaQuery.of(context).size.width,
             child: Button(
               loading: searchLoading,
               backgroundColor: config.darkOpacityBlueColor,
-              child: TextView("CARI", 3, color: Colors.white),
+              child: TextView("LANJUTKAN", 3, color: Colors.white),
               onTap: () {
-                getBlockInfo();
+                if(isLimitCustomerSelected) {
+                  getLimit();
+                } else {
+                  getLimitCorporate();
+                }
               },
             ),
           ),
-          blockInfoDetailWidgetList.length == 0
-          ? 
-          Container()
-          :
-          ListView(
-            scrollDirection: Axis.vertical,
-            padding: EdgeInsets.all(0),
-            physics: ScrollPhysics(),
-            shrinkWrap: true,
-            children: blockInfoDetailWidgetList,
-          ),
         ],
       ),
-      Container(
+      HistoryLimitRequest(),
+      SingleChildScrollView(
         child: Column(
           children: [
             Container(
               margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
               child: EditText(
                 useIcon: true,
-                key: Key("OldPassword"),
-                controller: oldPasswordController,
-                focusNode: oldPasswordFocus,
-                obscureText: unlockOldPassword,
-                validate: oldPasswordValid,
+                key: Key("CustomerId"),
+                controller: customerIdBlockedController,
+                focusNode: customerIdBlockedFocus,
+                validate: customerIdBlockedValid,
                 keyboardType: TextInputType.text,
-                textInputAction: TextInputAction.next,
+                textInputAction: TextInputAction.go,
                 textCapitalization: TextCapitalization.characters,
-                hintText: "Password Lama",
-                alertMessage: oldPasswordErrorMessage,
-                suffixIcon:
-                InkWell(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 5),
-                    child: Icon(
-                      Icons.remove_red_eye,
-                      color:  unlockOldPassword ? config.lightGrayColor : config.grayColor,
-                      size: 18,
-                    ),
-                  ),
-                  onTap: () {
-                    setState(() {
-                      unlockOldPassword = !unlockOldPassword;
-                    });
-                  },
-                ),
+                hintText: "Kode Pelanggan",
                 onSubmitted: (value) {
-                  _fieldFocusChange(context, oldPasswordFocus, newPasswordFocus);
+                  customerIdFocus.unfocus();
+                  getBlockInfo();
                 },
                 onChanged: (value) {
-                  
+                  setState(() {
+                    resultBlocked = null;
+                  });
                 },
               ),
             ),
             Container(
-              margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-              child: EditText(
-                useIcon: true,
-                key: Key("NewPassword"),
-                controller: newPasswordController,
-                focusNode: newPasswordFocus,
-                validate:  newPasswordValid,
-                obscureText: unlockNewPassword,
-                keyboardType: TextInputType.text,
-                textInputAction: TextInputAction.next,
-                textCapitalization: TextCapitalization.characters,
-                hintText: "Password Baru",
-                alertMessage: newPasswordErrorMessage,
-                suffixIcon:
-                  InkWell(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 5),
-                      child: Icon(
-                        Icons.remove_red_eye,
-                        color:  unlockNewPassword ? config.lightGrayColor : config.grayColor,
-                        size: 18,
-                      ),
-                    ),
-                    onTap: () {
-                      setState(() {
-                        unlockNewPassword = !unlockNewPassword;
-                      });
-                    },
-                  ),
-                onSubmitted: (value) {
-                  _fieldFocusChange(context, newPasswordFocus, confirmPasswordFocus);
+              margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+              width: MediaQuery.of(context).size.width,
+              child: Button(
+                loading: searchBlockedLoading,
+                backgroundColor: config.darkOpacityBlueColor,
+                child: TextView("Cari", 3, color: Colors.white, caps: true),
+                onTap: () {
+                  getBlockInfo();
                 },
               ),
             ),
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-              child: EditText(
-                useIcon: true,
-                key: Key("ConfirmPassword"),
-                controller: confirmPasswordController,
-                focusNode: confirmPasswordFocus,
-                validate: confirmPasswordValid,
-                keyboardType: TextInputType.text,
-                obscureText: unlockConfirmPassword,
-                textInputAction: TextInputAction.done,
-                textCapitalization: TextCapitalization.characters,
-                hintText: "Konfirmasi Password Baru",
-                alertMessage: confirmPasswordErrorMessage,
-                suffixIcon:
-                  InkWell(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 5),
-                      child: Icon(
-                        Icons.remove_red_eye,
-                        color:  unlockConfirmPassword ? config.lightGrayColor : config.grayColor,
-                        size: 18,
+            blockInfoDetailWidgetList.length == 0
+            ? 
+            Container()
+            :
+            ListView(
+              scrollDirection: Axis.vertical,
+              padding: EdgeInsets.all(0),
+              physics: ScrollPhysics(),
+              shrinkWrap: true,
+              children: blockInfoDetailWidgetList,
+            ),
+          ],
+        ),
+      ),
+      
+      Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                  child: EditText(
+                    useIcon: true,
+                    key: Key("OldPassword"),
+                    controller: oldPasswordController,
+                    focusNode: oldPasswordFocus,
+                    obscureText: unlockOldPassword,
+                    validate: oldPasswordValid,
+                    keyboardType: TextInputType.text,
+                    textInputAction: TextInputAction.next,
+                    textCapitalization: TextCapitalization.characters,
+                    hintText: "Password Lama",
+                    alertMessage: oldPasswordErrorMessage,
+                    suffixIcon:
+                    InkWell(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 5),
+                        child: Icon(
+                          Icons.remove_red_eye,
+                          color:  unlockOldPassword ? config.lightGrayColor : config.grayColor,
+                          size: 18,
+                        ),
                       ),
+                      onTap: () {
+                        setState(() {
+                          unlockOldPassword = !unlockOldPassword;
+                        });
+                      },
                     ),
-                    onTap: () {
-                      setState(() {
-                        unlockConfirmPassword = !unlockConfirmPassword;
-                      });
+                    onSubmitted: (value) {
+                      _fieldFocusChange(context, oldPasswordFocus, newPasswordFocus);
+                    },
+                    onChanged: (value) {
+                      
                     },
                   ),
-                onSubmitted: (value) {
-                  confirmPasswordFocus.unfocus();
-                },
-              ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                  child: EditText(
+                    useIcon: true,
+                    key: Key("NewPassword"),
+                    controller: newPasswordController,
+                    focusNode: newPasswordFocus,
+                    validate:  newPasswordValid,
+                    obscureText: unlockNewPassword,
+                    keyboardType: TextInputType.text,
+                    textInputAction: TextInputAction.next,
+                    textCapitalization: TextCapitalization.characters,
+                    hintText: "Password Baru",
+                    alertMessage: newPasswordErrorMessage,
+                    suffixIcon:
+                      InkWell(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 5),
+                          child: Icon(
+                            Icons.remove_red_eye,
+                            color:  unlockNewPassword ? config.lightGrayColor : config.grayColor,
+                            size: 18,
+                          ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            unlockNewPassword = !unlockNewPassword;
+                          });
+                        },
+                      ),
+                    onSubmitted: (value) {
+                      _fieldFocusChange(context, newPasswordFocus, confirmPasswordFocus);
+                    },
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                  child: EditText(
+                    useIcon: true,
+                    key: Key("ConfirmPassword"),
+                    controller: confirmPasswordController,
+                    focusNode: confirmPasswordFocus,
+                    validate: confirmPasswordValid,
+                    keyboardType: TextInputType.text,
+                    obscureText: unlockConfirmPassword,
+                    textInputAction: TextInputAction.done,
+                    textCapitalization: TextCapitalization.characters,
+                    hintText: "Konfirmasi Password Baru",
+                    alertMessage: confirmPasswordErrorMessage,
+                    suffixIcon:
+                      InkWell(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 5),
+                          child: Icon(
+                            Icons.remove_red_eye,
+                            color:  unlockConfirmPassword ? config.lightGrayColor : config.grayColor,
+                            size: 18,
+                          ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            unlockConfirmPassword = !unlockConfirmPassword;
+                          });
+                        },
+                      ),
+                    onSubmitted: (value) {
+                      confirmPasswordFocus.unfocus();
+                    },
+                  ),
+                ),
+              ],
             ),
             Container(
               margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
@@ -784,258 +986,454 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       
     ].where((c) => c != null).toList();
 
+    // List<PersistentBottomNavBarItem> bottomBarItems() {
+    //     return [
+    //         PersistentBottomNavBarItem(
+    //             icon: Icon(CupertinoIcons.money_dollar),
+    //             title: ("Limit"),
+    //             activeColorPrimary: CupertinoColors.activeBlue,
+    //             inactiveColorPrimary: CupertinoColors.systemGrey,
+    //         ),
+    //         PersistentBottomNavBarItem(
+    //             icon: Icon(Icons.change_circle),
+    //             title: ("Riwayat"),
+    //             activeColorPrimary: CupertinoColors.activeBlue,
+    //             inactiveColorPrimary: CupertinoColors.systemGrey,
+    //         ),
+    //         PersistentBottomNavBarItem(
+    //             icon: Icon(Icons.not_interested),
+    //             title: ("Blocked"),
+    //             activeColorPrimary: CupertinoColors.activeBlue,
+    //             inactiveColorPrimary: CupertinoColors.systemGrey,
+    //         ),
+    //         PersistentBottomNavBarItem(
+    //             icon: Icon(Icons.lock),
+    //             title: ("Password"),
+    //             activeColorPrimary: CupertinoColors.activeBlue,
+    //             inactiveColorPrimary: CupertinoColors.systemGrey,
+    //         ),
+
+    //         //     BottomBarWithSheetItem(icon: Icons.money, label: "Limit"),
+    //   //     BottomBarWithSheetItem(icon: Icons.change_circle, label: "Riwayat"),
+    //   //     BottomBarWithSheetItem(icon: Icons.not_interested, label: "Blocked"),
+    //   //     BottomBarWithSheetItem(icon: Icons.lock, label: "Password"),
+    //     ];
+    // }
+
     return Scaffold(
       key: _scaffoldKey,
-      resizeToAvoidBottomInset: false,
-      // appBar: AppBar(
-      //   title: TextView(dashboardTitle, 1),
-      //   automaticallyImplyLeading: false,
-      //   actions: [
-          // InkWell(
-          //   onTap: () {
-          //     Alert(
-          //       context: context,
-          //       title: "Konfirmasi,",
-          //       content: Text("Apakah Anda yakin ingin keluar dari aplikasi?"),
-          //       cancel: true,
-          //       type: "warning",
-          //       defaultAction: () async {
-          //         SharedPreferences prefs = await SharedPreferences.getInstance();
-          //         await prefs.remove("limit_dmd");
-          //         await prefs.remove("request_limit");
-          //         await prefs.remove("user_code_request");
-          //         await prefs.remove("user_code");
-          //         await prefs.remove("max_limit");
-          //         await prefs.remove("fcmToken");
-          //         await FirebaseMessaging.instance.deleteToken();
-          //         await prefs.clear();
-          //         Navigator.pushReplacementNamed(
-          //           context,
-          //           "login",
-          //         );
-          //     });
-              
-          //   },
-          //   child: Container(
-          //     margin: EdgeInsets.only(right: 10),
-          //     child:Icon (Icons.logout, size: 28),
-          //   ),
-          // ),
-          
-      //   ],
-      // ),
-      body: WillPopScope(
-        onWillPop: willPopScope,
-        child: CustomScrollView(
-          slivers: <Widget>[
-            SliverAppBar(
-              pinned: true,
-              expandedHeight: 140,
-              flexibleSpace: FlexibleSpaceBar(
-                title: TextView(dashboardTitle, 3),
-                centerTitle: true,
-              ),
-              title: Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextView("Selamat Datang, " + user_login.toUpperCase(), 3),
-                    InkWell(
-                      onTap: () {
-                        Alert(
-                          context: context,
-                          title: "Konfirmasi,",
-                          content: Text("Apakah Anda yakin ingin keluar dari aplikasi?"),
-                          cancel: true,
-                          type: "warning",
-                          defaultAction: () async {
-                            SharedPreferences prefs = await SharedPreferences.getInstance();
-                            await prefs.remove("limit_dmd");
-                            await prefs.remove("request_limit");
-                            await prefs.remove("user_code_request");
-                            await prefs.remove("user_code");
-                            await prefs.remove("max_limit");
-                            await prefs.remove("fcmToken");
-                            await prefs.remove("get_user_login");
-                            await FirebaseMessaging.instance.deleteToken();
-                            await prefs.clear();
-                            Navigator.pushReplacementNamed(
-                              context,
-                              "login",
-                            );
-                          }
-                        );
-                    },
-                    child: Container(
-                      child:Icon (Icons.logout, size: 30),
+      resizeToAvoidBottomInset: true,
+      appBar: currentIndex !=1 ?
+      PreferredSize(
+        preferredSize: Size.fromHeight(140),
+        child: AppBar(
+          flexibleSpace: SafeArea(
+            child: Container(
+              margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextView("Selamat Datang, " + user_login.toUpperCase(), 3),
+                      InkWell(
+                        onTap: () {
+                          Alert(
+                            context: context,
+                            title: "Konfirmasi,",
+                            content: Text("Apakah Anda yakin ingin keluar dari aplikasi?"),
+                            cancel: true,
+                            type: "warning",
+                            defaultAction: () async {
+                              SharedPreferences prefs = await SharedPreferences.getInstance();
+                              await prefs.remove("limit_dmd");
+                              await prefs.remove("request_limit");
+                              await prefs.remove("user_code_request");
+                              await prefs.remove("user_code");
+                              await prefs.remove("max_limit");
+                              await prefs.remove("fcmToken");
+                              await prefs.remove("get_user_login");
+                              await FirebaseMessaging.instance.deleteToken();
+                              await prefs.clear();
+                              Navigator.pushReplacementNamed(
+                                context,
+                                "login",
+                              );
+                            }
+                          );
+                      },
+                      child: Container(
+                        child:Icon (Icons.logout, size: 30, color: Colors.white),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                  Container(
+                    child: TextView(dashboardTitle, 1)
+                  ),
+                ],
               ),
             ),
-            // SliverToBoxAdapter(
-            //   child: Container(
-            //     child: menuList[currentIndex]
-            //   ),
-            // ),
-
-            // SliverList(
-            //   delegate: SliverChildBuilderDelegate(
-            //     (BuildContext context, int index) {
-            //       return Container(
-            //         child: menuList[currentIndex]
-            //       );
-            //     },
-            //   ),
-            // ),
-
-            SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                return Container(
-                  margin: EdgeInsets.symmetric(vertical: 30),
-                  child: menuList[currentIndex]
-                );
-              },  
-              childCount: 1),
-            ),
-
-          ]
+          ),
+          automaticallyImplyLeading: false,
         ),
-      ),
-      bottomNavigationBar: BottomBarWithSheet(
-        controller: _bottomBarController,
-        autoClose: false,
-        bottomBarTheme: BottomBarTheme(
-          mainButtonPosition: MainButtonPosition.middle,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.5),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: Offset(0, 3), // changes position of shadow
-              ),
-            ],
-          ),
-          heightOpened: 350,
-          itemIconColor: config.grayColor,
-          selectedItemIconColor: config.darkOpacityBlueColor,
-          itemTextStyle: TextStyle(
-            color: config.grayColor,
-            fontSize: 12,
-            fontFamily: "WorkSans"
-          ),
-          selectedItemTextStyle: TextStyle(
-            color: config.darkOpacityBlueColor,
-            fontSize: 14,
-            fontFamily: "WorkSans"
-          ),
-        ),
-        mainActionButtonTheme: MainActionButtonTheme(
-          size: 60,
-          color: config.darkOpacityBlueColor,
-          icon: Icon(
-            Icons.add,
-            color: Colors.white,
-            size: 32,
-          ),
-        ),
-        onSelectItem: (index) {
-          printHelp("get index "+index.toString());
-          setState(() {
-            if(index == 0){
-              dashboardTitle = "Blok Pelanggan";
-            } else if(index == 1) {
-              dashboardTitle = "Ubah Password";
-            }  
-          });
-          
-        },
-        sheetChild: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [                
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                  child: Button(
-                    backgroundColor: config.darkOpacityBlueColor,
-                    child: TextView("Tambah Limit", 3, color: Colors.white),
-                    onTap: () {
-                      _bottomBarController.toggleSheet();
-                      setState(() {
-                        customerIdController.text = "";
-                        result = null;
-                      });
-                      Navigator.pushNamed(
-                          context,
-                          "addLimit"
-                      );
-                    },
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                  child: Button(
-                    backgroundColor: config.darkOpacityBlueColor,
-                    child: TextView("Tambah Limit Corporate", 3, color: Colors.white),
-                    onTap: () {
-                      _bottomBarController.toggleSheet();
-                      setState(() {
-                        customerIdController.text = "";
-                        result = null;
-                      });
-                      Navigator.pushNamed(
-                          context,
-                          "addLimitCorporate"
-                      );
-                    },
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                  child: Button(
-                    backgroundColor: config.darkOpacityBlueColor,
-                    child: TextView("Riwayat Permintaan Limit", 3, color: Colors.white),
-                    onTap: () {
-                      _bottomBarController.toggleSheet();
-                      Navigator.pushNamed(
-                          context,
-                          "historyLimitRequest"
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        items: [
-          BottomBarWithSheetItem(icon: Icons.not_interested, label: "Status Blocked"),
-          BottomBarWithSheetItem(icon: Icons.password, label: "Ubah Password"),
-        ],
       )
+      : null,
+      body: Container(
+        child: menuList[currentIndex],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        selectedFontSize: 16,
+        unselectedFontSize: 14,
+        selectedIconTheme: IconThemeData(color: config.darkOpacityBlueColor),
+        selectedItemColor: config.darkOpacityBlueColor,
+        selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
+        unselectedIconTheme: IconThemeData(color: config.grayColor),
+        unselectedItemColor: config.grayColor,
+        type: BottomNavigationBarType.fixed,  
+        currentIndex: currentIndex,  
+        onTap: _selectedTab,  
+        elevation: 5,
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(CupertinoIcons.money_dollar), label: "Limit"),
+          BottomNavigationBarItem(icon: Icon(Icons.change_circle), label: "Riwayat"),
+          BottomNavigationBarItem(icon: Icon(Icons.not_interested), label: "Blocked"),
+          BottomNavigationBarItem(icon: Icon(Icons.lock), label: "Password"),
+        ],
+      ),
       
       
-      // FABBottomAppBar(
-      //   centerItemText: '',
-      //   color: config.grayColor,
-      //   selectedColor: config.darkerBlueColor,
-      //   notchedShape: CircularNotchedRectangle(),
-      //   onTabSelected: _selectedTab,
-      //   items: [
-      //     FABBottomAppBarItem(iconData: Icons.not_interested, text: 'Status Block'),
-      //     FABBottomAppBarItem(iconData: Icons.password, text: 'Ubah Password'),
+      // Container(
+      //   child: PersistentTabView(
+      //     context,
+      //     controller: tabController,
+      //     screens: menuList,
+      //     items: bottomBarItems(),
+      //     confineInSafeArea: true,
+      //     backgroundColor: Colors.white, // Default is Colors.white.
+      //     handleAndroidBackButtonPress: true, // Default is true.
+      //     resizeToAvoidBottomInset: true, // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
+      //     stateManagement: true, // Default is true.
+      //     hideNavigationBarWhenKeyboardShows: true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
+      //     decoration: NavBarDecoration(
+      //       borderRadius: BorderRadius.circular(32),
+      //       colorBehindNavBar: Colors.white,
+      //       boxShadow: [
+      //         BoxShadow(
+      //           color: Colors.grey.withOpacity(0.5),
+      //           spreadRadius: 5,
+      //           blurRadius: 7,
+      //           offset: Offset(0, 3),
+      //         ),
+      //       ],
+      //     ),
+      //     onItemSelected: (int) {
+      //       printHelp("get select "+ int.toString());
+      //       setState(() {
+      //         currentMenuIndex = int;
+      //         if(int == 0 || int == 2) {
+      //           if(int == 0) {
+      //             dashboardTitle = "Tambah Limit";
+      //           } else {
+      //             dashboardTitle = "Ubah Status Blocked";
+      //           }
+      //           isHomePage = true;
+      //         } else {
+      //           isHomePage = false;
+      //         }
+      //       }); // This is required to update the nav bar if Android back button is pressed
+      //     },
+      //     popAllScreensOnTapOfSelectedTab: true,
+      //     popActionScreens: PopActionScreensType.all,
+      //     itemAnimationProperties: ItemAnimationProperties( // Navigation Bar's items animation properties.
+      //       duration: Duration(milliseconds: 200),
+      //       curve: Curves.ease,
+      //     ),
+      //     screenTransitionAnimation: ScreenTransitionAnimation( // Screen transition animation on change of selected tab.
+      //       animateTabTransition: true,
+      //       curve: Curves.ease,
+      //       duration: Duration(milliseconds: 200),
+      //     ),
+      //     navBarStyle: NavBarStyle.style6, // Choose the nav bar style with this property.
+      //   ),
+      // )
+      
+      // CustomScrollView(
+      //   slivers: <Widget>[
+      //     SliverAppBar(
+      //       pinned: true,
+      //       snap: false,
+      //       floating: false,
+      //       expandedHeight: 160.0,
+      //       flexibleSpace: const FlexibleSpaceBar(
+      //         title: Text('SliverAppBar'),
+      //         background: FlutterLogo(),
+      //       ),
+      //     ),
+      //     const SliverToBoxAdapter(
+      //       child: SizedBox(
+      //         height: 20,
+      //         child: Center(
+      //           child: Text('Scroll to see the SliverAppBar in effect.'),
+      //         ),
+      //       ),
+      //     ),
+      //     SliverList(
+      //       delegate: SliverChildBuilderDelegate(
+      //         (BuildContext context, int index) {
+      //           return Container(
+      //             color: index.isOdd ? Colors.white : Colors.black12,
+      //             height: 100.0,
+      //             child: Center(
+      //               child: Text('$index', textScaleFactor: 5),
+      //             ),
+      //           );
+      //         },
+      //         childCount: 20,
+      //       ),
+      //     ),
       //   ],
       // ),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      // floatingActionButton: _buildFab(
-      //     context), // This trailing comma makes auto-formatting nicer for build methods.
+
+      
+      
+      // bottomNavigationBar: PersistentTabView(
+      //   context,
+      //   controller: tabController,
+      //   screens: menuList,
+      //   items: bottomBarItems(),
+      //   confineInSafeArea: true,
+      //   backgroundColor: Colors.white, // Default is Colors.white.
+      //   handleAndroidBackButtonPress: true, // Default is true.
+      //   resizeToAvoidBottomInset: true, // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
+      //   stateManagement: true, // Default is true.
+      //   hideNavigationBarWhenKeyboardShows: true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
+      //   decoration: NavBarDecoration(
+      //     borderRadius: BorderRadius.circular(10.0),
+      //     colorBehindNavBar: Colors.white,
+      //   ),
+      //   popAllScreensOnTapOfSelectedTab: true,
+      //   popActionScreens: PopActionScreensType.all,
+      //   itemAnimationProperties: ItemAnimationProperties( // Navigation Bar's items animation properties.
+      //     duration: Duration(milliseconds: 200),
+      //     curve: Curves.ease,
+      //   ),
+      //   screenTransitionAnimation: ScreenTransitionAnimation( // Screen transition animation on change of selected tab.
+      //     animateTabTransition: true,
+      //     curve: Curves.ease,
+      //     duration: Duration(milliseconds: 200),
+      //   ),
+      //   navBarStyle: NavBarStyle.style6, // Choose the nav bar style with this property.
+      // )
+      
+      
+      // WillPopScope(
+      //   onWillPop: willPopScope,
+      //   child: CustomScrollView(
+      //     slivers: <Widget>[
+      //       SliverAppBar(
+      //         pinned: true,
+      //         expandedHeight: 140,
+      //         flexibleSpace: FlexibleSpaceBar(
+      //           title: TextView(dashboardTitle, 3),
+      //           centerTitle: true,
+      //         ),
+      //         title: Container(
+      //           child: Row(
+      //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //             children: [
+      //               TextView("Selamat Datang, " + user_login.toUpperCase(), 3),
+      //               InkWell(
+      //                 onTap: () {
+      //                   Alert(
+      //                     context: context,
+      //                     title: "Konfirmasi,",
+      //                     content: Text("Apakah Anda yakin ingin keluar dari aplikasi?"),
+      //                     cancel: true,
+      //                     type: "warning",
+      //                     defaultAction: () async {
+      //                       SharedPreferences prefs = await SharedPreferences.getInstance();
+      //                       await prefs.remove("limit_dmd");
+      //                       await prefs.remove("request_limit");
+      //                       await prefs.remove("user_code_request");
+      //                       await prefs.remove("user_code");
+      //                       await prefs.remove("max_limit");
+      //                       await prefs.remove("fcmToken");
+      //                       await prefs.remove("get_user_login");
+      //                       await FirebaseMessaging.instance.deleteToken();
+      //                       await prefs.clear();
+      //                       Navigator.pushReplacementNamed(
+      //                         context,
+      //                         "login",
+      //                       );
+      //                     }
+      //                   );
+      //               },
+      //               child: Container(
+      //                 child:Icon (Icons.logout, size: 30),
+      //                 ),
+      //               ),
+      //             ],
+      //           ),
+      //         ),
+      //       ),
+      //       // SliverToBoxAdapter(
+      //       //   child: Container(
+      //       //     child: menuList[currentIndex]
+      //       //   ),
+      //       // ),
+
+      //       // SliverList(
+      //       //   delegate: SliverChildBuilderDelegate(
+      //       //     (BuildContext context, int index) {
+      //       //       return Container(
+      //       //         child: menuList[currentIndex]
+      //       //       );
+      //       //     },
+      //       //   ),
+      //       // ),
+
+      //       SliverList(
+      //         delegate: SliverChildBuilderDelegate((context, index) {
+      //           return Container(
+      //             margin: EdgeInsets.symmetric(vertical: 30),
+      //             child: menuList[currentIndex]
+      //           );
+      //         },  
+      //         childCount: 1),
+      //       ),
+
+      //     ]
+      //   ),
+      // ),
+      
+      // bottomNavigationBar: 
+      
+      
+      // BottomBarWithSheet(
+      //   disableMainActionButton: true,
+      //   controller: _bottomBarController,
+      //   bottomBarTheme: BottomBarTheme(
+      //     mainButtonPosition: MainButtonPosition.middle,
+      //     decoration: BoxDecoration(
+      //       color: Colors.white,
+      //       borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      //       boxShadow: [
+      //         BoxShadow(
+      //           color: Colors.grey.withOpacity(0.5),
+      //           spreadRadius: 5,
+      //           blurRadius: 7,
+      //           offset: Offset(0, 3), // changes position of shadow
+      //         ),
+      //       ],
+      //     ),
+      //     heightOpened: 350,
+      //     itemIconColor: config.grayColor,
+      //     selectedItemIconColor: config.darkOpacityBlueColor,
+      //     itemTextStyle: TextStyle(
+      //       color: config.grayColor,
+      //       fontSize: 12,
+      //       fontFamily: "WorkSans",
+      //       fontWeight: FontWeight.bold
+      //     ),
+      //     selectedItemTextStyle: TextStyle(
+      //       color: config.darkOpacityBlueColor,
+      //       fontSize: 14,
+      //       fontFamily: "WorkSans",
+      //       fontWeight: FontWeight.bold
+      //     ),
+      //   ),
+      //   mainActionButtonTheme: MainActionButtonTheme(
+      //     size: 60,
+      //     color: config.darkOpacityBlueColor,
+      //     icon: Icon(
+      //       Icons.add,
+      //       color: Colors.white,
+      //       size: 32,
+      //     ),
+      //   ),
+      //   onSelectItem: (index) {
+      //     printHelp("get index "+index.toString());
+      //     setState(() {
+      //       if(index == 0){
+      //         dashboardTitle = "Blok Pelanggan";
+      //       } else if(index == 1) {
+      //         dashboardTitle = "Ubah Password";
+      //       }  
+      //     });
+          
+      //   },
+      //   sheetChild: SingleChildScrollView(
+      //     scrollDirection: Axis.vertical,
+      //     child: Container(
+      //       child: Column(
+      //         mainAxisAlignment: MainAxisAlignment.center,
+      //         mainAxisSize: MainAxisSize.min,
+      //         children: [                
+      //           Container(
+      //             margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+      //             child: Button(
+      //               backgroundColor: config.darkOpacityBlueColor,
+      //               child: TextView("Tambah Limit", 3, color: Colors.white),
+      //               onTap: () {
+      //                 _bottomBarController.toggleSheet();
+      //                 setState(() {
+      //                   customerIdController.text = "";
+      //                   result = null;
+      //                 });
+      //                 Navigator.pushNamed(
+      //                     context,
+      //                     "addLimit"
+      //                 );
+      //               },
+      //             ),
+      //           ),
+      //           Container(
+      //             margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+      //             child: Button(
+      //               backgroundColor: config.darkOpacityBlueColor,
+      //               child: TextView("Tambah Limit Corporate", 3, color: Colors.white),
+      //               onTap: () {
+      //                 _bottomBarController.toggleSheet();
+      //                 setState(() {
+      //                   customerIdController.text = "";
+      //                   result = null;
+      //                 });
+      //                 Navigator.pushNamed(
+      //                     context,
+      //                     "addLimitCorporate"
+      //                 );
+      //               },
+      //             ),
+      //           ),
+      //           Container(
+      //             margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+      //             child: Button(
+      //               backgroundColor: config.darkOpacityBlueColor,
+      //               child: TextView("Riwayat Permintaan Limit", 3, color: Colors.white),
+      //               onTap: () {
+      //                 _bottomBarController.toggleSheet();
+      //                 Navigator.pushNamed(
+      //                     context,
+      //                     "historyLimitRequest"
+      //                 );
+      //               },
+      //             ),
+      //           ),
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      //   items: [
+      //     BottomBarWithSheetItem(icon: Icons.money, label: "Limit"),
+      //     BottomBarWithSheetItem(icon: Icons.change_circle, label: "Riwayat"),
+      //     BottomBarWithSheetItem(icon: Icons.not_interested, label: "Blocked"),
+      //     BottomBarWithSheetItem(icon: Icons.lock, label: "Password"),
+      //   ],
+      // )
+
+
     );
   }
 
@@ -1043,19 +1441,12 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
     List<Widget> tempWidgetList = [];
 
-    if(result != null){
-      final resultObject = jsonDecode(result.data.toString());
+    if(resultBlocked != null){
+      final resultObject = jsonDecode(resultBlocked.data.toString());
       var blockedType;
-      
-      // printHelp(resultObject[0]["blocked"]);
-      // resultObject[0]["Name"];
-
-      // String blockedTypeSelected = "coba";
-      // var blockedType = resultObject[0]["blocked"];
 
       if(selectedRadio == -1){
         blockedType = resultObject[0]["blocked"];
-        // blockedType == 3 ? blockedTypeSelected = "Blocked All" : blockedType == 0 ? blockedTypeSelected = "Not Blocked" : blockedType == 1 ? blockedTypeSelected = "Blocked Ship" : blockedType == 2 ? "Blocked Invoice" : ""; //kalau diunblock value awal bisa muncul, namun waktu onchange radio, value gk keganti. kalau diblock, running awal, value ndk muncul
         if(blockedType == 3) {
           blockedTypeSelected = "Blocked All";
           selectedRadio = 3;
@@ -1071,7 +1462,6 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         }
       } else {
         blockedType = selectedRadio;
-        // blockedType == 3 ? blockedTypeSelected = "Blocked All" : blockedType == 0 ? blockedTypeSelected = "Not Blocked" : blockedType == 1 ? blockedTypeSelected = "Blocked Ship" : "Blocked Invoice"; //kalau diunblock value awal bisa muncul, namun waktu onchange radio, value gk keganti. kalau diblock, running awal, value ndk muncul
         if(blockedType == 3) {
           blockedTypeSelected = "Blocked All";
         } else if(blockedType == 2) {
@@ -1298,25 +1688,31 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
     SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
     final SharedPreferences sharedPreferences = await _sharedPreferences;
-    String user_code = sharedPreferences.getString('user_code');
+    String user_login = sharedPreferences.getString('get_user_login');
 
     //http://192.168.10.213/dbrudie-2-0-0/updateBlock.php?json={ "user_code" : "isak", "kode_customer" : "01A01010001" , "block_lama" : 3, "block_baru" : 0}
 
-    final resultObject = jsonDecode(result.data.toString());
+    final resultObject = jsonDecode(resultBlocked.data.toString());
     var block_lama = resultObject[0]["blocked"];
     var block_baru = selectedRadio;
 
-    Result result_ = await customerAPI.updateBlock(context, parameter: 'json={"kode_customer":"${customerIdController.text}","user_code":"${user_code}","block_lama":${block_lama},"block_baru":${block_baru}}');
+    Result result_ = await customerAPI.updateBlock(context, parameter: 'json={"kode_customer":"${customerIdBlockedController.text}","user_code":"${user_login}","block_lama":${block_lama},"block_baru":${block_baru}}');
 
     Navigator.of(context).pop();
 
-    if(result.success == 1){
+    if(result_.success == 1){
       Alert(
         context: context,
         title: "Terima kasih,",
         content: Text(result_.message),
         cancel: false,
-        type: "success"
+        type: "success",
+        defaultAction: (){
+          setState(() {
+            customerIdBlockedController.clear();
+            resultBlocked = null;
+          });
+        }
       );
     } else{
       Alert(
@@ -1333,7 +1729,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   }
 
-  void getBlockInfo() async {
+  void getLimitCorporate() async {
     setState(() {
       customerIdController.text.isEmpty ? customerIdValid = true : customerIdValid = false;
     });
@@ -1344,13 +1740,75 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         searchLoading = true;
       });
 
+      //var obj = {"kode_customerc": $$('#corporate_code').val(),"corporate_name":$$('#corporate_name').val(), "limit_baru": limit_baru.replace(/\./g,''), "user_code": localStorage.getItem('user_code'), "old_limit": localStorage.getItem('old_limitc')};
+
       Alert(context: context, loading: true, disableBackButton: true);
 
-      SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+      SharedPreferences _sharedPreferences;
+      _sharedPreferences = await SharedPreferences.getInstance();
       final SharedPreferences sharedPreferences = await _sharedPreferences;
       String user_code = sharedPreferences.getString('user_code');
 
-      Result result_ = await customerAPI.getBlockInfo(context, parameter: 'json={"kode_customer":"${customerIdController.text}","user_code":"${user_code}"}');
+      Result result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${customerIdController.text}","user_code":"${user_code}"}');
+
+      Navigator.of(context).pop();
+
+      if(result_.success == 1){
+        setState(() {
+          resultLimit = result_;
+        });
+
+        Navigator.pushNamed(
+          context,
+          "addLimitCorporateDetail",
+          arguments: resultLimit
+        );
+      } else {
+        Alert(
+          context: context,
+          title: "Maaf,",
+          content: Text(result_.message),
+          cancel: false,
+          type: "error"
+        );
+        setState(() {
+          resultLimit = null;
+        });
+      }
+
+      setState(() {
+        searchLoading = false;
+      });
+
+    } else {
+      setState(() {
+        resultLimit = null;
+      });
+    }
+
+  }
+
+  void getLimit() async {
+    setState(() {
+      customerIdController.text.isEmpty ? customerIdValid = true : customerIdValid = false;
+    });
+
+    if(!customerIdValid){
+      FocusScope.of(context).requestFocus(FocusNode());
+      setState(() {
+        searchLoading = true;
+      });
+
+      //http://192.168.10.213/dbrudie-2-0-0/getLimit.php?json={ "user_code" : "isak", "kode_customer" : "01A01010001" }
+
+      Alert(context: context, loading: true, disableBackButton: true);
+
+      SharedPreferences _sharedPreferences;
+      _sharedPreferences = await SharedPreferences.getInstance();
+      final SharedPreferences sharedPreferences = await _sharedPreferences;
+      String user_code = sharedPreferences.getString('user_code');
+
+      Result result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${customerIdController.text}","user_code":"${user_code}"}');
 
       Navigator.of(context).pop();
 
@@ -1359,7 +1817,68 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         // products[0]["Name"]
 
         setState(() {
-          result = result_;
+          resultLimit = result_;
+        });
+
+        Navigator.pushNamed(
+          context,
+          "addLimitDetail",
+          arguments: resultLimit,
+        );
+
+        // showBlockInfoDetail(config);
+      } else {
+        Alert(
+          context: context,
+          title: "Maaf,",
+          content: Text(result_.message),
+          cancel: false,
+          type: "error"
+        );
+        setState(() {
+          resultLimit = null;
+        });
+      }
+
+      setState(() {
+        searchLoading = false;
+      });
+
+    } else {
+      setState(() {
+        resultLimit = null;
+      });
+    }
+
+  }
+
+  void getBlockInfo() async {
+    setState(() {
+      customerIdBlockedController.text.isEmpty ? customerIdBlockedValid = true : customerIdBlockedValid = false;
+    });
+
+    if(!customerIdBlockedValid){
+      FocusScope.of(context).requestFocus(FocusNode());
+      setState(() {
+        searchBlockedLoading = true;
+      });
+
+      Alert(context: context, loading: true, disableBackButton: true);
+
+      SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
+      final SharedPreferences sharedPreferences = await _sharedPreferences;
+      String user_login = sharedPreferences.getString('get_user_login');
+
+      Result result_ = await customerAPI.getBlockInfo(context, parameter: 'json={"kode_customer":"${customerIdBlockedController.text}","user_code":"${user_login}"}');
+
+      Navigator.of(context).pop();
+
+      if(result_.success == 1){
+        // final products = jsonDecode(result.data.toString());
+        // products[0]["Name"]
+
+        setState(() {
+          resultBlocked = result_;
           selectedRadio = -1;
         });
 
@@ -1373,17 +1892,17 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           type: "error"
         );
         setState(() {
-          result = null;
+          resultBlocked = null;
         });
       }
 
       setState(() {
-        searchLoading = false;
+        searchBlockedLoading = false;
       });
 
     } else {
       setState(() {
-        result = null;
+        resultBlocked = null;
       });
     }
   }

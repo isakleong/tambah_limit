@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' show Client;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
@@ -14,6 +16,7 @@ import 'package:tambah_limit/models/userModel.dart';
 import 'package:tambah_limit/resources/customerAPI.dart';
 import 'package:tambah_limit/resources/limitHistoryAPI.dart';
 import 'package:tambah_limit/resources/userAPI.dart';
+import 'package:tambah_limit/screens/historyLimitRequestDetail.dart';
 import 'package:tambah_limit/settings/configuration.dart';
 import 'package:tambah_limit/tools/function.dart';
 import 'package:tambah_limit/widgets/EditText.dart';
@@ -44,6 +47,8 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
   List<LimitHistory> approvedLimitHistoryList = [];
   List<LimitHistory> rejectedLimitHistoryList = [];
 
+  String user_login = "";
+
   @override
   void initState() {
     super.initState();
@@ -62,8 +67,14 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
     if(rejectedLimitHistoryListLoading){
       getRequestHistoryList(3);
     }
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      user_login = prefs.getString("get_user_login");  
+    });
   }
   
+  var top;
   @override
   Widget build(BuildContext context) {
 
@@ -77,11 +88,213 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
         // print('Current Index: ${DefaultTabController.of(context).index}');
         return Scaffold(
           resizeToAvoidBottomInset: true,
+          // appBar: PreferredSize(
+          // preferredSize: Size.fromHeight(140),
+          // child: AppBar(
+          //   flexibleSpace: SafeArea(
+          //     child: Container(
+          //       margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+          //       child: Column(
+          //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //         children: [
+          //           Row(
+          //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //             children: [
+          //               TextView("Selamat Datang, " + user_login.toUpperCase(), 3),
+          //               InkWell(
+          //                 onTap: () {
+          //                   Alert(
+          //                     context: context,
+          //                     title: "Konfirmasi,",
+          //                     content: Text("Apakah Anda yakin ingin keluar dari aplikasi?"),
+          //                     cancel: true,
+          //                     type: "warning",
+          //                     defaultAction: () async {
+          //                       SharedPreferences prefs = await SharedPreferences.getInstance();
+          //                       await prefs.remove("limit_dmd");
+          //                       await prefs.remove("request_limit");
+          //                       await prefs.remove("user_code_request");
+          //                       await prefs.remove("user_code");
+          //                       await prefs.remove("max_limit");
+          //                       await prefs.remove("fcmToken");
+          //                       await prefs.remove("get_user_login");
+          //                       await FirebaseMessaging.instance.deleteToken();
+          //                       await prefs.clear();
+          //                       Navigator.pushReplacementNamed(
+          //                         context,
+          //                         "login",
+          //                       );
+          //                     }
+          //                   );
+          //               },
+          //               child: Container(
+          //                 child:Icon (Icons.logout, size: 30, color: Colors.white),
+          //                 ),
+          //               ),
+          //             ],
+          //           ),
+          //           Container(
+          //             child: TextView("Riwayat Permintaan Limit", 1)
+          //           ),
+
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          //   automaticallyImplyLeading: false,
+          //   ),
+          // ),
           body: NestedScrollView(
             headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
               return <Widget>[
                 new SliverAppBar(
-                  title: TextView('Riwayat Permintaan Limit', 1),
+                  expandedHeight: 140,
+                  // flexibleSpace: LayoutBuilder(builder: (context, constraints) {
+                  //   top = constraints.biggest.height;
+                  //   print(top);
+                  //   return SafeArea(
+                  //     child: Container(
+                  //       margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  //       child: Column(
+                  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //         children: [
+                  //           Row(
+                  //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //             children: [
+                  //               TextView("Selamat Datang, " + user_login.toUpperCase(), 3),
+                  //               InkWell(
+                  //                 onTap: () {
+                  //                   Alert(
+                  //                     context: context,
+                  //                     title: "Konfirmasi,",
+                  //                     content: Text("Apakah Anda yakin ingin keluar dari aplikasi?"),
+                  //                     cancel: true,
+                  //                     type: "warning",
+                  //                     defaultAction: () async {
+                  //                       SharedPreferences prefs = await SharedPreferences.getInstance();
+                  //                       await prefs.remove("limit_dmd");
+                  //                       await prefs.remove("request_limit");
+                  //                       await prefs.remove("user_code_request");
+                  //                       await prefs.remove("user_code");
+                  //                       await prefs.remove("max_limit");
+                  //                       await prefs.remove("fcmToken");
+                  //                       await prefs.remove("get_user_login");
+                  //                       await FirebaseMessaging.instance.deleteToken();
+                  //                       await prefs.clear();
+                  //                       Navigator.pushReplacementNamed(
+                  //                         context,
+                  //                         "login",
+                  //                       );
+                  //                     }
+                  //                   );
+                  //               },
+                  //               child: Container(
+                  //                 child:Icon (Icons.logout, size: 30, color: Colors.white),
+                  //                 ),
+                  //               ),
+                  //             ],
+                  //           ),
+                  //           Container(
+                  //             child: TextView("Riwayat Permintaan Limit", 1)
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   );
+                  // }),
+
+                  // flexibleSpace: SafeArea(
+                  //   child: Container(
+                  //     margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  //     child: Column(
+                  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //       children: [
+                  //         Row(
+                  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //           children: [
+                  //             TextView("Selamat Datang, " + user_login.toUpperCase(), 3),
+                  //             InkWell(
+                  //               onTap: () {
+                  //                 Alert(
+                  //                   context: context,
+                  //                   title: "Konfirmasi,",
+                  //                   content: Text("Apakah Anda yakin ingin keluar dari aplikasi?"),
+                  //                   cancel: true,
+                  //                   type: "warning",
+                  //                   defaultAction: () async {
+                  //                     SharedPreferences prefs = await SharedPreferences.getInstance();
+                  //                     await prefs.remove("limit_dmd");
+                  //                     await prefs.remove("request_limit");
+                  //                     await prefs.remove("user_code_request");
+                  //                     await prefs.remove("user_code");
+                  //                     await prefs.remove("max_limit");
+                  //                     await prefs.remove("fcmToken");
+                  //                     await prefs.remove("get_user_login");
+                  //                     await FirebaseMessaging.instance.deleteToken();
+                  //                     await prefs.clear();
+                  //                     Navigator.pushReplacementNamed(
+                  //                       context,
+                  //                       "login",
+                  //                     );
+                  //                   }
+                  //                 );
+                  //             },
+                  //             child: Container(
+                  //               child:Icon (Icons.logout, size: 30, color: Colors.white),
+                  //               ),
+                  //             ),
+                  //           ],
+                  //         ),
+                  //         // Container(
+                  //         //   child: TextView("Riwayat Permintaan Limit", 1)
+                  //         // ),
+                          
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
+                  
+                  title: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TextView("Selamat Datang, " + user_login.toUpperCase(), 3),
+                          InkWell(
+                            onTap: () {
+                              Alert(
+                                context: context,
+                                title: "Konfirmasi,",
+                                content: Text("Apakah Anda yakin ingin keluar dari aplikasi?"),
+                                cancel: true,
+                                type: "warning",
+                                defaultAction: () async {
+                                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                                  await prefs.remove("limit_dmd");
+                                  await prefs.remove("request_limit");
+                                  await prefs.remove("user_code_request");
+                                  await prefs.remove("user_code");
+                                  await prefs.remove("max_limit");
+                                  await prefs.remove("fcmToken");
+                                  await prefs.remove("get_user_login");
+                                  await FirebaseMessaging.instance.deleteToken();
+                                  await prefs.clear();
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    "login",
+                                  );
+                                }
+                              );
+                          },
+                          child: Container(
+                            child:Icon (Icons.logout, size: 30, color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                      // TextView('Riwayat Permintaan Limit', 1),
+                    ],
+                  ),
                   pinned: true,
                   floating: true,
                   bottom: TabBar(
@@ -105,7 +318,7 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                 requestHistoryWidgetList.length != 0
                 ?
                 SmartRefresher(
-                  onRefresh: _onRequestRefresh,
+                  onRefresh: _onHistoryRefresh,
                   controller: _refreshRequestController,
                   physics: BouncingScrollPhysics(),
                   header: WaterDropMaterialHeader(),
@@ -119,7 +332,7 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                 )
                 :
                 SmartRefresher(
-                  onRefresh: _onRequestRefresh,
+                  onRefresh: _onHistoryRefresh,
                   controller: _refreshRequestController,
                   physics: BouncingScrollPhysics(),
                   header: WaterDropMaterialHeader(),
@@ -147,7 +360,7 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                 approvedHistoryWidgetList.length != 0
                 ?
                 SmartRefresher(
-                  onRefresh: _onApprovedRefresh,
+                  onRefresh: _onHistoryRefresh,
                   controller: _refreshApprovedController,
                   physics: BouncingScrollPhysics(),
                   header: WaterDropMaterialHeader(),
@@ -161,7 +374,7 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                 )
                 :
                 SmartRefresher(
-                  onRefresh: _onApprovedRefresh,
+                  onRefresh: _onHistoryRefresh,
                   controller: _refreshApprovedController,
                   physics: BouncingScrollPhysics(),
                   header: WaterDropMaterialHeader(),
@@ -190,7 +403,7 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                 rejectedHistoryWidgetList.length != 0
                 ?
                 SmartRefresher(
-                  onRefresh: _onRejectedRefresh,
+                  onRefresh: _onHistoryRefresh,
                   controller: _refreshRejectedController,
                   physics: BouncingScrollPhysics(),
                   header: WaterDropMaterialHeader(),
@@ -204,7 +417,7 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                 )
                 :
                 SmartRefresher(
-                  onRefresh: _onRejectedRefresh,
+                  onRefresh: _onHistoryRefresh,
                   controller: _refreshRejectedController,
                   physics: BouncingScrollPhysics(),
                   header: WaterDropMaterialHeader(),
@@ -368,7 +581,7 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
     if(tempLimitHistory.customer_code.length > 11) {
       Alert(context: context, loading: true, disableBackButton: true);
 
-      result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${tempLimitHistory.customer_code}","user_code":"${tempLimitHistory.user_code}"}');
+      result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${tempLimitHistory.customer_code}","user_code":"$user_login"}');
 
       final SharedPreferences sharedPreferences = await _sharedPreferences;
       await sharedPreferences.setInt("request_limit", int.parse(tempLimitHistory.limit));
@@ -377,19 +590,19 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
       Navigator.of(context).pop();
 
       if(type == 1) {
-        Navigator.popAndPushNamed(
+        Navigator.pushNamed(
           context,
           "historyLimitRequestDetail/${tempLimitHistory.id}/4",
           arguments: result_,
         );
       } else if(type == 2) {
-        Navigator.popAndPushNamed(
+        Navigator.pushNamed(
           context,
           "historyLimitRequestDetail/${tempLimitHistory.id}/5",
           arguments: result_,
         );
       } else {
-        Navigator.popAndPushNamed(
+        Navigator.pushNamed(
           context,
           "historyLimitRequestDetail/${tempLimitHistory.id}/6",
           arguments: result_,
@@ -399,15 +612,16 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
     } else {
       Alert(context: context, loading: true, disableBackButton: true);
 
-      result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${tempLimitHistory.customer_code}","user_code":"${tempLimitHistory.user_code}"}');
+      result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${tempLimitHistory.customer_code}","user_code":"$user_login"}');
 
       final SharedPreferences sharedPreferences = await _sharedPreferences;
       await sharedPreferences.setInt("request_limit", int.parse(tempLimitHistory.limit));
+      await sharedPreferences.setInt("request_limit_dmd", int.parse(tempLimitHistory.limit_dmd));
       await sharedPreferences.setString("user_code_request", tempLimitHistory.user_code);
 
       Navigator.of(context).pop();
 
-      Navigator.popAndPushNamed(
+      Navigator.pushNamed(
         context,
         "historyLimitRequestDetail/${tempLimitHistory.id}/$type",
         arguments: result_,
@@ -488,70 +702,30 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
   RefreshController _refreshRequestController =
       RefreshController(initialRefresh: false);
 
-  void _onRequestRefresh() async{
+  void _onHistoryRefresh() async{
     setState(() {
       requestLimitHistoryListLoading = true;
-      // approvedLimitHistoryListLoading = true;
-      // rejectedLimitHistoryListLoading = true;
+      approvedLimitHistoryListLoading = true;
+      rejectedLimitHistoryListLoading = true;
     });
 
     if(requestLimitHistoryListLoading){
       getRequestHistoryList(1);
     }
 
-    // if(approvedLimitHistoryListLoading){
-    //   getRequestHistoryList(2);
-    // }
-
-    // if(rejectedLimitHistoryListLoading){
-    //   getRequestHistoryList(3);
-    // }
-  }
-
-  RefreshController _refreshApprovedController =
-      RefreshController(initialRefresh: false);
-
-  void _onApprovedRefresh() async{
-    setState(() {
-      // requestLimitHistoryListLoading = true;
-      approvedLimitHistoryListLoading = true;
-      // rejectedLimitHistoryListLoading = true;
-    });
-
-    // if(requestLimitHistoryListLoading){
-    //   getRequestHistoryList(1);
-    // }
-
     if(approvedLimitHistoryListLoading){
       getRequestHistoryList(2);
     }
-
-    // if(rejectedLimitHistoryListLoading){
-    //   getRequestHistoryList(3);
-    // }
-  }
-
-  RefreshController _refreshRejectedController =
-      RefreshController(initialRefresh: false);
-
-  void _onRejectedRefresh() async{
-    setState(() {
-      // requestLimitHistoryListLoading = true;
-      // approvedLimitHistoryListLoading = true;
-      rejectedLimitHistoryListLoading = true;
-    });
-
-    // if(requestLimitHistoryListLoading){
-    //   getRequestHistoryList(1);
-    // }
-
-    // if(approvedLimitHistoryListLoading){
-    //   getRequestHistoryList(2);
-    // }
 
     if(rejectedLimitHistoryListLoading){
       getRequestHistoryList(3);
     }
   }
+
+  RefreshController _refreshApprovedController =
+      RefreshController(initialRefresh: false);
+
+  RefreshController _refreshRejectedController =
+      RefreshController(initialRefresh: false);
 
 }
