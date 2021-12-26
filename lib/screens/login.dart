@@ -147,7 +147,7 @@ class LoginState extends State<Login> {
                           ),
                         ),
                         Container(
-                          margin: EdgeInsets.symmetric(vertical: 10),
+                          margin: EdgeInsets.symmetric(vertical: 20),
                           child: EditText(
                             useIcon: true,
                             key: Key("Password"),

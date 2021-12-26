@@ -163,10 +163,17 @@ class CustomerAPI {
         printHelp(url);
 
         if(response.body.toString() != "false" && response.body.toString() != "otoritas") {
-          var parsedJson = jsonDecode(response.body);
+          if(!response.body.toString().contains("corporate")) {
+            var parsedJson = jsonDecode(response.body);
 
-          customer = Customer.fromJson(parsedJson[0]);
-          result = new Result(success: 1, message: "OK", data: response.body.toString());
+            customer = Customer.fromJson(parsedJson[0]);
+            result = new Result(success: 1, message: "OK", data: response.body.toString());
+
+          } else {
+            var str_split = response.body.toString().split('|');
+            result = new Result(success: 0, message: "Customer ini memiliki kode corporate " + str_split[1] + ". Proses tambah limit akan dilanjutkan menggunakan kode corporate tersebut", data: str_split[1]);
+          }
+          
         } else {
           if(response.body.toString() == "false") {
             result = new Result(success: 0, message: "Data Customer tidak ditemukan");

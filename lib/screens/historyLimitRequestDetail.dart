@@ -1286,18 +1286,22 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                 child: TextFormField(
                   enabled: false,
                   decoration: new InputDecoration(
-                    hintStyle: TextStyle(color: config.grayNonActiveColor),
-                    labelStyle: TextStyle(color: config.grayNonActiveColor),
+                    hintStyle: TextStyle(
+                      color: Colors.black
+                    ),
+                    labelStyle: TextStyle(
+                      color: Colors.black
+                    ),
                     floatingLabelBehavior: FloatingLabelBehavior.always,
                     labelText: "Kode Corporate",
                     hintText: resultObject[0]["corporate_code"],
-                    icon: Icon(Icons.bookmark),
+                    icon: Icon(Icons.bookmark, color: config.grayColor),
                     disabledBorder: OutlineInputBorder(
                       borderRadius: new BorderRadius.circular(
                         5.0,
                       ),
                       borderSide: BorderSide(
-                        color: config.grayNonActiveColor,
+                        color: config.grayColor,
                         width: 1.5,
                       ),
                     ),
@@ -1309,18 +1313,22 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                 child: TextFormField(
                   enabled: false,
                   decoration: new InputDecoration(
-                    hintStyle: TextStyle(color: config.grayNonActiveColor),
-                    labelStyle: TextStyle(color: config.grayNonActiveColor),
+                    hintStyle: TextStyle(
+                      color: Colors.black
+                    ),
+                    labelStyle: TextStyle(
+                      color: Colors.black
+                    ),
                     floatingLabelBehavior: FloatingLabelBehavior.always,
                     labelText: "Nama Corporate",
                     hintText: resultObject[0]["corporate_name"],
-                    icon: Icon(Icons.person),
+                    icon: Icon(Icons.person, color: config.grayColor),
                     disabledBorder: OutlineInputBorder(
                       borderRadius: new BorderRadius.circular(
                         5.0,
                       ),
                       borderSide: BorderSide(
-                        color: config.grayNonActiveColor,
+                        color: config.grayColor,
                         width: 1.5,
                       ),
                     ),
@@ -1332,18 +1340,22 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                 child: TextFormField(
                   enabled: false,
                   decoration: new InputDecoration(
-                    hintStyle: TextStyle(color: config.grayNonActiveColor),
-                    labelStyle: TextStyle(color: config.grayNonActiveColor),
+                    hintStyle: TextStyle(
+                      color: Colors.black
+                    ),
+                    labelStyle: TextStyle(
+                      color: Colors.black
+                    ),
                     floatingLabelBehavior: FloatingLabelBehavior.always,
                     labelText: "Induk Pelanggan",
                     hintText: resultObject[0]["head_customer"],
-                    icon: Icon(Icons.group),
+                    icon: Icon(Icons.group, color: config.grayColor),
                     disabledBorder: OutlineInputBorder(
                       borderRadius: new BorderRadius.circular(
                         5.0,
                       ),
                       borderSide: BorderSide(
-                        color: config.grayNonActiveColor,
+                        color: config.grayColor,
                         width: 1.5,
                       ),
                     ),
@@ -1355,18 +1367,22 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                 child: TextFormField(
                   enabled: false,
                   decoration: new InputDecoration(
-                    hintStyle: TextStyle(color: config.grayNonActiveColor),
-                    labelStyle: TextStyle(color: config.grayNonActiveColor),
+                    hintStyle: TextStyle(
+                      color: Colors.black
+                    ),
+                    labelStyle: TextStyle(
+                      color: Colors.black
+                    ),
                     floatingLabelBehavior: FloatingLabelBehavior.always,
                     labelText: "Limit Saat Ini",
                     hintText: currencyFormatter.format(int.parse(resultObject[0]["old_limit"])),
-                    icon: TextView("Rp ", 4, color: config.grayNonActiveColor),
+                    icon: TextView("Rp ", 4, color: config.grayColor),
                     disabledBorder: OutlineInputBorder(
                       borderRadius: new BorderRadius.circular(
                         5.0,
                       ),
                       borderSide: BorderSide(
-                        color: config.grayNonActiveColor,
+                        color: config.grayColor,
                         width: 1.5,
                       ),
                     ),
@@ -1376,7 +1392,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
               Container(
                 padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
                 child: TextFormField(
-                  style: TextStyle(color: config.grayNonActiveColor),
+                  style: TextStyle(color: Colors.black),
                   inputFormatters: <TextInputFormatter>[
                     CurrencyTextInputFormatter(
                       locale: 'IDR',
@@ -1389,17 +1405,17 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                   controller: limitRequestController,
                   decoration: new InputDecoration(
                     hintStyle: TextStyle(
-                      color: config.grayNonActiveColor
+                      color: Colors.black
                     ),
                     labelStyle: TextStyle(
-                      color: config.grayNonActiveColor
+                      color: Colors.black
                     ),
                     floatingLabelBehavior: FloatingLabelBehavior.always,
                     labelText: "Limit Yang Diajukan",
-                    icon: TextView("Rp ", 4, color: config.grayNonActiveColor),
+                    icon: TextView("Rp ", 4, color: config.grayColor),
                     disabledBorder: OutlineInputBorder(
                         borderRadius: new BorderRadius.circular(5.0,),
-                        borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
+                        borderSide: BorderSide(color: config.grayColor, width: 1.5,),
                     ),
                   ),
                 ),
@@ -1496,18 +1512,18 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                     enabled: false,
                     decoration: new InputDecoration(
                       hintStyle: TextStyle(
-                        color: config.grayNonActiveColor
+                        color: Colors.black
                       ),
                       labelStyle: TextStyle(
-                        color: config.grayNonActiveColor
+                        color: Colors.black
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Kode Pelanggan",
                       hintText: resultObject[0]["No_"],
-                      icon: Icon(Icons.bookmark),
+                      icon: Icon(Icons.bookmark, color: config.grayColor),
                       disabledBorder: OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
+                          borderSide: BorderSide(color: config.grayColor, width: 1.5,),
                       ),
                     ),
                   ),
@@ -1518,18 +1534,18 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                     enabled: false,
                     decoration: new InputDecoration(
                       hintStyle: TextStyle(
-                        color: config.grayNonActiveColor
+                        color: Colors.black
                       ),
                       labelStyle: TextStyle(
-                        color: config.grayNonActiveColor
+                        color: Colors.black
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Nama Pelanggan",
                       hintText: resultObject[0]["Name"],
-                      icon: Icon(Icons.person),
+                      icon: Icon(Icons.person, color: config.grayColor),
                       disabledBorder: OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
+                          borderSide: BorderSide(color: config.grayColor, width: 1.5,),
                       ),
                     ),
                   ),
@@ -1540,18 +1556,18 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                     enabled: false,
                     decoration: new InputDecoration(
                       hintStyle: TextStyle(
-                        color: config.grayNonActiveColor
+                        color: Colors.black
                       ),
                       labelStyle: TextStyle(
-                        color: config.grayNonActiveColor
+                        color: Colors.black
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Alamat Pelanggan",
                       hintText: resultObject[0]["Address"],
-                      icon: Icon(Icons.location_on),
+                      icon: Icon(Icons.location_on, color: config.grayColor),
                       disabledBorder: OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
+                          borderSide: BorderSide(color: config.grayColor, width: 1.5,),
                       ),
                     ),
                   ),
@@ -1562,18 +1578,18 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                     enabled: false,
                     decoration: new InputDecoration(
                       hintStyle: TextStyle(
-                        color: config.grayNonActiveColor
+                        color: Colors.black
                       ),
                       labelStyle: TextStyle(
-                        color: config.grayNonActiveColor
+                        color: Colors.black
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Status",
                       hintText: resultObject[0]["disc"] + " | " +blockedTypeSelected,
-                      icon: Icon(Icons.list_alt),
+                      icon: Icon(Icons.list_alt, color: config.grayColor),
                       disabledBorder: OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
+                          borderSide: BorderSide(color: config.grayColor, width: 1.5,),
                       ),
                     ),
                   ),
@@ -1583,21 +1599,21 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                   child: TextFormField(
                     enabled: false,
                     controller: limitDMDController,
-                    style: TextStyle(color: config.grayNonActiveColor),
+                    style: TextStyle(color: Colors.black),
                     decoration: new InputDecoration(
                       hintStyle: TextStyle(
-                        color: config.grayNonActiveColor
+                        color: Colors.black
                       ),
                       labelStyle: TextStyle(
-                        color: config.grayNonActiveColor
+                        color: Colors.black
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Limit DMD",
                       // hintText: resultObject[0]["limit_dmd"].toString(),
-                      icon: TextView("Rp ",5,color: config.grayNonActiveColor),
+                      icon: TextView("Rp ",5,color: config.grayColor),
                       disabledBorder: OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
+                          borderSide: BorderSide(color: config.grayColor, width: 1.5,),
                       ),
                     ),
                   ),
@@ -1608,18 +1624,18 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                     enabled: false,
                     decoration: new InputDecoration(
                       hintStyle: TextStyle(
-                        color: config.grayNonActiveColor
+                        color: Colors.black
                       ),
                       labelStyle: TextStyle(
-                        color: config.grayNonActiveColor
+                        color: Colors.black
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Limit Saat Ini",
                       hintText: currencyFormatter.format(int.parse(resultObject[0]["Limit"])),
-                      icon: TextView("Rp ",5,color:config.grayNonActiveColor),
+                      icon: TextView("Rp ",5,color:config.grayColor),
                       disabledBorder: OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
+                          borderSide: BorderSide(color: config.grayColor, width: 1.5,),
                       ),
                     ),
                   ),
@@ -1629,17 +1645,20 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                   child: TextFormField(
                     enabled: false,
                     controller: limitRequestController,
-                    style: TextStyle(color: config.grayNonActiveColor),
+                    style: TextStyle(color: Colors.black),
                     decoration: new InputDecoration(
-                      hintStyle: TextStyle(color: config.grayNonActiveColor),
+                      hintStyle: TextStyle(
+                        color: Colors.black
+                      ),
                       labelStyle: TextStyle(
-                        color: config.grayNonActiveColor),
+                        color: Colors.black
+                      ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       labelText: "Limit Yang Diajukan",
-                      icon: TextView("Rp ",5,color: config.grayNonActiveColor),
+                      icon: TextView("Rp ",5,color: config.grayColor),
                       disabledBorder: OutlineInputBorder(
                           borderRadius: new BorderRadius.circular(5.0,),
-                          borderSide: BorderSide(color: config.grayNonActiveColor, width: 1.5,),
+                          borderSide: BorderSide(color: config.grayColor, width: 1.5,),
                       )
                     ),
                   ),

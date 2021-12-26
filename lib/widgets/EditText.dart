@@ -63,14 +63,16 @@ class EditText extends StatelessWidget{
 
     return TextField(
       decoration: InputDecoration(
-        isDense: true,
+        // isDense: true,
         enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: config.lightBlueColor, width: 0),
+        borderSide: BorderSide(color: config.darkOpacityBlueColor, width: 1.5),
         ),
         border: OutlineInputBorder(),
-        hintText: this.hintText,
+        // hintText: this.hintText,
+        labelText: this.hintText,
         filled: true,
         fillColor: this.hintText == "Username" || this.hintText == "Password" ? config.lightBlueColor : config.lightOpactityBlueColor,
+        // fillColor: Colors.white,
         focusColor: config.secondaryColor,
         suffix: suffixIcon,
         prefixIcon: prefixIcon,

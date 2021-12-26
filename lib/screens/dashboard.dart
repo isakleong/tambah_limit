@@ -849,7 +849,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         ),
       ),
       
-      Container(
+      SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -1729,7 +1729,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   }
 
-  void getLimitCorporate() async {
+  void getLimitCorporate({String customerCorporateId=""}) async {
     setState(() {
       customerIdController.text.isEmpty ? customerIdValid = true : customerIdValid = false;
     });
@@ -1749,13 +1749,19 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       final SharedPreferences sharedPreferences = await _sharedPreferences;
       String user_code = sharedPreferences.getString('user_code');
 
-      Result result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${customerIdController.text}","user_code":"${user_code}"}');
+      Result result_;
+      if(customerCorporateId != "") {
+        result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"$customerCorporateId","user_code":"${user_code}"}');
+      } else {
+        result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${customerIdController.text}","user_code":"${user_code}"}');
+      }
 
       Navigator.of(context).pop();
 
       if(result_.success == 1){
         setState(() {
           resultLimit = result_;
+          customerIdController.clear();
         });
 
         Navigator.pushNamed(
@@ -1818,6 +1824,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
         setState(() {
           resultLimit = result_;
+          customerIdController.clear();
         });
 
         Navigator.pushNamed(
@@ -1828,13 +1835,27 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
         // showBlockInfoDetail(config);
       } else {
-        Alert(
-          context: context,
-          title: "Maaf,",
-          content: Text(result_.message),
-          cancel: false,
-          type: "error"
-        );
+        if(result_.message.toLowerCase().contains("corporate")) {
+          Alert(
+            context: context,
+            title: "Info,",
+            content: Text(result_.message),
+            cancel: false,
+            type: "warning",
+            defaultAction: () {
+              getLimitCorporate(customerCorporateId: result_.data);
+            }
+          );
+
+        } else {
+          Alert(
+            context: context,
+            title: "Maaf,",
+            content: Text(result_.message),
+            cancel: false,
+            type: "error"
+          );
+        }
         setState(() {
           resultLimit = null;
         });
