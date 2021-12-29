@@ -3,13 +3,16 @@ import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:open_file/open_file.dart';
 // import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:permission_handler/permission_handler.dart';
 // import 'package:percent_indicator/percent_indicator.dart';
 // import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
-import 'package:http/http.dart' show Client;
+import 'package:http/http.dart' show Client, Request;
 import 'package:tambah_limit/models/resultModel.dart';
 import 'package:tambah_limit/resources/PushNotificationService.dart';
 import 'package:tambah_limit/resources/customerAPI.dart';
@@ -17,6 +20,8 @@ import 'package:tambah_limit/resources/customerAPI.dart';
 import 'package:tambah_limit/screens/login.dart';
 import 'package:tambah_limit/settings/configuration.dart';
 import 'package:tambah_limit/tools/function.dart';
+import 'package:tambah_limit/widgets/TextView.dart';
+import 'package:tambah_limit/widgets/button.dart';
 
 Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstance();
 
@@ -30,6 +35,7 @@ class SplashScreenState extends State<SplashScreen> {
   bool isLoadingVersion = false;
 
   bool isDownloadNewVersion = false;
+  bool isRetryDownload = false;
   double progressValue = 0.0;
   String progressText = "";
 
@@ -47,6 +53,8 @@ class SplashScreenState extends State<SplashScreen> {
   String notificationCustomerCode = '';
   String notificationUserCode = '';
   String notificationLimit = '';
+
+  var fileDownloaded = 0;
 
   void initializeFlutterFire() async {
     try {
@@ -97,113 +105,275 @@ class SplashScreenState extends State<SplashScreen> {
       user_code = sharedPreferences.getString("user_code");
     });
 
-    // final isPermissionStatusGranted = await checkAppsPermission();
-    // doCheckVersion();
-    // if(isPermissionStatusGranted) {
-    //   doCheckVersion();
-    // } else {
-    //   // checkAppsPermission();
-    // }
-
-    doCheckVersion();
+    final isPermissionStatusGranted = await checkAppsPermission();
+    if(isPermissionStatusGranted) {
+      doCheckVersion();
+    } else {
+      checkAppsPermission();
+    }
     
   }
 
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
 
-  // Future<void> downloadNewVersion() async {
-  //   String url = "";
+  Future<void> downloadNewVersion() async {
+    String url = "";
 
-  //   bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-  //   String url_address_1 = config.baseUrl + "/" + config.apkName+".apk";
-  //   String url_address_2 = config.baseUrlAlt + "/" + config.apkName+".apk";
+    bool isUrlAddress_1 = false, isUrlAddress_2 = false;
+    String url_address_1 = config.baseUrl + "/" + config.apkName+".apk";
+    String url_address_2 = config.baseUrlAlt + "/" + config.apkName+".apk";
 
-  //   try {
-	// 	  final conn_1 = await ConnectionTest(url_address_1, context);
-  //     printHelp("GET STATUS 1 "+conn_1);
-  //     if(conn_1 == "OK"){
-  //       isUrlAddress_1 = true;
-  //     }
-	//   } on SocketException {
-  //     isUrlAddress_1 = false;
-  //     isGetVersionSuccess = "Gagal terhubung dengan server";
-  //   }
+    try {
+		  final conn_1 = await ConnectionTest(url_address_1, context);
+      printHelp("GET STATUS 1 "+conn_1);
+      if(conn_1 == "OK"){
+        isUrlAddress_1 = true;
+      }
+	  } on SocketException {
+      isUrlAddress_1 = false;
+      // isGetVersionSuccess = "Gagal terhubung dengan server";
+    }
 
-  //   if(isUrlAddress_1) {
-  //     url = url_address_1;
-  //   } else {
-  //     try {
-  //       final conn_2 = await ConnectionTest(url_address_2, context);
-  //       printHelp("GET STATUS 2 "+conn_2);
-  //       if(conn_2 == "OK"){
-  //         isUrlAddress_2 = true;
-  //       }
-  //     } on SocketException {
-  //       isUrlAddress_2 = false;
-  //       isGetVersionSuccess = "Gagal terhubung dengan server";
-  //     }
-  //   }
-  //   if(isUrlAddress_2){
-  //     url = url_address_2;
-  //   }
+    if(isUrlAddress_1) {
+      url = url_address_1;
+    } else {
+      try {
+        final conn_2 = await ConnectionTest(url_address_2, context);
+        printHelp("GET STATUS 2 "+conn_2);
+        if(conn_2 == "OK"){
+          isUrlAddress_2 = true;
+        }
+      } on SocketException {
+        isUrlAddress_2 = false;
+        // isGetVersionSuccess = "Gagal terhubung dengan server";
+      }
+    }
+    if(isUrlAddress_2){
+      url = url_address_2;
+    }
 
-  //   if(url != "") {
-  //     final isPermissionStatusGranted = await checkAppsPermission();
+    if(url != "") {
+      final isPermissionStatusGranted = await checkAppsPermission();
+      Client client = Client();
 
-  //     if(isPermissionStatusGranted) {
-  //       try {
-  //         Dio dio = Dio();
+      if(isPermissionStatusGranted) {
+        try {
+          Dio dio = Dio();
 
-  //         String downloadPath = await getFilePath(config.apkName+".apk");
+          String downloadPath = await getFilePath(config.apkName+".apk");
 
-  //         printHelp("download path "+downloadPath);
-  //         printHelp("url download "+ url);
+          printHelp("download path "+downloadPath);
+          printHelp("url download "+ url);
 
-  //         dio.download(url, downloadPath,
-  //           onReceiveProgress: (rcv, total) {
-  //             print(
-  //                 'received: ${rcv.toStringAsFixed(0)} out of total: ${total.toStringAsFixed(0)}');
+          // final response = await client.get(url);
+          // // Response response = await client.get(url);
+          // printHelp("content length "+response.headers.toString());
 
-  //             _setState(() {
-  //               progressValue = (rcv / total * 100)/100;
-  //               progressText = ((rcv / total) * 100).toStringAsFixed(0);
-  //             });
+          var fileSize=0;
+          var totalDownloaded = 0;
+          var totalProgress = 0;
 
-  //             if (progressText == '100') {
-  //               _setState(() {
-  //                 isDownloadNewVersion = true;
-  //               });
-  //             } else if (double.parse(progressText) < 100) {}
-  //           },
-  //           deleteOnError: true,
-  //         ).then((_) async {
-  //           _setState(() {
-  //             if (progressText == '100') {
-  //               isDownloadNewVersion = true;
-  //             }
+          final request = new Request('HEAD', Uri.parse(url))..followRedirects = false;
+          final response = await client.send(request).timeout(
+            Duration(seconds: 5),
+              onTimeout: () {
+                return null;
+              },
+          );
+          printHelp("full header "+response.headers.toString());
+          printHelp("content length "+response.headers['content-length'].toString());
 
-  //             isDownloadNewVersion = false;
-  //           });
+          fileDownloaded = isInCompleteDownload(downloadPath);
+          printHelp("tes fileDownloaded "+fileDownloaded.toString());
+          if(fileDownloaded > 0) {
+            printHelp("masuk if");
+            totalDownloaded = fileDownloaded;
+            fileSize = fileDownloaded;
+          }
+          fileSize += int.parse(response.headers['content-length']);
 
-  //           Navigator.of(context).pop();
-  //           // var directory = await getApplicationDocumentsDirectory(); OpenFile.open(downloadPath);
+          printHelp("tes fileSize "+ fileSize.toString());
 
-  //           setState(() {
-  //             isLoadingVersion = false;
-  //             isDownloadNewVersion = false;
-  //           });
-  //         });
+          try {
+            await downloadWithChunks(url, downloadPath, onReceiveProgress: (received, total) {
+              if (total != -1) {
+                print('${(received / total * 100).floor()}%');
+                _setState(() {
+                  // totalDownloaded+=rcv;
+                  progressValue = (received / total * 100)/100;
+                  progressText = ((received / total) * 100).toStringAsFixed(0);
+                });
 
-  //       } catch (e) {
+                if (progressText == '100') {
+                  _setState(() {
+                    isDownloadNewVersion = true;
+                  });
+                } else if (double.parse(progressText) < 100) {}
 
-  //       }
 
-  //     }
+              }
+            });
 
-  //   } else {
-  //     //gagal terhubung
-  //   }
-  // }
+            _setState(() {
+              if (progressText == '100') {
+                isDownloadNewVersion = true;
+              }
+
+              isDownloadNewVersion = false;
+            });
+
+            Navigator.of(context).pop();
+            // var directory = await getApplicationDocumentsDirectory(); OpenFile.open(downloadPath);
+
+            setState(() {
+              isLoadingVersion = false;
+              isDownloadNewVersion = false;
+            });
+
+            printHelp("MASUK SELESAI");
+            // String downloadPath = await getFilePath(config.apkName+".apk");
+            OpenFile.open(downloadPath);
+
+          } catch (e) {
+            printHelp("masuk resume");
+            print(e);
+            setState(() {
+              isRetryDownload = true;
+            });
+          }
+
+          
+
+          
+
+          // dio.download(url, downloadPath,
+          //   onReceiveProgress: (rcv, total) {
+          //     print(
+          //         'received: ${rcv.toStringAsFixed(0)} out of total: ${total.toStringAsFixed(0)}');
+          //     _setState(() {
+          //       // totalDownloaded+=rcv;
+          //       progressValue = (rcv / total * 100)/100;
+          //       progressText = ((rcv / total) * 100).toStringAsFixed(0);
+          //     });
+
+          //     if (progressText == '100') {
+          //       _setState(() {
+          //         isDownloadNewVersion = true;
+          //       });
+          //     } else if (double.parse(progressText) < 100) {}
+          //   },
+          //   deleteOnError: true,
+          // ).then((_) async {
+          //   _setState(() {
+          //     if (progressText == '100') {
+          //       isDownloadNewVersion = true;
+          //     }
+
+          //     isDownloadNewVersion = false;
+          //   });
+
+          //   Navigator.of(context).pop();
+          //   // var directory = await getApplicationDocumentsDirectory(); OpenFile.open(downloadPath);
+
+          //   setState(() {
+          //     isLoadingVersion = false;
+          //     isDownloadNewVersion = false;
+          //   });
+
+          //   printHelp("MASUK SELESAI");
+          //   String downloadPath = await getFilePath(config.apkName+".apk");
+          //   OpenFile.open(downloadPath);
+
+          // });
+
+          
+
+        } catch (e) {
+
+        }
+
+      }
+
+    } else {
+      //gagal terhubung
+    }
+  }
+
+  Future downloadWithChunks(url, savePath, {ProgressCallback onReceiveProgress}) async {
+    const firstChunkSize = 102;
+    const maxChunk = 3;
+
+    var total = 0;
+    var dio = Dio();
+    var progress = <int>[];
+
+    void Function(int, int) createCallback(no) {
+      return (int received, int _) {
+        progress[no] = received;
+        if (onReceiveProgress != null && total != 0) {
+          onReceiveProgress(progress.reduce((a, b) => a + b), total);
+        }
+      };
+    }
+
+    Future<Response> downloadChunk(url, start, end, no) async {
+      progress.add(0);
+      --end;
+      return dio.download(
+        url,
+        savePath + 'temp$no',
+        onReceiveProgress: createCallback(no),
+        options: Options(
+          headers: {'range': 'bytes=$start-$end'},
+        ),
+      );
+    }
+
+    Future mergeTempFiles(chunk) async {
+      var f = File(savePath + 'temp0');
+      var ioSink = f.openWrite(mode: FileMode.writeOnlyAppend);
+      for (var i = 1; i < chunk; ++i) {
+        var _f = File(savePath + 'temp$i');
+        await ioSink.addStream(_f.openRead());
+        await _f.delete();
+      }
+      await ioSink.close();
+      await f.rename(savePath);
+    }
+
+    var response = await downloadChunk(url, 0, firstChunkSize, 0);
+    if (response.statusCode == 206) {
+      total = int.parse(
+          response.headers.value(HttpHeaders.contentRangeHeader).split('/').last);
+      var reserved =
+          total - int.parse(response.headers.value(Headers.contentLengthHeader));
+      var chunk = (reserved / firstChunkSize).ceil() + 1;
+      if (chunk > 1) {
+        var chunkSize = firstChunkSize;
+        if (chunk > maxChunk + 1) {
+          chunk = maxChunk + 1;
+          chunkSize = (reserved / maxChunk).ceil();
+        }
+        var futures = <Future>[];
+        for (var i = 0; i < maxChunk; ++i) {
+          var start = firstChunkSize + i * chunkSize;
+          futures.add(downloadChunk(url, start, start + chunkSize, i + 1));
+        }
+        await Future.wait(futures);
+      }
+      await mergeTempFiles(chunk);
+    }
+  }
+
+  int isInCompleteDownload(String downloadPath) {
+    if(FileSystemEntity.typeSync(downloadPath) != FileSystemEntityType.notFound){
+      var file = File(downloadPath);
+      printHelp("masuk exist "+file.lengthSync().toString());
+      return file.lengthSync();
+    }
+    printHelp("masuk not exist");
+    return 0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -240,32 +410,31 @@ class SplashScreenState extends State<SplashScreen> {
                   maintainState: !isDownloadNewVersion,
                   visible: isLoadingVersion,
                   child: CircularProgressIndicator(
-                    backgroundColor: config.primaryColor,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    valueColor: AlwaysStoppedAnimation<Color>(config.darkOpacityBlueColor),
                   ),
                 ),
               ),
-              // Center(
-              //   child: Visibility(
-              //     maintainSize: true, 
-              //     maintainAnimation: true,
-              //     maintainState: true,
-              //     visible: isDownloadNewVersion,
-              //     child: CircularPercentIndicator(
-              //       radius: 120.0,
-              //       lineWidth: 13.0,
-              //       animation: true,
-              //       percent: progressValue,
-              //       center: new Text("${progressText}%", style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              //       footer: Padding(
-              //         padding: EdgeInsets.only(top: 30),
-              //         child: new Text("Mengunduh pembaruan aplikasi", style: new TextStyle(fontWeight: FontWeight.bold)),
-              //       ),
-              //       circularStrokeCap: CircularStrokeCap.round,
-              //       progressColor: config.primaryColor,
-              //     ),
-              //   ),
-              // ),
+              Center(
+                child: Visibility(
+                  maintainSize: true, 
+                  maintainAnimation: true,
+                  maintainState: true,
+                  visible: isDownloadNewVersion,
+                  child: CircularPercentIndicator(
+                    radius: 120.0,
+                    lineWidth: 13.0,
+                    animation: true,
+                    percent: progressValue,
+                    center: Text("${progressText}%", style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    footer: Padding(
+                      padding: EdgeInsets.only(top: 30),
+                      child: Text("Mengunduh pembaruan aplikasi", style: new TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                    circularStrokeCap: CircularStrokeCap.round,
+                    progressColor: config.primaryColor,
+                  ),
+                ),
+              ),
 
             ],
           ),
@@ -296,50 +465,58 @@ class SplashScreenState extends State<SplashScreen> {
           content: Text("Terdapat pembaruan versi aplikasi. Otomatis mengunduh pembaruan aplikasi setelah tekan OK"),
           cancel: false,
           type: "warning",
-          defaultAction: (){
-            setState(() {
-              isLoadingVersion = false;
-              isDownloadNewVersion = true;
-            });
+          defaultAction: () {
+            preparingNewVersion();
+            // String downloadPath = await getFilePath(config.apkName+".apk");
+            // OpenFile.open(downloadPath);
+
+            // Navigator.of(context).pop();
+            
+
+            // setState(() {
+            //   isLoadingVersion = false;
+            //   isDownloadNewVersion = true;
+            // });
             // downloadNewVersion();
-            showDialog (
-              context: context,
-              barrierDismissible: false,
-              builder: (context){
-                return WillPopScope(
-                  onWillPop: null,
-                  child: AlertDialog(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(7.5)),
-                    ),
-                    content: StatefulBuilder(
-                      builder: (BuildContext context, StateSetter setState) {
-                      _setState = setState;
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Center(
-                          //   child: CircularPercentIndicator(
-                          //     radius: 120.0,
-                          //     lineWidth: 13.0,
-                          //     animation: false,
-                          //     percent: progressValue,
-                          //     center: new Text("${progressText}%", style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                          //     footer: Padding(
-                          //       padding: EdgeInsets.only(top: 10),
-                          //       child: new Text("Mengunduh pembaruan aplikasi", style: new TextStyle(fontWeight: FontWeight.bold)),
-                          //     ),
-                          //     circularStrokeCap: CircularStrokeCap.round,
-                          //     progressColor: config.primaryColor,
-                          //   ),
-                          // ),
-                        ],
-                      );
-                    }),
-                  )
-                );
-              }
-            );
+            // showDialog (
+            //   context: context,
+            //   barrierDismissible: false,
+            //   builder: (context){
+            //     return WillPopScope(
+            //       onWillPop: null,
+            //       child: AlertDialog(
+            //         shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.all(Radius.circular(7.5)),
+            //         ),
+            //         content: StatefulBuilder(
+            //           builder: (BuildContext context, StateSetter setState) {
+            //           _setState = setState;
+            //           return Column(
+            //             mainAxisSize: MainAxisSize.min,
+            //             children: [
+            //               Center(
+            //                 child: CircularPercentIndicator(
+            //                   radius: 120.0,
+            //                   lineWidth: 13.0,
+            //                   animation: false,
+            //                   percent: progressValue,
+            //                   center: new Text("${progressText}%", style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            //                   footer: Padding(
+            //                     padding: EdgeInsets.only(top: 10),
+            //                     child: new Text("Mengunduh pembaruan aplikasi", style: new TextStyle(fontWeight: FontWeight.bold)),
+            //                   ),
+            //                   circularStrokeCap: CircularStrokeCap.round,
+            //                   progressColor: config.primaryColor,
+            //                 ),
+            //               ),
+            //             ],
+            //           );
+            //         }),
+            //       )
+            //     );
+            //   }
+            // );
+
           }
         );            
       } else {
@@ -360,37 +537,105 @@ class SplashScreenState extends State<SplashScreen> {
     }
   }
 
-  // Future<bool> checkAppsPermission() async {
-  //   final serviceStatus = await Permission.storage.isGranted;
+  void preparingNewVersion() {
+    setState(() {
+      isLoadingVersion = false;
+      isDownloadNewVersion = true;
+    });
+    downloadNewVersion();
+    showDialog (
+      context: context,
+      barrierDismissible: false,
+      builder: (context){
+        return WillPopScope(
+          onWillPop: null,
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(7.5)),
+            ),
+            content: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+              _setState = setState;
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Center(
+                    child: CircularPercentIndicator(
+                      radius: 120.0,
+                      lineWidth: 13.0,
+                      animation: false,
+                      percent: progressValue,
+                      center: Text("${progressText}%", style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                      footer: Padding(
+                        padding: EdgeInsets.only(top: 10),
+                        child: Column(
+                          children: [
+                            Text("Mengunduh pembaruan aplikasi", style: new TextStyle(fontWeight: FontWeight.bold)),
+                            Visibility(
+                              maintainSize: true, 
+                              maintainAnimation: true,
+                              maintainState: true,
+                              visible: !isRetryDownload,
+                              child: Container(
+                                margin: EdgeInsets.symmetric(vertical: 15),
+                                width: MediaQuery.of(context).size.width,
+                                child: Button(
+                                  // loading: loginLoading,
+                                  backgroundColor: config.darkOpacityBlueColor,
+                                  child: TextView("Coba Lagi", 3, color: Colors.white),
+                                  onTap: () {
+                                    downloadNewVersion();
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      circularStrokeCap: CircularStrokeCap.round,
+                      progressColor: config.primaryColor,
+                    ),
+                  ),
+                ],
+              );
+            }),
+          )
+        );
+      }
+    );
+  }
 
-  //   bool isPermissionGranted = serviceStatus == ServiceStatus.enabled;
+  Future<bool> checkAppsPermission() async {
+    final serviceStatus = await Permission.storage.isGranted;
 
-  //   final status = await Permission.storage.request();
+    bool isPermissionGranted = serviceStatus == ServiceStatus.enabled;
 
-  //   // if(status == PermissionStatus.granted) {
-  //   // } else if (status == PermissionStatus.denied) {
-  //   //   print('Permission denied');
-  //   // } else if (status == PermissionStatus.permanentlyDenied) {
-  //   //   print('Permission Permanently Denied');
-  //   // }
+    final status = await Permission.storage.request();
 
-  //   if(status != PermissionStatus.granted) {
-  //     await openAppSettings();
-  //   }
+    // if(status == PermissionStatus.granted) {
+    // } else if (status == PermissionStatus.denied) {
+    //   print('Permission denied');
+    // } else if (status == PermissionStatus.permanentlyDenied) {
+    //   print('Permission Permanently Denied');
+    // }
 
-  //   return status == PermissionStatus.granted;
+    if(status != PermissionStatus.granted) {
+      await openAppSettings();
+    }
 
-  // }
+    return status == PermissionStatus.granted;
 
-  // Future<String> getFilePath(filename) async {
-  //   String path = '';
+  }
 
-  //   Directory dir = await getExternalStorageDirectory();
+  Future<String> getFilePath(filename) async {
+    String path = '';
 
-  //   path = '${dir.path}/$filename';
+    Directory dir = await getExternalStorageDirectory();
 
-  //   return path;
-  // }
+    path = '${dir.path}/$filename';
+
+    return path;
+  }
 
   Future<String> getVersion(final context, {String parameter=""}) async {
     Client client = Client();

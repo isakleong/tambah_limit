@@ -117,7 +117,7 @@ class LoginState extends State<Login> {
               height: MediaQuery.of(context).size.height,
               child: Center(
                 child: SingleChildScrollView(
-                  physics: AlwaysScrollableScrollPhysics(),
+                  physics: ScrollPhysics(),
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 0, horizontal: 30),
                     child: Column(
@@ -198,7 +198,16 @@ class LoginState extends State<Login> {
                 ),
               ),
             ),
-            
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: Theme(
+                  data: Theme.of(context).copyWith(canvasColor: Colors.transparent),
+                  child: TextView("v"+config.apkVersion, 3, color: config.grayColor),
+                ),
+              ),
+            )
           ],
         ),
       )
