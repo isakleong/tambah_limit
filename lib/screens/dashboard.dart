@@ -48,6 +48,7 @@ class Dashboard extends StatefulWidget {
 
 class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   PersistentTabController tabController;
+  List<BottomNavigationBarItem> bottomNavigationBarList;
 
   String user_login = "";
 
@@ -626,9 +627,27 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     });
 
     getBackgroundNotification();
+
+    // if(user_login.toLowerCase().contains("kc")) {
+    //   setState(() {
+    //     bottomNavigationBarList = [
+    //       BottomNavigationBarItem(icon: Icon(CupertinoIcons.money_dollar), label: "Limit"),
+    //       BottomNavigationBarItem(icon: Icon(Icons.change_circle), label: "Riwayat"),
+    //       BottomNavigationBarItem(icon: Icon(Icons.lock), label: "Password"),
+    //     ];  
+    //   });
+    // } else {
+    //   setState(() {
+    //     bottomNavigationBarList = [
+    //       BottomNavigationBarItem(icon: Icon(CupertinoIcons.money_dollar), label: "Limit"),
+    //       BottomNavigationBarItem(icon: Icon(Icons.change_circle), label: "Riwayat"),
+    //       BottomNavigationBarItem(icon: Icon(Icons.not_interested), label: "Blocked"),
+    //       BottomNavigationBarItem(icon: Icon(Icons.lock), label: "Password"),
+    //     ];  
+    //   });
+    // }
     
     super.initState();
-    
   }
 
   @override
@@ -640,385 +659,653 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     setState(() {
       user_login = prefs.getString("get_user_login");  
     });
-    
   }
 
   @override
   Widget build(BuildContext context) {
     List<Widget> blockInfoDetailWidgetList = showBlockInfoDetail(config);
 
-    final List<Widget> menuList = [
-      Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            children: [
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        elevation: 5,
-                        child: InkWell(
-                          onTap: (){
-                            setState(() {
-                              // customerIdController.clear();
+    List<Widget> menuList = [];
 
-                              isLimitCustomerSelected = true;
-                              isLimitCorporateSelected = false;
+    if(user_login.toLowerCase().contains("kc")) {
+      bottomNavigationBarList = [
+        BottomNavigationBarItem(icon: Icon(CupertinoIcons.money_dollar), label: "Limit"),
+        BottomNavigationBarItem(icon: Icon(Icons.change_circle), label: "Riwayat"),
+        BottomNavigationBarItem(icon: Icon(Icons.lock), label: "Password"),
+      ];  
 
-                              borderCardColor_1 = config.darkOpacityBlueColor;
-                              backgroundCardColor_1 = config.lightBlueColor;
-                              textCardColor_1 = config.grayColor;
-                              borderCardColor_2 = config.grayNonActiveColor;
-                              backgroundCardColor_2 = config.lighterGrayColor;
-                              textCardColor_2 = config.grayNonActiveColor;
-                            });
-                          },
-                          child: ClipPath(
-                            clipper: ShapeBorderClipper(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8))),
-                            child: Container(
-                              height: 100,
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                      right: BorderSide(color: borderCardColor_1, width: 10)),
-                                  color: backgroundCardColor_1,
-                                ),
-                                padding: EdgeInsets.all(20.0),
-                                alignment: Alignment.centerLeft,
-                                child: Container(
-                                 child: TextView("Limit Customer", 3, color: textCardColor_1),
-                                )
-                              ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        elevation: 5,
-                        child: InkWell(
-                          onTap: () {
-                            setState(() {
-                              // customerIdController.clear();
-
-                              isLimitCustomerSelected = false;
-                              isLimitCorporateSelected = true;
-
-                              borderCardColor_2 = config.darkOpacityBlueColor;
-                              backgroundCardColor_2 = config.lightBlueColor;
-                              textCardColor_2 = config.grayColor;
-                              borderCardColor_1 = config.grayNonActiveColor;
-                              backgroundCardColor_1 = config.lighterGrayColor;
-                              textCardColor_1 = config.grayNonActiveColor;
-                            });
-                          },
-                          child: ClipPath(
-                            clipper: ShapeBorderClipper(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8))),
-                            child: Container(
-                              height: 100,
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                      right: BorderSide(color: borderCardColor_2, width: 10)),
-                                  color: backgroundCardColor_2,
-                                ),
-                                padding: EdgeInsets.all(20.0),
-                                alignment: Alignment.centerLeft,
-                                child: Container(
-                                  child: TextView("Limit Corporate", 3, color: textCardColor_2),
-                                )
-                              ),
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-                child: EditText(
-                  useIcon: true,
-                  key: Key("CustomerId"),
-                  controller: customerIdController,
-                  focusNode: customerIdFocus,
-                  validate: customerIdValid,
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.go,
-                  textCapitalization: TextCapitalization.characters,
-                  hintText: isLimitCustomerSelected ? "Kode Pelanggan" : "Kode Corporate",
-                  onSubmitted: (value) {
-                    customerIdFocus.unfocus();
-                    if(isLimitCustomerSelected) {
-                      getLimit();
-                    } else {
-                      getLimitCorporate();
-                    }
-                  },
-                  onChanged: (value) {
-                    setState(() {
-                      resultLimit = null;
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-          
-          Container(
-            margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-            width: MediaQuery.of(context).size.width,
-            child: Button(
-              loading: searchLoading,
-              backgroundColor: config.darkOpacityBlueColor,
-              child: TextView("LANJUTKAN", 3, color: Colors.white),
-              onTap: () {
-                if(isLimitCustomerSelected) {
-                  getLimit();
-                } else {
-                  getLimitCorporate();
-                }
-              },
-            ),
-          ),
-        ],
-      ),
-      HistoryLimitRequest(),
-      SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-              child: EditText(
-                useIcon: true,
-                key: Key("CustomerId"),
-                controller: customerIdBlockedController,
-                focusNode: customerIdBlockedFocus,
-                validate: customerIdBlockedValid,
-                keyboardType: TextInputType.text,
-                textInputAction: TextInputAction.go,
-                textCapitalization: TextCapitalization.characters,
-                hintText: "Kode Pelanggan",
-                onSubmitted: (value) {
-                  customerIdFocus.unfocus();
-                  getBlockInfo();
-                },
-                onChanged: (value) {
-                  setState(() {
-                    resultBlocked = null;
-                  });
-                },
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-              width: MediaQuery.of(context).size.width,
-              child: Button(
-                loading: searchBlockedLoading,
-                backgroundColor: config.darkOpacityBlueColor,
-                child: TextView("Cari", 3, color: Colors.white, caps: true),
-                onTap: () {
-                  getBlockInfo();
-                },
-              ),
-            ),
-            blockInfoDetailWidgetList.length == 0
-            ? 
-            Container()
-            :
-            ListView(
-              scrollDirection: Axis.vertical,
-              padding: EdgeInsets.all(0),
-              physics: ScrollPhysics(),
-              shrinkWrap: true,
-              children: blockInfoDetailWidgetList,
-            ),
-          ],
-        ),
-      ),
-      
-      SingleChildScrollView(
-        child: Column(
+      menuList = [
+        Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
               children: [
                 Container(
+                  margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          elevation: 5,
+                          child: InkWell(
+                            onTap: (){
+                              setState(() {
+                                // customerIdController.clear();
+
+                                isLimitCustomerSelected = true;
+                                isLimitCorporateSelected = false;
+
+                                borderCardColor_1 = config.darkOpacityBlueColor;
+                                backgroundCardColor_1 = config.lightBlueColor;
+                                textCardColor_1 = config.grayColor;
+                                borderCardColor_2 = config.grayNonActiveColor;
+                                backgroundCardColor_2 = config.lighterGrayColor;
+                                textCardColor_2 = config.grayNonActiveColor;
+                              });
+                            },
+                            child: ClipPath(
+                              clipper: ShapeBorderClipper(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8))),
+                              child: Container(
+                                height: 100,
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                        right: BorderSide(color: borderCardColor_1, width: 10)),
+                                    color: backgroundCardColor_1,
+                                  ),
+                                  padding: EdgeInsets.all(20.0),
+                                  alignment: Alignment.centerLeft,
+                                  child: Container(
+                                  child: TextView("Limit Customer", 3, color: textCardColor_1),
+                                  )
+                                ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          elevation: 5,
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                // customerIdController.clear();
+
+                                isLimitCustomerSelected = false;
+                                isLimitCorporateSelected = true;
+
+                                borderCardColor_2 = config.darkOpacityBlueColor;
+                                backgroundCardColor_2 = config.lightBlueColor;
+                                textCardColor_2 = config.grayColor;
+                                borderCardColor_1 = config.grayNonActiveColor;
+                                backgroundCardColor_1 = config.lighterGrayColor;
+                                textCardColor_1 = config.grayNonActiveColor;
+                              });
+                            },
+                            child: ClipPath(
+                              clipper: ShapeBorderClipper(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8))),
+                              child: Container(
+                                height: 100,
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                        right: BorderSide(color: borderCardColor_2, width: 10)),
+                                    color: backgroundCardColor_2,
+                                  ),
+                                  padding: EdgeInsets.all(20.0),
+                                  alignment: Alignment.centerLeft,
+                                  child: Container(
+                                    child: TextView("Limit Corporate", 3, color: textCardColor_2),
+                                  )
+                                ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                Container(
                   margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
                   child: EditText(
                     useIcon: true,
-                    key: Key("OldPassword"),
-                    controller: oldPasswordController,
-                    focusNode: oldPasswordFocus,
-                    obscureText: unlockOldPassword,
-                    validate: oldPasswordValid,
+                    key: Key("CustomerId"),
+                    controller: customerIdController,
+                    focusNode: customerIdFocus,
+                    validate: customerIdValid,
                     keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
+                    textInputAction: TextInputAction.go,
                     textCapitalization: TextCapitalization.characters,
-                    hintText: "Password Lama",
-                    alertMessage: oldPasswordErrorMessage,
-                    suffixIcon:
-                    InkWell(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 5),
-                        child: Icon(
-                          Icons.remove_red_eye,
-                          color:  unlockOldPassword ? config.lightGrayColor : config.grayColor,
-                          size: 18,
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          unlockOldPassword = !unlockOldPassword;
-                        });
-                      },
-                    ),
+                    hintText: isLimitCustomerSelected ? "Kode Pelanggan" : "Kode Corporate",
                     onSubmitted: (value) {
-                      _fieldFocusChange(context, oldPasswordFocus, newPasswordFocus);
+                      customerIdFocus.unfocus();
+                      if(isLimitCustomerSelected) {
+                        getLimit();
+                      } else {
+                        getLimitCorporate();
+                      }
                     },
                     onChanged: (value) {
-                      
-                    },
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-                  child: EditText(
-                    useIcon: true,
-                    key: Key("NewPassword"),
-                    controller: newPasswordController,
-                    focusNode: newPasswordFocus,
-                    validate:  newPasswordValid,
-                    obscureText: unlockNewPassword,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    textCapitalization: TextCapitalization.characters,
-                    hintText: "Password Baru",
-                    alertMessage: newPasswordErrorMessage,
-                    suffixIcon:
-                      InkWell(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                          child: Icon(
-                            Icons.remove_red_eye,
-                            color:  unlockNewPassword ? config.lightGrayColor : config.grayColor,
-                            size: 18,
-                          ),
-                        ),
-                        onTap: () {
-                          setState(() {
-                            unlockNewPassword = !unlockNewPassword;
-                          });
-                        },
-                      ),
-                    onSubmitted: (value) {
-                      _fieldFocusChange(context, newPasswordFocus, confirmPasswordFocus);
-                    },
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-                  child: EditText(
-                    useIcon: true,
-                    key: Key("ConfirmPassword"),
-                    controller: confirmPasswordController,
-                    focusNode: confirmPasswordFocus,
-                    validate: confirmPasswordValid,
-                    keyboardType: TextInputType.text,
-                    obscureText: unlockConfirmPassword,
-                    textInputAction: TextInputAction.done,
-                    textCapitalization: TextCapitalization.characters,
-                    hintText: "Konfirmasi Password Baru",
-                    alertMessage: confirmPasswordErrorMessage,
-                    suffixIcon:
-                      InkWell(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                          child: Icon(
-                            Icons.remove_red_eye,
-                            color:  unlockConfirmPassword ? config.lightGrayColor : config.grayColor,
-                            size: 18,
-                          ),
-                        ),
-                        onTap: () {
-                          setState(() {
-                            unlockConfirmPassword = !unlockConfirmPassword;
-                          });
-                        },
-                      ),
-                    onSubmitted: (value) {
-                      confirmPasswordFocus.unfocus();
+                      setState(() {
+                        resultLimit = null;
+                      });
                     },
                   ),
                 ),
               ],
             ),
+            
             Container(
               margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
               width: MediaQuery.of(context).size.width,
               child: Button(
-                loading: changePasswordLoading,
+                loading: searchLoading,
                 backgroundColor: config.darkOpacityBlueColor,
-                child: TextView("UBAH", 3, color: Colors.white),
+                child: TextView("LANJUTKAN", 3, color: Colors.white),
                 onTap: () {
-                  submitValidation();
+                  if(isLimitCustomerSelected) {
+                    getLimit();
+                  } else {
+                    getLimitCorporate();
+                  }
                 },
               ),
             ),
           ],
         ),
-      )
+        HistoryLimitRequest(),
+        SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                child: EditText(
+                  useIcon: true,
+                  key: Key("CustomerId"),
+                  controller: customerIdBlockedController,
+                  focusNode: customerIdBlockedFocus,
+                  validate: customerIdBlockedValid,
+                  keyboardType: TextInputType.text,
+                  textInputAction: TextInputAction.go,
+                  textCapitalization: TextCapitalization.characters,
+                  hintText: "Kode Pelanggan",
+                  onSubmitted: (value) {
+                    customerIdFocus.unfocus();
+                    getBlockInfo();
+                  },
+                  onChanged: (value) {
+                    setState(() {
+                      resultBlocked = null;
+                    });
+                  },
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                width: MediaQuery.of(context).size.width,
+                child: Button(
+                  loading: searchBlockedLoading,
+                  backgroundColor: config.darkOpacityBlueColor,
+                  child: TextView("Cari", 3, color: Colors.white, caps: true),
+                  onTap: () {
+                    getBlockInfo();
+                  },
+                ),
+              ),
+              blockInfoDetailWidgetList.length == 0
+              ? 
+              Container()
+              :
+              ListView(
+                scrollDirection: Axis.vertical,
+                padding: EdgeInsets.all(0),
+                physics: ScrollPhysics(),
+                shrinkWrap: true,
+                children: blockInfoDetailWidgetList,
+              ),
+            ],
+          ),
+        ),
+        SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                    child: EditText(
+                      useIcon: true,
+                      key: Key("OldPassword"),
+                      controller: oldPasswordController,
+                      focusNode: oldPasswordFocus,
+                      obscureText: unlockOldPassword,
+                      validate: oldPasswordValid,
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                      textCapitalization: TextCapitalization.characters,
+                      hintText: "Password Lama",
+                      alertMessage: oldPasswordErrorMessage,
+                      suffixIcon:
+                      InkWell(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 5),
+                          child: Icon(
+                            Icons.remove_red_eye,
+                            color:  unlockOldPassword ? config.lightGrayColor : config.grayColor,
+                            size: 18,
+                          ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            unlockOldPassword = !unlockOldPassword;
+                          });
+                        },
+                      ),
+                      onSubmitted: (value) {
+                        _fieldFocusChange(context, oldPasswordFocus, newPasswordFocus);
+                      },
+                      onChanged: (value) {
+                        
+                      },
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                    child: EditText(
+                      useIcon: true,
+                      key: Key("NewPassword"),
+                      controller: newPasswordController,
+                      focusNode: newPasswordFocus,
+                      validate:  newPasswordValid,
+                      obscureText: unlockNewPassword,
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                      textCapitalization: TextCapitalization.characters,
+                      hintText: "Password Baru",
+                      alertMessage: newPasswordErrorMessage,
+                      suffixIcon:
+                        InkWell(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 5),
+                            child: Icon(
+                              Icons.remove_red_eye,
+                              color:  unlockNewPassword ? config.lightGrayColor : config.grayColor,
+                              size: 18,
+                            ),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              unlockNewPassword = !unlockNewPassword;
+                            });
+                          },
+                        ),
+                      onSubmitted: (value) {
+                        _fieldFocusChange(context, newPasswordFocus, confirmPasswordFocus);
+                      },
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                    child: EditText(
+                      useIcon: true,
+                      key: Key("ConfirmPassword"),
+                      controller: confirmPasswordController,
+                      focusNode: confirmPasswordFocus,
+                      validate: confirmPasswordValid,
+                      keyboardType: TextInputType.text,
+                      obscureText: unlockConfirmPassword,
+                      textInputAction: TextInputAction.done,
+                      textCapitalization: TextCapitalization.characters,
+                      hintText: "Konfirmasi Password Baru",
+                      alertMessage: confirmPasswordErrorMessage,
+                      suffixIcon:
+                        InkWell(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 5),
+                            child: Icon(
+                              Icons.remove_red_eye,
+                              color:  unlockConfirmPassword ? config.lightGrayColor : config.grayColor,
+                              size: 18,
+                            ),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              unlockConfirmPassword = !unlockConfirmPassword;
+                            });
+                          },
+                        ),
+                      onSubmitted: (value) {
+                        confirmPasswordFocus.unfocus();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                width: MediaQuery.of(context).size.width,
+                child: Button(
+                  loading: changePasswordLoading,
+                  backgroundColor: config.darkOpacityBlueColor,
+                  child: TextView("UBAH", 3, color: Colors.white),
+                  onTap: () {
+                    submitValidation();
+                  },
+                ),
+              ),
+            ],
+          ),
+        )
 
 
-      // Profile(),
-      
-    ].where((c) => c != null).toList();
+        // Profile(),
+        
+      ].where((c) => c != null).toList();
 
-    // List<PersistentBottomNavBarItem> bottomBarItems() {
-    //     return [
-    //         PersistentBottomNavBarItem(
-    //             icon: Icon(CupertinoIcons.money_dollar),
-    //             title: ("Limit"),
-    //             activeColorPrimary: CupertinoColors.activeBlue,
-    //             inactiveColorPrimary: CupertinoColors.systemGrey,
-    //         ),
-    //         PersistentBottomNavBarItem(
-    //             icon: Icon(Icons.change_circle),
-    //             title: ("Riwayat"),
-    //             activeColorPrimary: CupertinoColors.activeBlue,
-    //             inactiveColorPrimary: CupertinoColors.systemGrey,
-    //         ),
-    //         PersistentBottomNavBarItem(
-    //             icon: Icon(Icons.not_interested),
-    //             title: ("Blocked"),
-    //             activeColorPrimary: CupertinoColors.activeBlue,
-    //             inactiveColorPrimary: CupertinoColors.systemGrey,
-    //         ),
-    //         PersistentBottomNavBarItem(
-    //             icon: Icon(Icons.lock),
-    //             title: ("Password"),
-    //             activeColorPrimary: CupertinoColors.activeBlue,
-    //             inactiveColorPrimary: CupertinoColors.systemGrey,
-    //         ),
+    } else {
+      bottomNavigationBarList = [
+        BottomNavigationBarItem(icon: Icon(CupertinoIcons.money_dollar), label: "Limit"),
+        BottomNavigationBarItem(icon: Icon(Icons.change_circle), label: "Riwayat"),
+        BottomNavigationBarItem(icon: Icon(Icons.not_interested), label: "Blocked"),
+        BottomNavigationBarItem(icon: Icon(Icons.lock), label: "Password"),
+      ];  
 
-    //         //     BottomBarWithSheetItem(icon: Icons.money, label: "Limit"),
-    //   //     BottomBarWithSheetItem(icon: Icons.change_circle, label: "Riwayat"),
-    //   //     BottomBarWithSheetItem(icon: Icons.not_interested, label: "Blocked"),
-    //   //     BottomBarWithSheetItem(icon: Icons.lock, label: "Password"),
-    //     ];
-    // }
+      menuList = [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          elevation: 5,
+                          child: InkWell(
+                            onTap: (){
+                              setState(() {
+                                // customerIdController.clear();
+
+                                isLimitCustomerSelected = true;
+                                isLimitCorporateSelected = false;
+
+                                borderCardColor_1 = config.darkOpacityBlueColor;
+                                backgroundCardColor_1 = config.lightBlueColor;
+                                textCardColor_1 = config.grayColor;
+                                borderCardColor_2 = config.grayNonActiveColor;
+                                backgroundCardColor_2 = config.lighterGrayColor;
+                                textCardColor_2 = config.grayNonActiveColor;
+                              });
+                            },
+                            child: ClipPath(
+                              clipper: ShapeBorderClipper(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8))),
+                              child: Container(
+                                height: 100,
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                        right: BorderSide(color: borderCardColor_1, width: 10)),
+                                    color: backgroundCardColor_1,
+                                  ),
+                                  padding: EdgeInsets.all(20.0),
+                                  alignment: Alignment.centerLeft,
+                                  child: Container(
+                                  child: TextView("Limit Customer", 3, color: textCardColor_1),
+                                  )
+                                ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          elevation: 5,
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                // customerIdController.clear();
+
+                                isLimitCustomerSelected = false;
+                                isLimitCorporateSelected = true;
+
+                                borderCardColor_2 = config.darkOpacityBlueColor;
+                                backgroundCardColor_2 = config.lightBlueColor;
+                                textCardColor_2 = config.grayColor;
+                                borderCardColor_1 = config.grayNonActiveColor;
+                                backgroundCardColor_1 = config.lighterGrayColor;
+                                textCardColor_1 = config.grayNonActiveColor;
+                              });
+                            },
+                            child: ClipPath(
+                              clipper: ShapeBorderClipper(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8))),
+                              child: Container(
+                                height: 100,
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                        right: BorderSide(color: borderCardColor_2, width: 10)),
+                                    color: backgroundCardColor_2,
+                                  ),
+                                  padding: EdgeInsets.all(20.0),
+                                  alignment: Alignment.centerLeft,
+                                  child: Container(
+                                    child: TextView("Limit Corporate", 3, color: textCardColor_2),
+                                  )
+                                ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                  child: EditText(
+                    useIcon: true,
+                    key: Key("CustomerId"),
+                    controller: customerIdController,
+                    focusNode: customerIdFocus,
+                    validate: customerIdValid,
+                    keyboardType: TextInputType.text,
+                    textInputAction: TextInputAction.go,
+                    textCapitalization: TextCapitalization.characters,
+                    hintText: isLimitCustomerSelected ? "Kode Pelanggan" : "Kode Corporate",
+                    onSubmitted: (value) {
+                      customerIdFocus.unfocus();
+                      if(isLimitCustomerSelected) {
+                        getLimit();
+                      } else {
+                        getLimitCorporate();
+                      }
+                    },
+                    onChanged: (value) {
+                      setState(() {
+                        resultLimit = null;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+            
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+              width: MediaQuery.of(context).size.width,
+              child: Button(
+                loading: searchLoading,
+                backgroundColor: config.darkOpacityBlueColor,
+                child: TextView("LANJUTKAN", 3, color: Colors.white),
+                onTap: () {
+                  if(isLimitCustomerSelected) {
+                    getLimit();
+                  } else {
+                    getLimitCorporate();
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+        HistoryLimitRequest(),
+        SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                    child: EditText(
+                      useIcon: true,
+                      key: Key("OldPassword"),
+                      controller: oldPasswordController,
+                      focusNode: oldPasswordFocus,
+                      obscureText: unlockOldPassword,
+                      validate: oldPasswordValid,
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                      textCapitalization: TextCapitalization.characters,
+                      hintText: "Password Lama",
+                      alertMessage: oldPasswordErrorMessage,
+                      suffixIcon:
+                      InkWell(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 5),
+                          child: Icon(
+                            Icons.remove_red_eye,
+                            color:  unlockOldPassword ? config.lightGrayColor : config.grayColor,
+                            size: 18,
+                          ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            unlockOldPassword = !unlockOldPassword;
+                          });
+                        },
+                      ),
+                      onSubmitted: (value) {
+                        _fieldFocusChange(context, oldPasswordFocus, newPasswordFocus);
+                      },
+                      onChanged: (value) {
+                        
+                      },
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                    child: EditText(
+                      useIcon: true,
+                      key: Key("NewPassword"),
+                      controller: newPasswordController,
+                      focusNode: newPasswordFocus,
+                      validate:  newPasswordValid,
+                      obscureText: unlockNewPassword,
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                      textCapitalization: TextCapitalization.characters,
+                      hintText: "Password Baru",
+                      alertMessage: newPasswordErrorMessage,
+                      suffixIcon:
+                        InkWell(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 5),
+                            child: Icon(
+                              Icons.remove_red_eye,
+                              color:  unlockNewPassword ? config.lightGrayColor : config.grayColor,
+                              size: 18,
+                            ),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              unlockNewPassword = !unlockNewPassword;
+                            });
+                          },
+                        ),
+                      onSubmitted: (value) {
+                        _fieldFocusChange(context, newPasswordFocus, confirmPasswordFocus);
+                      },
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                    child: EditText(
+                      useIcon: true,
+                      key: Key("ConfirmPassword"),
+                      controller: confirmPasswordController,
+                      focusNode: confirmPasswordFocus,
+                      validate: confirmPasswordValid,
+                      keyboardType: TextInputType.text,
+                      obscureText: unlockConfirmPassword,
+                      textInputAction: TextInputAction.done,
+                      textCapitalization: TextCapitalization.characters,
+                      hintText: "Konfirmasi Password Baru",
+                      alertMessage: confirmPasswordErrorMessage,
+                      suffixIcon:
+                        InkWell(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 5),
+                            child: Icon(
+                              Icons.remove_red_eye,
+                              color:  unlockConfirmPassword ? config.lightGrayColor : config.grayColor,
+                              size: 18,
+                            ),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              unlockConfirmPassword = !unlockConfirmPassword;
+                            });
+                          },
+                        ),
+                      onSubmitted: (value) {
+                        confirmPasswordFocus.unfocus();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                width: MediaQuery.of(context).size.width,
+                child: Button(
+                  loading: changePasswordLoading,
+                  backgroundColor: config.darkOpacityBlueColor,
+                  child: TextView("UBAH", 3, color: Colors.white),
+                  onTap: () {
+                    submitValidation();
+                  },
+                ),
+              ),
+            ],
+          ),
+        )
+
+
+        // Profile(),
+        
+      ].where((c) => c != null).toList();
+    }
 
     return Scaffold(
       key: _scaffoldKey,
@@ -1095,12 +1382,12 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         currentIndex: currentIndex,  
         onTap: _selectedTab,  
         elevation: 5,
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(CupertinoIcons.money_dollar), label: "Limit"),
-          BottomNavigationBarItem(icon: Icon(Icons.change_circle), label: "Riwayat"),
-          BottomNavigationBarItem(icon: Icon(Icons.not_interested), label: "Blocked"),
-          BottomNavigationBarItem(icon: Icon(Icons.lock), label: "Password"),
-        ],
+        items: bottomNavigationBarList
+        // items: <BottomNavigationBarItem>[
+        //   BottomNavigationBarItem(icon: Icon(CupertinoIcons.money_dollar), label: "Limit"),
+        //   BottomNavigationBarItem(icon: Icon(Icons.change_circle), label: "Riwayat"),
+        //   BottomNavigationBarItem(icon: Icon(Icons.lock), label: "Password"),
+        // ]
       ),
       
       

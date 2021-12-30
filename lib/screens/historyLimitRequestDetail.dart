@@ -1420,7 +1420,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                   ),
                 ),
               ),
-              (pageType== 1 || pageType == 4) && (user_login.toLowerCase() == "tanto" || user_login.toLowerCase() == "hermawan") ?
+              (pageType== 1 || pageType == 4) && (user_login.toLowerCase() == "tanto" || user_login.toLowerCase() == "hermawan" || (user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc")) ) ?
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -1664,7 +1664,10 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                   ),
                 ),
 
-                (pageType == 1 || pageType == 4) && (user_login.toLowerCase() == "tanto" || user_login.toLowerCase() == "hermawan") ?
+                // int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) < 1500000000
+                // (user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc"))
+
+                (pageType == 1 || pageType == 4) && (user_login.toLowerCase() == "tanto" || user_login.toLowerCase() == "hermawan" || (user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc")) ) ?
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -1676,11 +1679,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                           key: Key("submit"),
                           loading: acceptLimitRequestLoading,
                           backgroundColor: config.darkOpacityBlueColor,
-                          child: TextView(
-                            "terima",
-                            3,
-                            caps: true,
-                          ),
+                          child: user_login.toLowerCase().contains("dsd") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ? TextView("acc tanto", 3, caps: true) : TextView("terima", 3, caps: true),
                           onTap: () {
                             updateLimitRequest(1);
                           },
