@@ -9,8 +9,9 @@ class User {
   final String Password_User;
   final String Token;
   final String MaxLimit;
+  final List<String> ModuleId;
 
-  User({this.Id, this.Password_User, this.Token, this.MaxLimit});
+  User({this.Id, this.Password_User, this.Token, this.MaxLimit, this.ModuleId});
 
   factory User.fromJson(Map<String, dynamic> parsedJson) => _$UserFromJson(parsedJson);
   Map<String, dynamic> toJson() => _$UserToJson(this);

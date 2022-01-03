@@ -64,6 +64,7 @@ class UserAPI {
         var parsedJson = jsonDecode(response.body);
         if(response.body.toString() != "false") {
           user = User.fromJson(parsedJson[0]);
+          printHelp("CEK MOD "+user.ModuleId.toString());
 
           if(user.Id != ""){
             isLoginSuccess = "OK";
@@ -215,6 +216,7 @@ class UserAPI {
     final SharedPreferences sharedPreferences = await _sharedPreferences;
     await sharedPreferences.setString("user_code", user.Id);
     await sharedPreferences.setInt("max_limit", int.parse(user.MaxLimit));
+    await sharedPreferences.setStringList("module_privilege", user.ModuleId);
   }
 
 }

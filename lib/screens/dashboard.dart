@@ -1,35 +1,23 @@
 import 'dart:async';
 import 'dart:convert';
-// import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:bottom_bar_with_sheet/bottom_bar_with_sheet.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' show Client;
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tambah_limit/models/customerModel.dart';
 import 'package:tambah_limit/models/resultModel.dart';
-import 'package:tambah_limit/models/userModel.dart';
 import 'package:tambah_limit/resources/customerAPI.dart';
 import 'package:tambah_limit/resources/userAPI.dart';
-import 'package:tambah_limit/screens/addLimit.dart';
-import 'package:tambah_limit/screens/addLimitCorporate.dart';
-import 'package:tambah_limit/screens/changeBlockedStatus.dart';
 import 'package:tambah_limit/screens/historyLimitRequest.dart';
-import 'package:tambah_limit/screens/profile.dart';
 import 'package:tambah_limit/settings/configuration.dart';
 import 'package:tambah_limit/tools/function.dart';
 import 'package:tambah_limit/widgets/EditText.dart';
 import 'package:tambah_limit/widgets/TextView.dart';
-import 'package:tambah_limit/widgets/bottombarAdapter.dart';
 import 'package:tambah_limit/widgets/bottomBarLayout.dart';
 import 'package:tambah_limit/widgets/bottombarWithIcon.dart';
-import 'package:tambah_limit/widgets/bottomBarLayout.dart';
 
 import 'package:tambah_limit/widgets/button.dart';
 
@@ -48,7 +36,7 @@ class Dashboard extends StatefulWidget {
 
 class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   PersistentTabController tabController;
-  List<BottomNavigationBarItem> bottomNavigationBarList;
+  List<BottomNavigationBarItem> bottomNavigationBarList = [];
 
   String user_login = "";
 
@@ -116,6 +104,8 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   bool isHomePage = true;
   int currentMenuIndex = 0;
+
+  bool checkModulePrivilegeLoading = true;
 
   void _selectedTab(int index) {
     setState(() {
@@ -308,6 +298,9 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         currentIndex = widget.indexMenu;
       });
     }
+
+    //get privilege
+
 
     // initializeNotification();
 
@@ -659,6 +652,41 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     setState(() {
       user_login = prefs.getString("get_user_login");  
     });
+
+    if(checkModulePrivilegeLoading) {
+      checkModulePrivilege();
+    }
+  }
+
+  checkModulePrivilege() async {
+    setState(() {
+      checkModulePrivilegeLoading = true;
+    });
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> privilegeList = prefs.getStringList("module_privilege") ?? [];
+
+    for(int i=0; i<privilegeList.length; i++) {
+      if(privilegeList[i] == "ADDLIMIT") {
+        bottomNavigationBarList.add(BottomNavigationBarItem(icon: Icon(CupertinoIcons.money_dollar), label: "Limit"));
+      }
+
+      if(privilegeList[i] == "LIMITHISTORY") {
+        bottomNavigationBarList.add(BottomNavigationBarItem(icon: Icon(Icons.change_circle), label: "Riwayat"));
+      }
+
+      if(privilegeList[i] == "CHANGESTATUSBLOCKED") {
+        bottomNavigationBarList.add(BottomNavigationBarItem(icon: Icon(Icons.not_interested), label: "Blocked"));
+      }
+
+      if(privilegeList[i] == "EDITPASSWORD") {
+        bottomNavigationBarList.add(BottomNavigationBarItem(icon: Icon(CupertinoIcons.lock), label: "Password"));
+      }
+    }
+
+    setState(() {
+      checkModulePrivilegeLoading = false;
+      bottomNavigationBarList = bottomNavigationBarList;
+    });
   }
 
   @override
@@ -667,15 +695,10 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
     List<Widget> menuList = [];
 
-    if(user_login.toLowerCase().contains("kc")) {
-      bottomNavigationBarList = [
-        BottomNavigationBarItem(icon: Icon(CupertinoIcons.money_dollar), label: "Limit"),
-        BottomNavigationBarItem(icon: Icon(Icons.change_circle), label: "Riwayat"),
-        BottomNavigationBarItem(icon: Icon(Icons.lock), label: "Password"),
-      ];  
-
-      menuList = [
-        Column(
+    for (int i = 0; i < bottomNavigationBarList.length; i++) {
+      if(bottomNavigationBarList[i].label == "Limit") {
+       menuList.add(
+         Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
@@ -821,490 +844,207 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               ),
             ),
           ],
-        ),
-        HistoryLimitRequest(),
-        SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-                child: EditText(
-                  useIcon: true,
-                  key: Key("CustomerId"),
-                  controller: customerIdBlockedController,
-                  focusNode: customerIdBlockedFocus,
-                  validate: customerIdBlockedValid,
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.go,
-                  textCapitalization: TextCapitalization.characters,
-                  hintText: "Kode Pelanggan",
-                  onSubmitted: (value) {
-                    customerIdFocus.unfocus();
-                    getBlockInfo();
-                  },
-                  onChanged: (value) {
-                    setState(() {
-                      resultBlocked = null;
-                    });
-                  },
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                width: MediaQuery.of(context).size.width,
-                child: Button(
-                  loading: searchBlockedLoading,
-                  backgroundColor: config.darkOpacityBlueColor,
-                  child: TextView("Cari", 3, color: Colors.white, caps: true),
-                  onTap: () {
-                    getBlockInfo();
-                  },
-                ),
-              ),
-              blockInfoDetailWidgetList.length == 0
-              ? 
-              Container()
-              :
-              ListView(
-                scrollDirection: Axis.vertical,
-                padding: EdgeInsets.all(0),
-                physics: ScrollPhysics(),
-                shrinkWrap: true,
-                children: blockInfoDetailWidgetList,
-              ),
-            ],
-          ),
-        ),
-        SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-                    child: EditText(
-                      useIcon: true,
-                      key: Key("OldPassword"),
-                      controller: oldPasswordController,
-                      focusNode: oldPasswordFocus,
-                      obscureText: unlockOldPassword,
-                      validate: oldPasswordValid,
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
-                      textCapitalization: TextCapitalization.characters,
-                      hintText: "Password Lama",
-                      alertMessage: oldPasswordErrorMessage,
-                      suffixIcon:
-                      InkWell(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                          child: Icon(
-                            Icons.remove_red_eye,
-                            color:  unlockOldPassword ? config.lightGrayColor : config.grayColor,
-                            size: 18,
-                          ),
-                        ),
-                        onTap: () {
-                          setState(() {
-                            unlockOldPassword = !unlockOldPassword;
-                          });
-                        },
-                      ),
-                      onSubmitted: (value) {
-                        _fieldFocusChange(context, oldPasswordFocus, newPasswordFocus);
-                      },
-                      onChanged: (value) {
-                        
-                      },
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-                    child: EditText(
-                      useIcon: true,
-                      key: Key("NewPassword"),
-                      controller: newPasswordController,
-                      focusNode: newPasswordFocus,
-                      validate:  newPasswordValid,
-                      obscureText: unlockNewPassword,
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
-                      textCapitalization: TextCapitalization.characters,
-                      hintText: "Password Baru",
-                      alertMessage: newPasswordErrorMessage,
-                      suffixIcon:
-                        InkWell(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 5),
-                            child: Icon(
-                              Icons.remove_red_eye,
-                              color:  unlockNewPassword ? config.lightGrayColor : config.grayColor,
-                              size: 18,
-                            ),
-                          ),
-                          onTap: () {
-                            setState(() {
-                              unlockNewPassword = !unlockNewPassword;
-                            });
-                          },
-                        ),
-                      onSubmitted: (value) {
-                        _fieldFocusChange(context, newPasswordFocus, confirmPasswordFocus);
-                      },
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-                    child: EditText(
-                      useIcon: true,
-                      key: Key("ConfirmPassword"),
-                      controller: confirmPasswordController,
-                      focusNode: confirmPasswordFocus,
-                      validate: confirmPasswordValid,
-                      keyboardType: TextInputType.text,
-                      obscureText: unlockConfirmPassword,
-                      textInputAction: TextInputAction.done,
-                      textCapitalization: TextCapitalization.characters,
-                      hintText: "Konfirmasi Password Baru",
-                      alertMessage: confirmPasswordErrorMessage,
-                      suffixIcon:
-                        InkWell(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 5),
-                            child: Icon(
-                              Icons.remove_red_eye,
-                              color:  unlockConfirmPassword ? config.lightGrayColor : config.grayColor,
-                              size: 18,
-                            ),
-                          ),
-                          onTap: () {
-                            setState(() {
-                              unlockConfirmPassword = !unlockConfirmPassword;
-                            });
-                          },
-                        ),
-                      onSubmitted: (value) {
-                        confirmPasswordFocus.unfocus();
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                width: MediaQuery.of(context).size.width,
-                child: Button(
-                  loading: changePasswordLoading,
-                  backgroundColor: config.darkOpacityBlueColor,
-                  child: TextView("UBAH", 3, color: Colors.white),
-                  onTap: () {
-                    submitValidation();
-                  },
-                ),
-              ),
-            ],
-          ),
         )
+       );
+      }
 
+      if(bottomNavigationBarList[i].label == "Riwayat") {
+        menuList.add(HistoryLimitRequest());
+      }
 
-        // Profile(),
-        
-      ].where((c) => c != null).toList();
-
-    } else {
-      bottomNavigationBarList = [
-        BottomNavigationBarItem(icon: Icon(CupertinoIcons.money_dollar), label: "Limit"),
-        BottomNavigationBarItem(icon: Icon(Icons.change_circle), label: "Riwayat"),
-        BottomNavigationBarItem(icon: Icon(Icons.not_interested), label: "Blocked"),
-        BottomNavigationBarItem(icon: Icon(Icons.lock), label: "Password"),
-      ];  
-
-      menuList = [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
+      if(bottomNavigationBarList[i].label == "Blocked") {
+        menuList.add(
+          SingleChildScrollView(
+            child: Column(
               children: [
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          elevation: 5,
-                          child: InkWell(
-                            onTap: (){
-                              setState(() {
-                                // customerIdController.clear();
-
-                                isLimitCustomerSelected = true;
-                                isLimitCorporateSelected = false;
-
-                                borderCardColor_1 = config.darkOpacityBlueColor;
-                                backgroundCardColor_1 = config.lightBlueColor;
-                                textCardColor_1 = config.grayColor;
-                                borderCardColor_2 = config.grayNonActiveColor;
-                                backgroundCardColor_2 = config.lighterGrayColor;
-                                textCardColor_2 = config.grayNonActiveColor;
-                              });
-                            },
-                            child: ClipPath(
-                              clipper: ShapeBorderClipper(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8))),
-                              child: Container(
-                                height: 100,
-                                  decoration: BoxDecoration(
-                                    border: Border(
-                                        right: BorderSide(color: borderCardColor_1, width: 10)),
-                                    color: backgroundCardColor_1,
-                                  ),
-                                  padding: EdgeInsets.all(20.0),
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                  child: TextView("Limit Customer", 3, color: textCardColor_1),
-                                  )
-                                ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          elevation: 5,
-                          child: InkWell(
-                            onTap: () {
-                              setState(() {
-                                // customerIdController.clear();
-
-                                isLimitCustomerSelected = false;
-                                isLimitCorporateSelected = true;
-
-                                borderCardColor_2 = config.darkOpacityBlueColor;
-                                backgroundCardColor_2 = config.lightBlueColor;
-                                textCardColor_2 = config.grayColor;
-                                borderCardColor_1 = config.grayNonActiveColor;
-                                backgroundCardColor_1 = config.lighterGrayColor;
-                                textCardColor_1 = config.grayNonActiveColor;
-                              });
-                            },
-                            child: ClipPath(
-                              clipper: ShapeBorderClipper(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8))),
-                              child: Container(
-                                height: 100,
-                                  decoration: BoxDecoration(
-                                    border: Border(
-                                        right: BorderSide(color: borderCardColor_2, width: 10)),
-                                    color: backgroundCardColor_2,
-                                  ),
-                                  padding: EdgeInsets.all(20.0),
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    child: TextView("Limit Corporate", 3, color: textCardColor_2),
-                                  )
-                                ),
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
                   child: EditText(
                     useIcon: true,
                     key: Key("CustomerId"),
-                    controller: customerIdController,
-                    focusNode: customerIdFocus,
-                    validate: customerIdValid,
+                    controller: customerIdBlockedController,
+                    focusNode: customerIdBlockedFocus,
+                    validate: customerIdBlockedValid,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.go,
                     textCapitalization: TextCapitalization.characters,
-                    hintText: isLimitCustomerSelected ? "Kode Pelanggan" : "Kode Corporate",
+                    hintText: "Kode Pelanggan",
                     onSubmitted: (value) {
                       customerIdFocus.unfocus();
-                      if(isLimitCustomerSelected) {
-                        getLimit();
-                      } else {
-                        getLimitCorporate();
-                      }
+                      getBlockInfo();
                     },
                     onChanged: (value) {
                       setState(() {
-                        resultLimit = null;
+                        resultBlocked = null;
                       });
+                    },
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                  width: MediaQuery.of(context).size.width,
+                  child: Button(
+                    loading: searchBlockedLoading,
+                    backgroundColor: config.darkOpacityBlueColor,
+                    child: TextView("Cari", 3, color: Colors.white, caps: true),
+                    onTap: () {
+                      getBlockInfo();
+                    },
+                  ),
+                ),
+                blockInfoDetailWidgetList.length == 0
+                ? 
+                Container()
+                :
+                ListView(
+                  scrollDirection: Axis.vertical,
+                  padding: EdgeInsets.all(0),
+                  physics: ScrollPhysics(),
+                  shrinkWrap: true,
+                  children: blockInfoDetailWidgetList,
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      if(bottomNavigationBarList[i].label == "Password") {
+        menuList.add(
+          SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                      child: EditText(
+                        useIcon: true,
+                        key: Key("OldPassword"),
+                        controller: oldPasswordController,
+                        focusNode: oldPasswordFocus,
+                        obscureText: unlockOldPassword,
+                        validate: oldPasswordValid,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.next,
+                        textCapitalization: TextCapitalization.characters,
+                        hintText: "Password Lama",
+                        alertMessage: oldPasswordErrorMessage,
+                        suffixIcon:
+                        InkWell(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 5),
+                            child: Icon(
+                              Icons.remove_red_eye,
+                              color:  unlockOldPassword ? config.lightGrayColor : config.grayColor,
+                              size: 18,
+                            ),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              unlockOldPassword = !unlockOldPassword;
+                            });
+                          },
+                        ),
+                        onSubmitted: (value) {
+                          _fieldFocusChange(context, oldPasswordFocus, newPasswordFocus);
+                        },
+                        onChanged: (value) {
+                          
+                        },
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                      child: EditText(
+                        useIcon: true,
+                        key: Key("NewPassword"),
+                        controller: newPasswordController,
+                        focusNode: newPasswordFocus,
+                        validate:  newPasswordValid,
+                        obscureText: unlockNewPassword,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.next,
+                        textCapitalization: TextCapitalization.characters,
+                        hintText: "Password Baru",
+                        alertMessage: newPasswordErrorMessage,
+                        suffixIcon:
+                          InkWell(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 5),
+                              child: Icon(
+                                Icons.remove_red_eye,
+                                color:  unlockNewPassword ? config.lightGrayColor : config.grayColor,
+                                size: 18,
+                              ),
+                            ),
+                            onTap: () {
+                              setState(() {
+                                unlockNewPassword = !unlockNewPassword;
+                              });
+                            },
+                          ),
+                        onSubmitted: (value) {
+                          _fieldFocusChange(context, newPasswordFocus, confirmPasswordFocus);
+                        },
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                      child: EditText(
+                        useIcon: true,
+                        key: Key("ConfirmPassword"),
+                        controller: confirmPasswordController,
+                        focusNode: confirmPasswordFocus,
+                        validate: confirmPasswordValid,
+                        keyboardType: TextInputType.text,
+                        obscureText: unlockConfirmPassword,
+                        textInputAction: TextInputAction.done,
+                        textCapitalization: TextCapitalization.characters,
+                        hintText: "Konfirmasi Password Baru",
+                        alertMessage: confirmPasswordErrorMessage,
+                        suffixIcon:
+                          InkWell(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 5),
+                              child: Icon(
+                                Icons.remove_red_eye,
+                                color:  unlockConfirmPassword ? config.lightGrayColor : config.grayColor,
+                                size: 18,
+                              ),
+                            ),
+                            onTap: () {
+                              setState(() {
+                                unlockConfirmPassword = !unlockConfirmPassword;
+                              });
+                            },
+                          ),
+                        onSubmitted: (value) {
+                          confirmPasswordFocus.unfocus();
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                  width: MediaQuery.of(context).size.width,
+                  child: Button(
+                    loading: changePasswordLoading,
+                    backgroundColor: config.darkOpacityBlueColor,
+                    child: TextView("UBAH", 3, color: Colors.white),
+                    onTap: () {
+                      submitValidation();
                     },
                   ),
                 ),
               ],
             ),
-            
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-              width: MediaQuery.of(context).size.width,
-              child: Button(
-                loading: searchLoading,
-                backgroundColor: config.darkOpacityBlueColor,
-                child: TextView("LANJUTKAN", 3, color: Colors.white),
-                onTap: () {
-                  if(isLimitCustomerSelected) {
-                    getLimit();
-                  } else {
-                    getLimitCorporate();
-                  }
-                },
-              ),
-            ),
-          ],
-        ),
-        HistoryLimitRequest(),
-        SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-                    child: EditText(
-                      useIcon: true,
-                      key: Key("OldPassword"),
-                      controller: oldPasswordController,
-                      focusNode: oldPasswordFocus,
-                      obscureText: unlockOldPassword,
-                      validate: oldPasswordValid,
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
-                      textCapitalization: TextCapitalization.characters,
-                      hintText: "Password Lama",
-                      alertMessage: oldPasswordErrorMessage,
-                      suffixIcon:
-                      InkWell(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                          child: Icon(
-                            Icons.remove_red_eye,
-                            color:  unlockOldPassword ? config.lightGrayColor : config.grayColor,
-                            size: 18,
-                          ),
-                        ),
-                        onTap: () {
-                          setState(() {
-                            unlockOldPassword = !unlockOldPassword;
-                          });
-                        },
-                      ),
-                      onSubmitted: (value) {
-                        _fieldFocusChange(context, oldPasswordFocus, newPasswordFocus);
-                      },
-                      onChanged: (value) {
-                        
-                      },
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-                    child: EditText(
-                      useIcon: true,
-                      key: Key("NewPassword"),
-                      controller: newPasswordController,
-                      focusNode: newPasswordFocus,
-                      validate:  newPasswordValid,
-                      obscureText: unlockNewPassword,
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
-                      textCapitalization: TextCapitalization.characters,
-                      hintText: "Password Baru",
-                      alertMessage: newPasswordErrorMessage,
-                      suffixIcon:
-                        InkWell(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 5),
-                            child: Icon(
-                              Icons.remove_red_eye,
-                              color:  unlockNewPassword ? config.lightGrayColor : config.grayColor,
-                              size: 18,
-                            ),
-                          ),
-                          onTap: () {
-                            setState(() {
-                              unlockNewPassword = !unlockNewPassword;
-                            });
-                          },
-                        ),
-                      onSubmitted: (value) {
-                        _fieldFocusChange(context, newPasswordFocus, confirmPasswordFocus);
-                      },
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-                    child: EditText(
-                      useIcon: true,
-                      key: Key("ConfirmPassword"),
-                      controller: confirmPasswordController,
-                      focusNode: confirmPasswordFocus,
-                      validate: confirmPasswordValid,
-                      keyboardType: TextInputType.text,
-                      obscureText: unlockConfirmPassword,
-                      textInputAction: TextInputAction.done,
-                      textCapitalization: TextCapitalization.characters,
-                      hintText: "Konfirmasi Password Baru",
-                      alertMessage: confirmPasswordErrorMessage,
-                      suffixIcon:
-                        InkWell(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 5),
-                            child: Icon(
-                              Icons.remove_red_eye,
-                              color:  unlockConfirmPassword ? config.lightGrayColor : config.grayColor,
-                              size: 18,
-                            ),
-                          ),
-                          onTap: () {
-                            setState(() {
-                              unlockConfirmPassword = !unlockConfirmPassword;
-                            });
-                          },
-                        ),
-                      onSubmitted: (value) {
-                        confirmPasswordFocus.unfocus();
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                width: MediaQuery.of(context).size.width,
-                child: Button(
-                  loading: changePasswordLoading,
-                  backgroundColor: config.darkOpacityBlueColor,
-                  child: TextView("UBAH", 3, color: Colors.white),
-                  onTap: () {
-                    submitValidation();
-                  },
-                ),
-              ),
-            ],
-          ),
-        )
+          )
+        );
+      }
 
-
-        // Profile(),
-        
-      ].where((c) => c != null).toList();
     }
 
     return Scaffold(
@@ -1341,6 +1081,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                               await prefs.remove("max_limit");
                               await prefs.remove("fcmToken");
                               await prefs.remove("get_user_login");
+                              await prefs.remove("module_privilege");
                               await FirebaseMessaging.instance.deleteToken();
                               await prefs.clear();
                               Navigator.pushReplacementNamed(
@@ -1367,10 +1108,12 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         ),
       )
       : null,
-      body: Container(
+      body: menuList.length > 0 ?
+      Container(
         child: menuList[currentIndex],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
+      ) : null,
+      bottomNavigationBar: menuList.length > 0 ?
+      BottomNavigationBar(
         selectedFontSize: 16,
         unselectedFontSize: 14,
         selectedIconTheme: IconThemeData(color: config.darkOpacityBlueColor),
@@ -1383,344 +1126,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         onTap: _selectedTab,  
         elevation: 5,
         items: bottomNavigationBarList
-        // items: <BottomNavigationBarItem>[
-        //   BottomNavigationBarItem(icon: Icon(CupertinoIcons.money_dollar), label: "Limit"),
-        //   BottomNavigationBarItem(icon: Icon(Icons.change_circle), label: "Riwayat"),
-        //   BottomNavigationBarItem(icon: Icon(Icons.lock), label: "Password"),
-        // ]
-      ),
-      
-      
-      // Container(
-      //   child: PersistentTabView(
-      //     context,
-      //     controller: tabController,
-      //     screens: menuList,
-      //     items: bottomBarItems(),
-      //     confineInSafeArea: true,
-      //     backgroundColor: Colors.white, // Default is Colors.white.
-      //     handleAndroidBackButtonPress: true, // Default is true.
-      //     resizeToAvoidBottomInset: true, // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
-      //     stateManagement: true, // Default is true.
-      //     hideNavigationBarWhenKeyboardShows: true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
-      //     decoration: NavBarDecoration(
-      //       borderRadius: BorderRadius.circular(32),
-      //       colorBehindNavBar: Colors.white,
-      //       boxShadow: [
-      //         BoxShadow(
-      //           color: Colors.grey.withOpacity(0.5),
-      //           spreadRadius: 5,
-      //           blurRadius: 7,
-      //           offset: Offset(0, 3),
-      //         ),
-      //       ],
-      //     ),
-      //     onItemSelected: (int) {
-      //       printHelp("get select "+ int.toString());
-      //       setState(() {
-      //         currentMenuIndex = int;
-      //         if(int == 0 || int == 2) {
-      //           if(int == 0) {
-      //             dashboardTitle = "Tambah Limit";
-      //           } else {
-      //             dashboardTitle = "Ubah Status Blocked";
-      //           }
-      //           isHomePage = true;
-      //         } else {
-      //           isHomePage = false;
-      //         }
-      //       }); // This is required to update the nav bar if Android back button is pressed
-      //     },
-      //     popAllScreensOnTapOfSelectedTab: true,
-      //     popActionScreens: PopActionScreensType.all,
-      //     itemAnimationProperties: ItemAnimationProperties( // Navigation Bar's items animation properties.
-      //       duration: Duration(milliseconds: 200),
-      //       curve: Curves.ease,
-      //     ),
-      //     screenTransitionAnimation: ScreenTransitionAnimation( // Screen transition animation on change of selected tab.
-      //       animateTabTransition: true,
-      //       curve: Curves.ease,
-      //       duration: Duration(milliseconds: 200),
-      //     ),
-      //     navBarStyle: NavBarStyle.style6, // Choose the nav bar style with this property.
-      //   ),
-      // )
-      
-      // CustomScrollView(
-      //   slivers: <Widget>[
-      //     SliverAppBar(
-      //       pinned: true,
-      //       snap: false,
-      //       floating: false,
-      //       expandedHeight: 160.0,
-      //       flexibleSpace: const FlexibleSpaceBar(
-      //         title: Text('SliverAppBar'),
-      //         background: FlutterLogo(),
-      //       ),
-      //     ),
-      //     const SliverToBoxAdapter(
-      //       child: SizedBox(
-      //         height: 20,
-      //         child: Center(
-      //           child: Text('Scroll to see the SliverAppBar in effect.'),
-      //         ),
-      //       ),
-      //     ),
-      //     SliverList(
-      //       delegate: SliverChildBuilderDelegate(
-      //         (BuildContext context, int index) {
-      //           return Container(
-      //             color: index.isOdd ? Colors.white : Colors.black12,
-      //             height: 100.0,
-      //             child: Center(
-      //               child: Text('$index', textScaleFactor: 5),
-      //             ),
-      //           );
-      //         },
-      //         childCount: 20,
-      //       ),
-      //     ),
-      //   ],
-      // ),
-
-      
-      
-      // bottomNavigationBar: PersistentTabView(
-      //   context,
-      //   controller: tabController,
-      //   screens: menuList,
-      //   items: bottomBarItems(),
-      //   confineInSafeArea: true,
-      //   backgroundColor: Colors.white, // Default is Colors.white.
-      //   handleAndroidBackButtonPress: true, // Default is true.
-      //   resizeToAvoidBottomInset: true, // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
-      //   stateManagement: true, // Default is true.
-      //   hideNavigationBarWhenKeyboardShows: true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
-      //   decoration: NavBarDecoration(
-      //     borderRadius: BorderRadius.circular(10.0),
-      //     colorBehindNavBar: Colors.white,
-      //   ),
-      //   popAllScreensOnTapOfSelectedTab: true,
-      //   popActionScreens: PopActionScreensType.all,
-      //   itemAnimationProperties: ItemAnimationProperties( // Navigation Bar's items animation properties.
-      //     duration: Duration(milliseconds: 200),
-      //     curve: Curves.ease,
-      //   ),
-      //   screenTransitionAnimation: ScreenTransitionAnimation( // Screen transition animation on change of selected tab.
-      //     animateTabTransition: true,
-      //     curve: Curves.ease,
-      //     duration: Duration(milliseconds: 200),
-      //   ),
-      //   navBarStyle: NavBarStyle.style6, // Choose the nav bar style with this property.
-      // )
-      
-      
-      // WillPopScope(
-      //   onWillPop: willPopScope,
-      //   child: CustomScrollView(
-      //     slivers: <Widget>[
-      //       SliverAppBar(
-      //         pinned: true,
-      //         expandedHeight: 140,
-      //         flexibleSpace: FlexibleSpaceBar(
-      //           title: TextView(dashboardTitle, 3),
-      //           centerTitle: true,
-      //         ),
-      //         title: Container(
-      //           child: Row(
-      //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //             children: [
-      //               TextView("Selamat Datang, " + user_login.toUpperCase(), 3),
-      //               InkWell(
-      //                 onTap: () {
-      //                   Alert(
-      //                     context: context,
-      //                     title: "Konfirmasi,",
-      //                     content: Text("Apakah Anda yakin ingin keluar dari aplikasi?"),
-      //                     cancel: true,
-      //                     type: "warning",
-      //                     defaultAction: () async {
-      //                       SharedPreferences prefs = await SharedPreferences.getInstance();
-      //                       await prefs.remove("limit_dmd");
-      //                       await prefs.remove("request_limit");
-      //                       await prefs.remove("user_code_request");
-      //                       await prefs.remove("user_code");
-      //                       await prefs.remove("max_limit");
-      //                       await prefs.remove("fcmToken");
-      //                       await prefs.remove("get_user_login");
-      //                       await FirebaseMessaging.instance.deleteToken();
-      //                       await prefs.clear();
-      //                       Navigator.pushReplacementNamed(
-      //                         context,
-      //                         "login",
-      //                       );
-      //                     }
-      //                   );
-      //               },
-      //               child: Container(
-      //                 child:Icon (Icons.logout, size: 30),
-      //                 ),
-      //               ),
-      //             ],
-      //           ),
-      //         ),
-      //       ),
-      //       // SliverToBoxAdapter(
-      //       //   child: Container(
-      //       //     child: menuList[currentIndex]
-      //       //   ),
-      //       // ),
-
-      //       // SliverList(
-      //       //   delegate: SliverChildBuilderDelegate(
-      //       //     (BuildContext context, int index) {
-      //       //       return Container(
-      //       //         child: menuList[currentIndex]
-      //       //       );
-      //       //     },
-      //       //   ),
-      //       // ),
-
-      //       SliverList(
-      //         delegate: SliverChildBuilderDelegate((context, index) {
-      //           return Container(
-      //             margin: EdgeInsets.symmetric(vertical: 30),
-      //             child: menuList[currentIndex]
-      //           );
-      //         },  
-      //         childCount: 1),
-      //       ),
-
-      //     ]
-      //   ),
-      // ),
-      
-      // bottomNavigationBar: 
-      
-      
-      // BottomBarWithSheet(
-      //   disableMainActionButton: true,
-      //   controller: _bottomBarController,
-      //   bottomBarTheme: BottomBarTheme(
-      //     mainButtonPosition: MainButtonPosition.middle,
-      //     decoration: BoxDecoration(
-      //       color: Colors.white,
-      //       borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-      //       boxShadow: [
-      //         BoxShadow(
-      //           color: Colors.grey.withOpacity(0.5),
-      //           spreadRadius: 5,
-      //           blurRadius: 7,
-      //           offset: Offset(0, 3), // changes position of shadow
-      //         ),
-      //       ],
-      //     ),
-      //     heightOpened: 350,
-      //     itemIconColor: config.grayColor,
-      //     selectedItemIconColor: config.darkOpacityBlueColor,
-      //     itemTextStyle: TextStyle(
-      //       color: config.grayColor,
-      //       fontSize: 12,
-      //       fontFamily: "WorkSans",
-      //       fontWeight: FontWeight.bold
-      //     ),
-      //     selectedItemTextStyle: TextStyle(
-      //       color: config.darkOpacityBlueColor,
-      //       fontSize: 14,
-      //       fontFamily: "WorkSans",
-      //       fontWeight: FontWeight.bold
-      //     ),
-      //   ),
-      //   mainActionButtonTheme: MainActionButtonTheme(
-      //     size: 60,
-      //     color: config.darkOpacityBlueColor,
-      //     icon: Icon(
-      //       Icons.add,
-      //       color: Colors.white,
-      //       size: 32,
-      //     ),
-      //   ),
-      //   onSelectItem: (index) {
-      //     printHelp("get index "+index.toString());
-      //     setState(() {
-      //       if(index == 0){
-      //         dashboardTitle = "Blok Pelanggan";
-      //       } else if(index == 1) {
-      //         dashboardTitle = "Ubah Password";
-      //       }  
-      //     });
-          
-      //   },
-      //   sheetChild: SingleChildScrollView(
-      //     scrollDirection: Axis.vertical,
-      //     child: Container(
-      //       child: Column(
-      //         mainAxisAlignment: MainAxisAlignment.center,
-      //         mainAxisSize: MainAxisSize.min,
-      //         children: [                
-      //           Container(
-      //             margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-      //             child: Button(
-      //               backgroundColor: config.darkOpacityBlueColor,
-      //               child: TextView("Tambah Limit", 3, color: Colors.white),
-      //               onTap: () {
-      //                 _bottomBarController.toggleSheet();
-      //                 setState(() {
-      //                   customerIdController.text = "";
-      //                   result = null;
-      //                 });
-      //                 Navigator.pushNamed(
-      //                     context,
-      //                     "addLimit"
-      //                 );
-      //               },
-      //             ),
-      //           ),
-      //           Container(
-      //             margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-      //             child: Button(
-      //               backgroundColor: config.darkOpacityBlueColor,
-      //               child: TextView("Tambah Limit Corporate", 3, color: Colors.white),
-      //               onTap: () {
-      //                 _bottomBarController.toggleSheet();
-      //                 setState(() {
-      //                   customerIdController.text = "";
-      //                   result = null;
-      //                 });
-      //                 Navigator.pushNamed(
-      //                     context,
-      //                     "addLimitCorporate"
-      //                 );
-      //               },
-      //             ),
-      //           ),
-      //           Container(
-      //             margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-      //             child: Button(
-      //               backgroundColor: config.darkOpacityBlueColor,
-      //               child: TextView("Riwayat Permintaan Limit", 3, color: Colors.white),
-      //               onTap: () {
-      //                 _bottomBarController.toggleSheet();
-      //                 Navigator.pushNamed(
-      //                     context,
-      //                     "historyLimitRequest"
-      //                 );
-      //               },
-      //             ),
-      //           ),
-      //         ],
-      //       ),
-      //     ),
-      //   ),
-      //   items: [
-      //     BottomBarWithSheetItem(icon: Icons.money, label: "Limit"),
-      //     BottomBarWithSheetItem(icon: Icons.change_circle, label: "Riwayat"),
-      //     BottomBarWithSheetItem(icon: Icons.not_interested, label: "Blocked"),
-      //     BottomBarWithSheetItem(icon: Icons.lock, label: "Password"),
-      //   ],
-      // )
-
-
+      ) : null,
     );
   }
 

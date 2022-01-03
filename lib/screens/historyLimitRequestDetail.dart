@@ -55,6 +55,9 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
 
   final currencyFormatter = NumberFormat('#,##0', 'ID');
 
+  bool checkModulePrivilegeLoading = true;
+  bool isNeedApproval = false;
+
   @override
   void initState() {
     super.initState();
@@ -74,6 +77,10 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     });
 
     user_code = prefs.getString('user_code');
+
+    if(checkModulePrivilegeLoading) {
+      checkModulePrivilege();
+    }
 
     final _resultObject = jsonDecode(result.data.toString());
 
@@ -127,6 +134,24 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
       prefs.setInt("limit_dmd", resultObject[0]["limit_dmd"]);
     }
     
+  }
+
+  checkModulePrivilege() async {
+    setState(() {
+      checkModulePrivilegeLoading = true;
+      isNeedApproval = false;
+    });
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> privilegeList = prefs.getStringList("module_privilege") ?? [];
+
+    if(privilegeList.contains("LIMITREQUESTAPPROVAL")) {
+      isNeedApproval = true;
+    }
+
+    setState(() {
+      checkModulePrivilegeLoading = false;
+      isNeedApproval = isNeedApproval;
+    });
   }
 
 
@@ -1667,7 +1692,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                 // int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) < 1500000000
                 // (user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc"))
 
-                (pageType == 1 || pageType == 4) && (user_login.toLowerCase() == "tanto" || user_login.toLowerCase() == "hermawan" || (user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc")) ) ?
+                (pageType == 1 || pageType == 4) && isNeedApproval && user_code_request.toLowerCase() != user_login.toLowerCase() ?
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -1679,7 +1704,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                           key: Key("submit"),
                           loading: acceptLimitRequestLoading,
                           backgroundColor: config.darkOpacityBlueColor,
-                          child: user_login.toLowerCase().contains("dsd") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ? TextView("acc tanto", 3, caps: true) : TextView("terima", 3, caps: true),
+                          child: user_code_request.toLowerCase().contains("kc") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ? TextView("acc tanto", 3, caps: true) : TextView("terima", 3, caps: true),
                           onTap: () {
                             updateLimitRequest(1);
                           },
