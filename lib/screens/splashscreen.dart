@@ -1,13 +1,10 @@
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_range_download/dio_range_download.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:open_file/open_file.dart';
 // import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
@@ -62,13 +59,6 @@ class SplashScreenState extends State<SplashScreen> {
 
   var fileDownloaded = 0;
 
-  List<_TaskInfo> _tasks;
-  List<_ItemHolder> _items;
-  bool _isLoading;
-  bool _permissionReady;
-  String _localPath;
-  ReceivePort _port = ReceivePort();
-
   void initializeFlutterFire() async {
     try {
       // Wait for Firebase to initialize and set `_initialized` state to true
@@ -93,128 +83,9 @@ class SplashScreenState extends State<SplashScreen> {
 
     final firebaseMessaging = PushNotificationService();
     firebaseMessaging.setNotifications();
-
-    _bindBackgroundIsolate();
-    FlutterDownloader.registerCallback(downloadCallback);
-    _isLoading = true;
-    _permissionReady = false;
-    _prepare();
     
     super.initState();
   }
-
-  void _bindBackgroundIsolate() {
-    bool isSuccess = IsolateNameServer.registerPortWithName(
-        _port.sendPort, 'downloader_send_port');
-    if (!isSuccess) {
-      _unbindBackgroundIsolate();
-      _bindBackgroundIsolate();
-      return;
-    }
-    _port.listen((dynamic data) {
-      if (debug) {
-        print('UI Isolate Callback: $data');
-      }
-      String id = data[0];
-      DownloadTaskStatus status = data[1];
-      int progress = data[2];
-
-      if (_tasks != null && _tasks.isNotEmpty) {
-        final task = _tasks.firstWhere((task) => task.taskId == id);
-        setState(() {
-          task.status = status;
-          task.progress = progress;
-        });
-      }
-    });
-  }
-
-  void _unbindBackgroundIsolate() {
-    IsolateNameServer.removePortNameMapping('downloader_send_port');
-  }
-
-  static void downloadCallback(
-      String id, DownloadTaskStatus status, int progress) {
-    if (debug) {
-      print(
-          'Background Isolate Callback: task ($id) is in status ($status) and process ($progress)');
-    }
-    final SendPort send =
-        IsolateNameServer.lookupPortByName('downloader_send_port');
-    send.send([id, status, progress]);
-  }
-
-
-  Future<Null> _prepare() async {
-    final tasks = await FlutterDownloader.loadTasks();
-
-    int count = 0;
-    _tasks = [];
-    _items = [];
-
-    String downloadPath = await getFilePath(config.apkName+".apk");
-
-    final _documents = [
-    {
-      'name': 'TambahLimit.apk',
-      'link': downloadPath
-    }
-  ];
-
-    _tasks.addAll(_documents.map((document) =>
-        _TaskInfo(name: document['name'], link: document['link'])));
-
-    for (int i = count; i < _tasks.length; i++) {
-      _items.add(_ItemHolder(name: _tasks[i].name, task: _tasks[i]));
-      count++;
-    }
-
-    tasks.forEach((task) {
-      for (_TaskInfo info in _tasks) {
-        if (info.link == task.url) {
-          info.taskId = task.taskId;
-          info.status = task.status;
-          info.progress = task.progress;
-        }
-      }
-    });
-
-    _permissionReady = await checkAppsPermission();
-
-    if (_permissionReady) {
-      await _prepareSaveDir();
-    }
-
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  Future<void> _prepareSaveDir() async {
-    _localPath = await getFilePath(config.apkName+".apk");
-    final savedDir = Directory(_localPath);
-    bool hasExisted = await savedDir.exists();
-    if (!hasExisted) {
-      savedDir.create();
-    }
-  }
-
-  // Future<String> _findLocalPath() async {
-  //   var externalStorageDirPath;
-  //   if (Platform.isAndroid) {
-  //     try {
-  //       externalStorageDirPath = await AndroidPathProvider.downloadsPath;
-  //     } catch (e) {
-  //       final directory = await getExternalStorageDirectory();
-  //       externalStorageDirPath = directory?.path;
-  //     }
-  //   } else if (Platform.isIOS) {
-  //     externalStorageDirPath =
-  //         (await getApplicationDocumentsDirectory()).absolute.path;
-  //   }
-  //   return externalStorageDirPath;
-  // }
-
 
   didChangeDependencies() async {
     super.didChangeDependencies();
@@ -380,65 +251,56 @@ class SplashScreenState extends State<SplashScreen> {
 
           // });
 
-          // dio.interceptors.add(
-          //   RetryOnConnectionChangeInterceptor(
-          //     requestRetrier: DioConnectivityRequestRetrier(
-          //       dio: dio,
-          //       connectivity: Connectivity(),
-          //     ),
-          //   ),
-          // );
+          try {
+            await downloadWithChunks(url, downloadPath, total: totalDownloaded, onReceiveProgress: (received, total) {
+              if (total != -1) {
+                print('${(received / total * 100).floor()}%');
+                _setState(() {
+                  // totalDownloaded+=rcv;
+                  // progressValue = (received / total * 100)/100;
+                  // progressText = ((received / total) * 100).toStringAsFixed(0);
 
-          // try {
-          //   await downloadWithChunks(url, downloadPath, total: totalDownloaded, onReceiveProgress: (received, total) {
-          //     if (total != -1) {
-          //       print('${(received / total * 100).floor()}%');
-          //       _setState(() {
-          //         // totalDownloaded+=rcv;
-          //         // progressValue = (received / total * 100)/100;
-          //         // progressText = ((received / total) * 100).toStringAsFixed(0);
+                  progressValue = (received / fileSize * 100)/100;
+                  progressText = ((received / fileSize) * 100).toStringAsFixed(0);
+                });
 
-          //         progressValue = (received / fileSize * 100)/100;
-          //         progressText = ((received / fileSize) * 100).toStringAsFixed(0);
-          //       });
-
-          //       if (progressText == '100') {
-          //         _setState(() {
-          //           isDownloadNewVersion = true;
-          //         });
-          //       } else if (double.parse(progressText) < 100) {}
+                if (progressText == '100') {
+                  _setState(() {
+                    isDownloadNewVersion = true;
+                  });
+                } else if (double.parse(progressText) < 100) {}
 
 
-          //     }
-          //   });
+              }
+            });
 
-          //   _setState(() {
-          //     if (progressText == '100') {
-          //       isDownloadNewVersion = true;
-          //     }
+            _setState(() {
+              if (progressText == '100') {
+                isDownloadNewVersion = true;
+              }
 
-          //     isDownloadNewVersion = false;
-          //   });
+              isDownloadNewVersion = false;
+            });
 
-          //   Navigator.of(context).pop();
-          //   // var directory = await getApplicationDocumentsDirectory(); OpenFile.open(downloadPath);
+            Navigator.of(context).pop();
+            // var directory = await getApplicationDocumentsDirectory(); OpenFile.open(downloadPath);
 
-          //   setState(() {
-          //     isLoadingVersion = false;
-          //     isDownloadNewVersion = false;
-          //   });
+            setState(() {
+              isLoadingVersion = false;
+              isDownloadNewVersion = false;
+            });
 
-          //   printHelp("MASUK SELESAI");
-          //   // String downloadPath = await getFilePath(config.apkName+".apk");
-          //   OpenFile.open(downloadPath);
+            printHelp("MASUK SELESAI");
+            // String downloadPath = await getFilePath(config.apkName+".apk");
+            OpenFile.open(downloadPath);
 
-          // } catch (e) {
-          //   printHelp("masuk resume");
-          //   print(e);
-          //   setState(() {
-          //     isRetryDownload = true;
-          //   });
-          // }    
+          } catch (e) {
+            printHelp("masuk resume");
+            print(e);
+            setState(() {
+              isRetryDownload = true;
+            });
+          }    
 
         } catch (e) {
 
@@ -448,59 +310,6 @@ class SplashScreenState extends State<SplashScreen> {
 
     } else {
       //gagal terhubung
-    }
-  }
-
-  DateTime startTime;
-  rangeDownload(String url, String downloadPath) async {
-    print("start");
-    bool isStarted = false;
-    CancelToken cancelToken = CancelToken();
-
-    try {
-      Response res = await RangeDownload.downloadWithChunks(url, downloadPath,
-        //isRangeDownload: false,//Support normal download
-        // maxChunk: 6,
-        // dio: Dio(),//Optional parameters "dio".Convenient to customize request settings.
-        cancelToken: cancelToken,
-        onReceiveProgress: (received, total) {
-          if (!isStarted) {
-            startTime = DateTime.now();
-            isStarted = true;
-          }
-          if (total != -1) {
-            print("${(received / total * 100).floor()}%");
-            if (received / total * 100.floor() > 50) {
-              cancelToken.cancel();
-            }
-
-            _setState(() {
-              progressValue = (received / total * 100)/100;
-              progressText = ((received / total) * 100).toStringAsFixed(0);
-            });
-
-            if (progressText == '100') {
-              _setState(() {
-                isDownloadNewVersion = true;
-              });
-            } else if (double.parse(progressText) < 100) {}
-
-          }
-          if ((received / total * 100).floor() >= 100) {
-            var duration = (DateTime.now().millisecondsSinceEpoch -
-                    startTime.millisecondsSinceEpoch) /
-                1000;
-            print(duration.toString() + "s");
-            print(
-                (duration ~/ 60).toString() + "m" + (duration % 60).toString() + "s");
-          }
-        });
-        print(res.statusCode);
-        print(res.statusMessage);
-        print(res.data);
-    } catch(e) {
-      cancelToken.cancel();
-      printHelp("tes on catch "+ e.toString());
     }
   }
 
@@ -929,22 +738,4 @@ class SplashScreenState extends State<SplashScreen> {
     }
   }
 
-}
-
-class _TaskInfo {
-  final String name;
-  final String link;
-
-  String taskId;
-  int progress = 0;
-  DownloadTaskStatus status = DownloadTaskStatus.undefined;
-
-  _TaskInfo({this.name, this.link});
-}
-
-class _ItemHolder {
-  final String name;
-  final _TaskInfo task;
-
-  _ItemHolder({this.name, this.task});
 }

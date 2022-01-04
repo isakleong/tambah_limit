@@ -46,9 +46,8 @@ dependencies:
   permission_handler: ^8.1.6
   percent_indicator: ^3.4.0
   open_file: ^3.0.3
-  connectivity_plus: ^2.1.0
-  dio_range_download: ^1.0.0
-  flutter_downloader: ^1.7.1
+  # connectivity_plus: ^2.1.0
+  # dio_range_download: ^1.0.0
   # firebase_messaging: ^11.1.0
   # firebase_core: ^1.10.0
 

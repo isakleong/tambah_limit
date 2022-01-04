@@ -1688,10 +1688,6 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                     ),
                   ),
                 ),
-
-                // int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) < 1500000000
-                // (user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc"))
-
                 (pageType == 1 || pageType == 4) && isNeedApproval && user_code_request.toLowerCase() != user_login.toLowerCase() ?
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
