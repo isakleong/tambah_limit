@@ -145,7 +145,15 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     List<String> privilegeList = prefs.getStringList("module_privilege") ?? [];
 
     if(privilegeList.contains("LIMITREQUESTAPPROVAL")) {
-      isNeedApproval = true;
+      if(user_login.toLowerCase().contains("dsd")){
+        if(user_code_request.toLowerCase().contains("kc")){
+          isNeedApproval = true;
+        } else {
+          isNeedApproval = false;
+        }
+      } else {
+        isNeedApproval = true;
+      }
     }
 
     setState(() {
@@ -1445,7 +1453,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                   ),
                 ),
               ),
-              (pageType== 1 || pageType == 4) && (user_login.toLowerCase() == "tanto" || user_login.toLowerCase() == "hermawan" || (user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc")) ) ?
+              (pageType == 1 || pageType == 4) && isNeedApproval && user_code_request.toLowerCase() != user_login.toLowerCase() ?
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -1457,12 +1465,11 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                         key: Key("submit"),
                         loading: acceptLimitRequestLoading,
                         backgroundColor: config.darkOpacityBlueColor,
-                        child: TextView(
-                          "terima",
-                          3,
-                          caps: true,
-                        ),
+                        child: user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ? TextView("acc (sales director)", 3, caps: true) : TextView("terima", 3, caps: true),
                         onTap: () {
+                          user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ?
+                          updateLimitGabunganRequest(-1)
+                          :
                           updateLimitGabunganRequest(1);
                         },
                       ),
@@ -1700,8 +1707,11 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                           key: Key("submit"),
                           loading: acceptLimitRequestLoading,
                           backgroundColor: config.darkOpacityBlueColor,
-                          child: user_code_request.toLowerCase().contains("kc") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ? TextView("acc tanto", 3, caps: true) : TextView("terima", 3, caps: true),
+                          child: user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ? TextView("acc (sales director)", 3, caps: true) : TextView("terima", 3, caps: true),
                           onTap: () {
+                            user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ?
+                            updateLimitRequest(-1)
+                            :
                             updateLimitRequest(1);
                           },
                         ),
@@ -1731,6 +1741,10 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                 )
                 :
                 Container(),
+                (pageType == 1 || pageType == 4) && isNeedApproval && user_code_request.toLowerCase() == user_login.toLowerCase() ?
+                Container(child: Text("hehe"),)
+                :
+                Container(),
               ],
             ),
           ),
@@ -1752,11 +1766,11 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     Alert(
       context: context,
       title: "Konfirmasi,",
-      content: command == 1 ? Text("Apakah Anda yakin ingin menyetujui permintaan limit ini?") : Text("Apakah Anda yakin ingin menolak permintaan limit ini?"),
+      content: command == 1 ? Text("Apakah Anda yakin ingin menyetujui permintaan limit ini?") : command == 0 ? Text("Apakah Anda yakin ingin menolak permintaan limit ini?") : Text("Apakah Anda yakin ingin mengajukan ACC permintaan limit ini ke Sales Director?"),
       cancel: true,
       type: "warning",
       defaultAction: (){
-        command == 1 ? changeLimitRequestGabungan(1) : changeLimitRequestGabungan(0);
+        command == 1 ? changeLimitRequestGabungan(1) : command == 0 ? changeLimitRequestGabungan(0) : addRequestLimitCorporate();
       }
     );
   }
@@ -1846,14 +1860,116 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     Alert(
       context: context,
       title: "Konfirmasi,",
-      content: command == 1 ? Text("Apakah Anda yakin ingin menyetujui permintaan limit ini?") : Text("Apakah Anda yakin ingin menolak permintaan limit ini?"),
+      content: command == 1 ? Text("Apakah Anda yakin ingin menyetujui permintaan limit ini?") : command == 0 ? Text("Apakah Anda yakin ingin menolak permintaan limit ini?") : Text("Apakah Anda yakin ingin mengajukan ACC permintaan limit ini ke Sales Director?"),
       cancel: true,
       type: "warning",
       defaultAction: (){
-        command == 1 ? changeLimitRequest(1) : changeLimitRequest(0);
+        command == 1 ? changeLimitRequest(1) : command == 0 ? changeLimitRequest(0) : addRequestLimit();
       }
     );
   }
+
+  void addRequestLimit() async {
+    FocusScope.of(context).requestFocus(FocusNode());
+    setState(() {
+      acceptLimitRequestLoading = true;
+    });
+
+    Alert(context: context, loading: true, disableBackButton: true);
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String getRequestLimit = await customerAPI.addRequestLimit(context, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"${prefs.getString('user_code')}","nama_cust":"${resultObject[0]['Name']}","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}","limit_dmd_baru":"${limitDMDController.text.replaceAll(new RegExp('\\.'),'')}"}');
+
+    Navigator.of(context).pop();
+
+    if (getRequestLimit == "OK") {
+      Alert(
+          context: context,
+          title: "Terima kasih,",
+          content: Text("Permintaan sudah dikirim"),
+          cancel: false,
+          type: "success",
+          defaultAction: () {
+            if(notificationType == 0) {
+              Navigator.pop(context);  
+            } else {
+              Navigator.pop(context);
+              Navigator.popAndPushNamed(
+                context,
+                "dashboard/1"
+              );
+            }
+          }
+        );
+    } else {
+      Alert(
+          context: context,
+          title: "Maaf,",
+          content: Text(getRequestLimit),
+          cancel: false,
+          type: "error");
+    }
+
+    setState(() {
+      acceptLimitRequestLoading = false;
+    });
+  }
+
+  void addRequestLimitCorporate() async {
+    FocusScope.of(context).requestFocus(FocusNode());
+    setState(() {
+      acceptLimitRequestLoading = true;
+    });
+
+    Alert(context: context, loading: true, disableBackButton: true);
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    //var obj = {"kode_customerc": $$('#corporate_code').val(),"corporate_name":$$('#corporate_name').val(), "limit_baru": limit_baru.replace(/\./g,''), "user_code": localStorage.getItem('user_code'), "old_limit": localStorage.getItem('old_limitc')};
+
+    String getRequestLimit = await customerAPI.addRequestLimitGabungan(context, parameter: 'json={"kode_customerc":"${resultObject[0]['corporate_code']}","user_code":"${prefs.getString('user_code')}","corporate_name":"${resultObject[0]['corporate_name']}","old_limit":"${resultObject[0]['old_limit']}","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}"}');
+
+    Navigator.of(context).pop();
+
+    if(getRequestLimit == "OK"){
+      Alert(
+        context: context,
+        title: "Terima kasih,",
+        content: Text("Permintaan sudah dikirim"),
+        cancel: false,
+        type: "success",
+        defaultAction: () {
+          if(notificationType == 0) {
+            Navigator.pop(context);  
+          } else {
+            Navigator.pop(context);
+            Navigator.popAndPushNamed(
+              context,
+              "dashboard/1"
+            );
+          }
+        }
+      );
+    } else {
+      Alert(
+        context: context,
+        title: "Maaf,",
+        content: Text(getRequestLimit),
+        cancel: false,
+        type: "error"
+      );
+    }
+
+    setState(() {
+      acceptLimitRequestLoading = false;
+    });
+
+
+
+  }
+
+
 
   void changeLimitRequest(int command) async {
     FocusScope.of(context).requestFocus(FocusNode());
