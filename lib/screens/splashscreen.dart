@@ -297,19 +297,24 @@ class SplashScreenState extends State<SplashScreen> {
           } catch (e) {
             printHelp("masuk resume");
             print(e);
-            setState(() {
+            _setState(() {
               isRetryDownload = true;
             });
           }    
 
         } catch (e) {
-
+          _setState(() {
+            isRetryDownload = true;
+          });
         }
 
       }
 
     } else {
       //gagal terhubung
+      _setState(() {
+        isRetryDownload = true;
+      });
     }
   }
 
@@ -587,12 +592,12 @@ class SplashScreenState extends State<SplashScreen> {
                           children: [
                             Text("Mengunduh pembaruan aplikasi", style: new TextStyle(fontWeight: FontWeight.bold)),
                             Visibility(
-                              maintainSize: true, 
-                              maintainAnimation: true,
-                              maintainState: true,
-                              visible: !isRetryDownload,
+                              // maintainSize: true, 
+                              // maintainAnimation: true,
+                              // maintainState: true,
+                              visible: isRetryDownload,
                               child: Container(
-                                margin: EdgeInsets.symmetric(vertical: 15),
+                                margin: EdgeInsets.only(top: 15),
                                 width: MediaQuery.of(context).size.width,
                                 child: Button(
                                   // loading: loginLoading,

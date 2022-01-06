@@ -718,10 +718,10 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                             onTap: (){
                               setState(() {
                                 // customerIdController.clear();
-
+                
                                 isLimitCustomerSelected = true;
                                 isLimitCorporateSelected = false;
-
+                
                                 borderCardColor_1 = config.darkOpacityBlueColor;
                                 backgroundCardColor_1 = config.lightBlueColor;
                                 textCardColor_1 = config.grayColor;
@@ -761,10 +761,10 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                             onTap: () {
                               setState(() {
                                 // customerIdController.clear();
-
+                
                                 isLimitCustomerSelected = false;
                                 isLimitCorporateSelected = true;
-
+                
                                 borderCardColor_2 = config.darkOpacityBlueColor;
                                 backgroundCardColor_2 = config.lightBlueColor;
                                 textCardColor_2 = config.grayColor;
@@ -826,7 +826,6 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                 ),
               ],
             ),
-            
             Container(
               margin: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
               width: MediaQuery.of(context).size.width,
@@ -844,7 +843,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               ),
             ),
           ],
-        )
+               )
        );
       }
 
@@ -1109,8 +1108,11 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       )
       : null,
       body: menuList.length > 0 ?
+      // Container(
+      //   child: menuList[currentIndex],
+      // ) : null,
       Container(
-        child: menuList[currentIndex],
+        child: menuList[currentIndex], //disini
       ) : null,
       bottomNavigationBar: menuList.length > 0 ?
       BottomNavigationBar(
