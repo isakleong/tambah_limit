@@ -29,17 +29,15 @@ Future<String> ConnectionTest(String url, BuildContext context) async {
   // );
 
   final request = new Request('HEAD', Uri.parse(url))..followRedirects = false;
-  final response = await client.send(request).timeout(
-    Duration(seconds: 5),
-      onTimeout: () {
-        // time has run out, do what you wanted to do
-        return null;
-      },
-  );
-
-  // printHelp("cek debug "+url.toString()+"-----"+response.statusCode.toString());
-
   try {
+    final response = await client.send(request).timeout(
+      Duration(seconds: 10),
+        onTimeout: () {
+          // time has run out, do what you wanted to do
+          return null;
+        },
+    );
+
     if(response.statusCode == 200){
       testResult = "OK";
     } else {
@@ -48,7 +46,6 @@ Future<String> ConnectionTest(String url, BuildContext context) async {
   } catch (e) {
     testResult = "ERROR";
   }
-  
 
   return testResult;
 

@@ -387,7 +387,7 @@ class CustomerAPI {
           isAddRequestLimitSuccess = "OK";
         
         } else {
-          isAddRequestLimitSuccess = "Gagal terhubung dengan server";
+          isAddRequestLimitSuccess = "ACC permintaan limit ini telah diajukan sebelumnya\n\nMohon menunggu permintaan limit ini di-review oleh Sales Director";
         }
 
       } catch (e) {

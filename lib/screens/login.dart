@@ -113,101 +113,99 @@ class LoginState extends State<Login> {
               width: double.infinity,
               child: Image.asset("assets/illustration/bg.png", alignment: Alignment.center, fit: BoxFit.fill),
             ),
-            Container(
-              height: MediaQuery.of(context).size.height,
-              child: Center(
-                child: SingleChildScrollView(
-                  physics: ScrollPhysics(),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 0, horizontal: 30),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Hero(
-                          tag: 'logo',
-                          child: Container(
-                            width: 220,
-                            height: 220,
-                            child: Image.asset("assets/illustration/logo.png", alignment: Alignment.center, fit: BoxFit.contain),
-                          ),
+            Center(
+              child: SingleChildScrollView(
+                reverse: true,
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 30),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Hero(
+                        tag: 'logo',
+                        child: Container(
+                          width: 220,
+                          height: 220,
+                          child: Image.asset("assets/illustration/logo.png", alignment: Alignment.center, fit: BoxFit.contain),
                         ),
-                        Container(
-                          child: EditText(
-                            key: Key("Username"),
-                            controller: usernameController,
-                            keyboardType: TextInputType.text,
-                            textInputAction: TextInputAction.next,
-                            focusNode: usernameFocus,
-                            validate: usernameValid,
-                            hintText: "Username",
-                            textCapitalization: TextCapitalization.characters,
-                            onSubmitted: (value) {
-                              _fieldFocusChange(context, usernameFocus, passwordFocus);
-                            },
-                          ),
+                      ),
+                      Container(
+                        child: EditText(
+                          key: Key("Username"),
+                          controller: usernameController,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.next,
+                          focusNode: usernameFocus,
+                          validate: usernameValid,
+                          hintText: "Username",
+                          textCapitalization: TextCapitalization.characters,
+                          onSubmitted: (value) {
+                            _fieldFocusChange(context, usernameFocus, passwordFocus);
+                          },
                         ),
-                        Container(
-                          margin: EdgeInsets.symmetric(vertical: 20),
-                          child: EditText(
-                            useIcon: true,
-                            key: Key("Password"),
-                            controller: passwordController,
-                            obscureText: unlockPassword,
-                            focusNode: passwordFocus,
-                            validate: passwordValid,
-                            keyboardType: TextInputType.text,
-                            textInputAction: TextInputAction.go,
-                            hintText: "Password",
-                            suffixIcon:
-                            InkWell(
-                              child: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 5),
-                                child: Icon(
-                                  Icons.remove_red_eye,
-                                  color:  unlockPassword ? config.lightGrayColor : config.grayColor,
-                                  size: 18,
-                                ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.symmetric(vertical: 20),
+                        child: EditText(
+                          useIcon: true,
+                          key: Key("Password"),
+                          controller: passwordController,
+                          obscureText: unlockPassword,
+                          focusNode: passwordFocus,
+                          validate: passwordValid,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.go,
+                          hintText: "Password",
+                          suffixIcon:
+                          InkWell(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 5),
+                              child: Icon(
+                                Icons.remove_red_eye,
+                                color:  unlockPassword ? config.lightGrayColor : config.grayColor,
+                                size: 18,
                               ),
-                              onTap: () {
-                                setState(() {
-                                  unlockPassword = !unlockPassword;
-                                });
-                              },
                             ),
-                            onSubmitted: (value) {
-                              passwordFocus.unfocus();
-                              submitValidation();
-                            },
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.symmetric(vertical: 15),
-                          width: MediaQuery.of(context).size.width,
-                          child: Button(
-                            loading: loginLoading,
-                            backgroundColor: config.darkOpacityBlueColor,
-                            child: TextView("MASUK", 3, color: Colors.white),
                             onTap: () {
-                              submitValidation();
+                              setState(() {
+                                unlockPassword = !unlockPassword;
+                              });
                             },
                           ),
+                          onSubmitted: (value) {
+                            passwordFocus.unfocus();
+                            submitValidation();
+                          },
                         ),
-                      ],
-                    ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.symmetric(vertical: 15),
+                        width: MediaQuery.of(context).size.width,
+                        child: Button(
+                          loading: loginLoading,
+                          backgroundColor: config.darkOpacityBlueColor,
+                          child: TextView("MASUK", 3, color: Colors.white),
+                          onTap: () {
+                            submitValidation();
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 20),
+                        child: Align(
+                          alignment: Alignment.bottomRight,
+                          child: Theme(
+                            data: Theme.of(context).copyWith(canvasColor: Colors.transparent),
+                            child: TextView("v"+config.apkVersion, 3, color: config.grayColor),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 30),
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: Theme(
-                  data: Theme.of(context).copyWith(canvasColor: Colors.transparent),
-                  child: TextView("v"+config.apkVersion, 3, color: config.grayColor),
-                ),
-              ),
-            )
+            
           ],
         ),
       )

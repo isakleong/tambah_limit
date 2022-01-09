@@ -47,6 +47,14 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
   List<LimitHistory> approvedLimitHistoryList = [];
   List<LimitHistory> rejectedLimitHistoryList = [];
 
+  List<bool> selectedLimitRequestHistoryData = [true, false, false];
+  List<bool> selectedLimitApprovedHistoryData = [true, false, false];
+  List<bool> selectedLimitRejectedHistoryData = [true, false, false];
+  FocusNode focusNodeButton1 = FocusNode();
+  FocusNode focusNodeButton2 = FocusNode();
+  FocusNode focusNodeButton3 = FocusNode();
+  List<FocusNode> focusToggle;
+
   String user_login = "";
 
   @override
@@ -81,6 +89,8 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
     List<Widget> requestHistoryWidgetList = showRequestHistory(config);
     List<Widget> approvedHistoryWidgetList = showApprovedHistory(config);
     List<Widget> rejectedHistoryWidgetList = showRejectedHistory(config);
+
+    List<bool> selectionDataRequestHistory = List.generate(3, (index) => false);
 
     return DefaultTabController(
       length: 3,
@@ -148,7 +158,7 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
             headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
               return <Widget>[
                 new SliverAppBar(
-                  expandedHeight: 140,
+                  expandedHeight: 150,
                   // flexibleSpace: LayoutBuilder(builder: (context, constraints) {
                   //   top = constraints.biggest.height;
                   //   print(top);
@@ -298,8 +308,10 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                   pinned: true,
                   floating: true,
                   bottom: TabBar(
+                    isScrollable: true,
                     indicatorColor: Colors.white,
                     indicatorWeight: 3,
+                    indicatorSize: TabBarIndicatorSize.label,
                     tabs: [
                       Tab(icon: Icon(Icons.request_quote), child: TextView("Permintaan", 3)),
                       Tab(icon: Icon(Icons.check), child: TextView("Disetujui", 3)),
@@ -549,27 +561,132 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
 
     final currencyFormatter = NumberFormat('#,##0', 'ID');
 
-    for(int i = 0; i < requestLimitHistoryList.length; i++){
-      tempWidgetList.add(
-        Card(
-          margin: EdgeInsets.only(top: 20),
-          elevation: 3,
-          child: InkWell(
-            onTap: () {
-              goToHistoryLimitDetail(requestLimitHistoryList[i], 1);
+    tempWidgetList.add(
+      Center(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ToggleButtons(  
+            fillColor: config.lightOpactityBlueColor,
+            borderColor: config.darkOpacityBlueColor,
+            borderWidth: 2,
+            selectedBorderColor: config.darkOpacityBlueColor,        
+            borderRadius: BorderRadius.circular(30),
+            focusNodes: focusToggle,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: Container(
+                  child: TextView("Semua Data", 5, color: selectedLimitRequestHistoryData[0] ? config.darkOpacityBlueColor : config.grayNonActiveColor),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: Container(
+                  child: TextView("Permintaan BM", 5, color: selectedLimitRequestHistoryData[1] ? config.darkOpacityBlueColor : config.grayNonActiveColor),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: Container(
+                  child: TextView("Permintaan Saya", 5, color: selectedLimitRequestHistoryData[2] ? config.darkOpacityBlueColor : config.grayNonActiveColor),
+                ),
+              ),
+              // Icon(Icons.format_italic),
+              // Icon(Icons.link),
+            ],
+            isSelected: selectedLimitRequestHistoryData,
+            onPressed: (int index) {
+              setState(() {
+                for (int indexBtn = 0;indexBtn < selectedLimitRequestHistoryData.length;indexBtn++) {
+                  if (indexBtn == index) {
+                    selectedLimitRequestHistoryData[indexBtn] = true;
+                  } else {
+                    selectedLimitRequestHistoryData[indexBtn] = false;
+                  }
+                }
+              });
             },
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: ListTile(
-                title: TextView(requestLimitHistoryList[i].customer_code, 4),
-                subtitle: TextView(requestLimitHistoryList[i].customer_name, 4),
-                trailing: TextView("Rp " + currencyFormatter.format(int.parse(requestLimitHistoryList[i].limit)), 4),
+          ),
+        ),
+      )
+    );
+
+    if(selectedLimitRequestHistoryData[0]) {
+      for(int i = 0; i < requestLimitHistoryList.length; i++){
+        tempWidgetList.add(
+          Card(
+            margin: EdgeInsets.only(top: 20),
+            elevation: 3,
+            child: InkWell(
+              onTap: () {
+                goToHistoryLimitDetail(requestLimitHistoryList[i], 1);
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: ListTile(
+                  title: TextView(requestLimitHistoryList[i].customer_code, 4),
+                  subtitle: TextView(requestLimitHistoryList[i].customer_name, 4),
+                  trailing: TextView("Rp " + currencyFormatter.format(int.parse(requestLimitHistoryList[i].limit)), 4),
+                ),
               ),
             ),
           ),
-        ),
-      );
+        );
+      }
+
+    } else if(selectedLimitRequestHistoryData[1]) {
+      printHelp("YOI");
+      for(int i = 0; i < requestLimitHistoryList.length; i++){
+        if(requestLimitHistoryList[i].user_code.toLowerCase().contains("kc")){
+          tempWidgetList.add(
+            Card(
+              margin: EdgeInsets.only(top: 20),
+              elevation: 3,
+              child: InkWell(
+                onTap: () {
+                  goToHistoryLimitDetail(requestLimitHistoryList[i], 1);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: ListTile(
+                    title: TextView(requestLimitHistoryList[i].customer_code, 4),
+                    subtitle: TextView(requestLimitHistoryList[i].customer_name, 4),
+                    trailing: TextView("Rp " + currencyFormatter.format(int.parse(requestLimitHistoryList[i].limit)), 4),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+      }
+
+    } else {
+      for(int i = 0; i < requestLimitHistoryList.length; i++){
+        if(requestLimitHistoryList[i].user_code.contains(user_login)){
+          tempWidgetList.add(
+            Card(
+              margin: EdgeInsets.only(top: 20),
+              elevation: 3,
+              child: InkWell(
+                onTap: () {
+                  goToHistoryLimitDetail(requestLimitHistoryList[i], 1);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: ListTile(
+                    title: TextView(requestLimitHistoryList[i].customer_code, 4),
+                    subtitle: TextView(requestLimitHistoryList[i].customer_name, 4),
+                    trailing: TextView("Rp " + currencyFormatter.format(int.parse(requestLimitHistoryList[i].limit)), 4),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+      }
     }
+
+    
 
     return tempWidgetList;
 
@@ -589,23 +706,34 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
 
       Navigator.of(context).pop();
 
-      if(type == 1) {
-        Navigator.pushNamed(
-          context,
-          "historyLimitRequestDetail/${tempLimitHistory.id}/4",
-          arguments: result_,
-        );
-      } else if(type == 2) {
-        Navigator.pushNamed(
-          context,
-          "historyLimitRequestDetail/${tempLimitHistory.id}/5",
-          arguments: result_,
-        );
+      if(result_.success == 1) {
+        if(type == 1) {
+          Navigator.pushNamed(
+            context,
+            "historyLimitRequestDetail/${tempLimitHistory.id}/4",
+            arguments: result_,
+          );
+        } else if(type == 2) {
+          Navigator.pushNamed(
+            context,
+            "historyLimitRequestDetail/${tempLimitHistory.id}/5",
+            arguments: result_,
+          );
+        } else {
+          Navigator.pushNamed(
+            context,
+            "historyLimitRequestDetail/${tempLimitHistory.id}/6",
+            arguments: result_,
+          );
+        }
       } else {
-        Navigator.pushNamed(
-          context,
-          "historyLimitRequestDetail/${tempLimitHistory.id}/6",
-          arguments: result_,
+        Alert(
+          context: context,
+          title: "Maaf,",
+          content: Text(result_.message),
+          cancel: false,
+          type: "error",
+          defaultAction: () {}
         );
       }
 
@@ -616,35 +744,32 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
 
       final SharedPreferences sharedPreferences = await _sharedPreferences;
       await sharedPreferences.setInt("request_limit", int.parse(tempLimitHistory.limit));
-
-      // if(tempLimitHistory.limit_dmd != "null") {
-      //   printHelp("cek why "+ tempLimitHistory.limit_dmd);
-        
-      // }
       try {
         await sharedPreferences.setInt("request_limit_dmd", int.parse(tempLimitHistory.limit_dmd));
       } catch(e) {
 
       }
-      // await sharedPreferences.setInt("request_limit_dmd", int.parse(tempLimitHistory.limit_dmd));
       await sharedPreferences.setString("user_code_request", tempLimitHistory.user_code);
 
       Navigator.of(context).pop();
 
-      Navigator.pushNamed(
-        context,
-        "historyLimitRequestDetail/${tempLimitHistory.id}/$type",
-        arguments: result_,
-      );
-
+      if(result_.success == 1) {
+        Navigator.pushNamed(
+          context,
+          "historyLimitRequestDetail/${tempLimitHistory.id}/$type",
+          arguments: result_,
+        );
+      } else {
+        Alert(
+          context: context,
+          title: "Maaf,",
+          content: Text(result_.message),
+          cancel: false,
+          type: "error",
+          defaultAction: () {}
+        );
+      }
     }
-
-    // var tempResultData = [];
-    // tempResultData.add(requestLimitHistoryList[i].toJson());
-    // printHelp(jsonEncode(tempResultData));
-    // var parsedJson = jsonEncode(tempResultData);
-    // Result tempResult = new Result(success: 1, data: parsedJson);
-
   }
 
   showApprovedHistory(Configuration config) {
@@ -652,26 +777,150 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
 
     final currencyFormatter = NumberFormat('#,##0', 'ID');
 
-    for(int i = 0; i < approvedLimitHistoryList.length; i++){
-      tempWidgetList.add(
-        Card(
-          margin: EdgeInsets.only(top: 20),
-          elevation: 3,
-          child: InkWell(
-            onTap: (){
-              goToHistoryLimitDetail(approvedLimitHistoryList[i], 2);
+    tempWidgetList.add(
+      Center(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ToggleButtons(  
+            fillColor: config.lightOpactityBlueColor,
+            borderColor: config.darkOpacityBlueColor,
+            borderWidth: 2,
+            selectedBorderColor: config.darkOpacityBlueColor,        
+            borderRadius: BorderRadius.circular(30),
+            focusNodes: focusToggle,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: Container(
+                  child: TextView("Semua Data", 5, color: selectedLimitApprovedHistoryData[0] ? config.darkOpacityBlueColor : config.grayNonActiveColor),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: Container(
+                  child: TextView("Permintaan BM", 5, color: selectedLimitApprovedHistoryData[1] ? config.darkOpacityBlueColor : config.grayNonActiveColor),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: Container(
+                  child: TextView("Permintaan Saya", 5, color: selectedLimitApprovedHistoryData[2] ? config.darkOpacityBlueColor : config.grayNonActiveColor),
+                ),
+              ),
+              // Icon(Icons.format_italic),
+              // Icon(Icons.link),
+            ],
+            isSelected: selectedLimitApprovedHistoryData,
+            onPressed: (int index) {
+              setState(() {
+                for (int indexBtn = 0;indexBtn < selectedLimitApprovedHistoryData.length;indexBtn++) {
+                  if (indexBtn == index) {
+                    selectedLimitApprovedHistoryData[indexBtn] = true;
+                  } else {
+                    selectedLimitApprovedHistoryData[indexBtn] = false;
+                  }
+                }
+              });
             },
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: ListTile(
-                title: TextView(approvedLimitHistoryList[i].customer_code, 4),
-                subtitle: TextView(approvedLimitHistoryList[i].customer_name, 4),
-                trailing: TextView("Rp " + currencyFormatter.format(int.parse(approvedLimitHistoryList[i].limit)), 4),
+          ),
+        ),
+      )
+    );
+
+
+    if(selectedLimitApprovedHistoryData[0]) {
+      for(int i = 0; i < approvedLimitHistoryList.length; i++){
+        tempWidgetList.add(
+          Card(
+            margin: EdgeInsets.only(top: 20),
+            elevation: 3,
+            child: InkWell(
+              onTap: (){
+                goToHistoryLimitDetail(approvedLimitHistoryList[i], 2);
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: ListTile(
+                  title: TextView(approvedLimitHistoryList[i].customer_code, 4),
+                  subtitle: TextView(approvedLimitHistoryList[i].customer_name, 4),
+                  trailing: TextView("Rp " + currencyFormatter.format(int.parse(approvedLimitHistoryList[i].limit)), 4),
+                ),
               ),
             ),
           ),
-        ),
-      );
+        );
+      }
+
+    } else if(selectedLimitApprovedHistoryData[1]) {
+      for(int i = 0; i < approvedLimitHistoryList.length; i++){
+        if(approvedLimitHistoryList[i].user_code.toLowerCase().contains("kc")){
+          // tempWidgetList.add(
+          //   Card(
+          //     margin: EdgeInsets.only(top: 20),
+          //     elevation: 3,
+          //     child: InkWell(
+          //       onTap: (){
+          //         goToHistoryLimitDetail(approvedLimitHistoryList[i], 2);
+          //       },
+          //       child: Padding(
+          //         padding: const EdgeInsets.all(10),
+          //         child: ListTile(
+          //           title: TextView(approvedLimitHistoryList[i].user_code, 4),
+          //           subtitle: TextView(approvedLimitHistoryList[i].customer_name, 4),
+          //           trailing: TextView("Rp " + currencyFormatter.format(int.parse(approvedLimitHistoryList[i].limit)), 4),
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // );
+        }
+      }
+
+      if(tempWidgetList.length == 1) {
+        tempWidgetList.add(
+          Align(alignment: Alignment.bottomCenter, child: Text("hehe"))
+          // Container(
+          //   margin: EdgeInsets.symmetric(horizontal: 15),
+          //   child: Column(
+          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //     children: [
+          //       Container(
+          //         child: Image.asset("assets/illustration/accepted-history.png", alignment: Alignment.center, fit: BoxFit.fill, scale: 2.75)
+          //       ),
+          //       SizedBox(height: 30),
+          //       Container(
+          //         child: TextView("Tidak ada data permintaan limit\nyang disetujui", 3, color: config.grayColor, align: TextAlign.center),
+          //       )
+          //     ],
+          //   )
+          // )
+        );
+      }
+
+    } else {
+      for(int i = 0; i < approvedLimitHistoryList.length; i++){
+        if(approvedLimitHistoryList[i].user_code.contains(user_login)){
+          tempWidgetList.add(
+            Card(
+              margin: EdgeInsets.only(top: 20),
+              elevation: 3,
+              child: InkWell(
+                onTap: (){
+                  goToHistoryLimitDetail(approvedLimitHistoryList[i], 2);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: ListTile(
+                    title: TextView(approvedLimitHistoryList[i].customer_code, 4),
+                    subtitle: TextView(approvedLimitHistoryList[i].customer_name, 4),
+                    trailing: TextView("Rp " + currencyFormatter.format(int.parse(approvedLimitHistoryList[i].limit)), 4),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+      }
     }
 
     return tempWidgetList;

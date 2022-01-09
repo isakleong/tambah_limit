@@ -4,10 +4,12 @@ import 'package:currency_text_input_formatter/currency_text_input_formatter.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tambah_limit/models/limitHistoryModel.dart';
 import 'package:tambah_limit/models/resultModel.dart';
 import 'package:tambah_limit/resources/customerAPI.dart';
+import 'package:tambah_limit/resources/limitHistoryAPI.dart';
 import 'package:tambah_limit/settings/configuration.dart';
 import 'package:tambah_limit/tools/function.dart';
 import 'package:tambah_limit/widgets/TextView.dart';
@@ -58,6 +60,9 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
   bool checkModulePrivilegeLoading = true;
   bool isNeedApproval = false;
 
+  bool getLimitRequestApprovalStatusLoading = true;
+  bool isLimitRequestApprovalExist = false;
+
   @override
   void initState() {
     super.initState();
@@ -83,6 +88,11 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     }
 
     final _resultObject = jsonDecode(result.data.toString());
+
+    //get limit request approval status
+    if(getLimitRequestApprovalStatusLoading) {
+      getLimitRequestApprovalStatus();
+    }
 
     if(pageType > 3){
       // final _newValue = currencyFormatter.format(_resultObject[0]["old_limit"]).toString();
@@ -134,6 +144,42 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
       prefs.setInt("limit_dmd", resultObject[0]["limit_dmd"]);
     }
     
+  }
+
+  getLimitRequestApprovalStatus() async {
+    setState(() {
+      getLimitRequestApprovalStatusLoading = true;
+      isLimitRequestApprovalExist = false;
+    });
+
+    String getLimitRequestApprovalStatus = await limitHistoryAPI.getLimitRequestApprovalStatus(context, parameter: 'json={"id_approval":"${widget.id.toString()}"}');
+
+    try {
+      if(int.parse(getLimitRequestApprovalStatus) > 0) {
+        isLimitRequestApprovalExist = true;
+      } else {
+          isLimitRequestApprovalExist = false;
+      }
+
+      if((pageType == 1 || pageType == 4) && !isNeedApproval && user_code_request.toLowerCase() == user_login.toLowerCase()) {
+        isLimitRequestApprovalExist = true;
+      }
+    } catch (e) {
+      isLimitRequestApprovalExist = true;
+      Alert(
+        context: context,
+        title: "Maaf,",
+        content: Text(getLimitRequestApprovalStatus),
+        cancel: false,
+        type: "error",
+        defaultAction: () {}
+      );
+    }
+
+    setState(() {
+      getLimitRequestApprovalStatusLoading = false;
+      isLimitRequestApprovalExist = isLimitRequestApprovalExist;
+    });
   }
 
   checkModulePrivilege() async {
@@ -1295,6 +1341,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
 
 
     }  else {
+      //hoi
       return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
@@ -1454,48 +1501,54 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                 ),
               ),
               (pageType == 1 || pageType == 4) && isNeedApproval && user_code_request.toLowerCase() != user_login.toLowerCase() ?
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                      child: Button(
-                        key: Key("submit"),
-                        loading: acceptLimitRequestLoading,
-                        backgroundColor: config.darkOpacityBlueColor,
-                        child: user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ? TextView("acc (sales director)", 3, caps: true) : TextView("terima", 3, caps: true),
-                        onTap: () {
-                          user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ?
-                          updateLimitGabunganRequest(-1)
-                          :
-                          updateLimitGabunganRequest(1);
-                        },
-                      ),
-                    ),
-                  ),
-
-                  Expanded(
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                      child: Button(
-                        key: Key("submit"),
-                        loading: rejectLimitRequestLoading,
-                        backgroundColor: config.darkOpacityBlueColor,
-                        child: TextView(
-                          "tolak",
-                          3,
-                          caps: true,
+              IntrinsicHeight(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                        child: Button(
+                          key: Key("submit"),
+                          loading: acceptLimitRequestLoading,
+                          backgroundColor: isLimitRequestApprovalExist ? config.grayNonActiveColor : config.darkOpacityBlueColor,
+                          child: user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ? TextView("acc (sales director)", 3, caps: true, align: TextAlign.center) : TextView("terima", 3, caps: true, align: TextAlign.center),
+                          onTap: () {
+                            if(!isLimitRequestApprovalExist) {
+                              user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ?
+                              updateLimitGabunganRequest(-1)
+                              :
+                              updateLimitGabunganRequest(1);
+                            }
+                          },
                         ),
-                        onTap: () {
-                          updateLimitGabunganRequest(0);
-                        },
                       ),
                     ),
-                  ),
-                ],
+              
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                        child: Button(
+                          key: Key("submit"),
+                          loading: rejectLimitRequestLoading,
+                          backgroundColor: isLimitRequestApprovalExist ? config.grayNonActiveColor : config.darkOpacityBlueColor,
+                          child: TextView(
+                            "tolak",
+                            3,
+                            caps: true,
+                            align: TextAlign.center,
+                          ),
+                          onTap: () {
+                            if(!isLimitRequestApprovalExist) {
+                              updateLimitGabunganRequest(0);
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               )
               :
               Container(),
@@ -1538,6 +1591,20 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                Visibility(
+                  visible: isLimitRequestApprovalExist,
+                  child: Card(
+                    color: config.lightOpactityBlueColor,
+                    margin: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                    elevation: 3,
+                    child: ListTile(
+                      leading: Icon(Icons.notifications, color:config.darkOpacityBlueColor),
+                      title: Container(
+                        child: TextView('Menunggu persetujuan Sales Director', 3, color: config.darkOpacityBlueColor),
+                      ),
+                    ),
+                  ),
+                ),
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
                   child: TextFormField(
@@ -1696,53 +1763,55 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                   ),
                 ),
                 (pageType == 1 || pageType == 4) && isNeedApproval && user_code_request.toLowerCase() != user_login.toLowerCase() ?
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                        child: Button(
-                          key: Key("submit"),
-                          loading: acceptLimitRequestLoading,
-                          backgroundColor: config.darkOpacityBlueColor,
-                          child: user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ? TextView("acc (sales director)", 3, caps: true) : TextView("terima", 3, caps: true),
-                          onTap: () {
-                            user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ?
-                            updateLimitRequest(-1)
-                            :
-                            updateLimitRequest(1);
-                          },
-                        ),
-                      ),
-                    ),
-
-                    Expanded(
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                        child: Button(
-                          key: Key("submit"),
-                          loading: rejectLimitRequestLoading,
-                          backgroundColor: config.darkOpacityBlueColor,
-                          child: TextView(
-                            "tolak",
-                            3,
-                            caps: true,
+                IntrinsicHeight(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                          child: Button(
+                            key: Key("submit"),
+                            loading: acceptLimitRequestLoading,
+                            backgroundColor: isLimitRequestApprovalExist ? config.grayNonActiveColor : config.darkOpacityBlueColor,
+                            child: user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ? TextView("acc (sales director)", 3, caps: true, align: TextAlign.center) : TextView("terima", 3, caps: true, align: TextAlign.center),
+                            onTap: () {
+                              if(!isLimitRequestApprovalExist) {
+                                user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ?
+                                updateLimitRequest(-1)
+                                :
+                                updateLimitRequest(1);
+                              }
+                            },
                           ),
-                          onTap: () {
-                            updateLimitRequest(0);
-                          },
                         ),
                       ),
-                    ),
-                  ],
+                
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                          child: Button(
+                            key: Key("submit"),
+                            loading: rejectLimitRequestLoading,
+                            backgroundColor: isLimitRequestApprovalExist ? config.grayNonActiveColor : config.darkOpacityBlueColor,
+                            child: TextView(
+                              "tolak",
+                              3,
+                              caps: true,
+                              align: TextAlign.center
+                            ),
+                            onTap: () {
+                              if(!isLimitRequestApprovalExist) {
+                                updateLimitRequest(0);
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 )
-                :
-                Container(),
-                (pageType == 1 || pageType == 4) && isNeedApproval && user_code_request.toLowerCase() == user_login.toLowerCase() ?
-                Container(child: Text("hehe"),)
                 :
                 Container(),
               ],
@@ -2055,5 +2124,91 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     });
 
   }
+
+  // RefreshController _refreshRequestController =
+  //     RefreshController(initialRefresh: false);
+
+  // void _onHistoryRefresh() async{
+  //   setState(() {
+  //     checkModulePrivilegeLoading = true;
+  //     getLimitRequestApprovalStatusLoading = true;
+  //   });
+
+  //   if(checkModulePrivilegeLoading){
+  //     checkModulePrivilege();
+  //   }
+
+  //   if(getLimitRequestApprovalStatusLoading){
+  //     getLimitRequestApprovalStatus();
+  //   }
+
+  //   refreshHistoryLimitDetail()
+  // }
+
+  // Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstance();
+  // void refreshHistoryLimitDetail(LimitHistory tempLimitHistory, int type) async {
+  //   Result result_;
+
+  //   if(tempLimitHistory.customer_code.length > 11) {
+  //     Alert(context: context, loading: true, disableBackButton: true);
+
+  //     result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${tempLimitHistory.customer_code}","user_code":"$user_login"}');
+
+  //     final SharedPreferences sharedPreferences = await _sharedPreferences;
+  //     await sharedPreferences.setInt("request_limit", int.parse(tempLimitHistory.limit));
+  //     await sharedPreferences.setString("user_code_request", tempLimitHistory.user_code);
+
+  //     Navigator.of(context).pop();
+
+  //     if(result_.success == 1) {
+  //       if(type == 1) {
+  //         Navigator.pushNamed(
+  //           context,
+  //           "historyLimitRequestDetail/${tempLimitHistory.id}/4",
+  //           arguments: result_,
+  //         );
+  //       } else if(type == 2) {
+  //         Navigator.pushNamed(
+  //           context,
+  //           "historyLimitRequestDetail/${tempLimitHistory.id}/5",
+  //           arguments: result_,
+  //         );
+  //       } else {
+  //         Navigator.pushNamed(
+  //           context,
+  //           "historyLimitRequestDetail/${tempLimitHistory.id}/6",
+  //           arguments: result_,
+  //         );
+  //       }
+  //     } else {
+  //       Alert(
+  //         context: context,
+  //         title: "Maaf,",
+  //         content: Text(result_.message),
+  //         cancel: false,
+  //         type: "error",
+  //         defaultAction: () {}
+  //       );
+  //     }
+
+  //   } else {
+  //     result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${tempLimitHistory.customer_code}","user_code":"$user_login"}');
+
+  //     final SharedPreferences sharedPreferences = await _sharedPreferences;
+  //     await sharedPreferences.setInt("request_limit", int.parse(tempLimitHistory.limit));
+  //     try {
+  //       await sharedPreferences.setInt("request_limit_dmd", int.parse(tempLimitHistory.limit_dmd));
+  //     } catch(e) {
+
+  //     }
+  //     await sharedPreferences.setString("user_code_request", tempLimitHistory.user_code);
+
+  //     setState(() {
+  //       result = result_;
+  //       pageType = type;
+  //       historyLimitId = tempLimitHistory.id;
+  //     });
+  //   }
+  // }
 
 }

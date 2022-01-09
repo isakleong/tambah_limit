@@ -88,6 +88,69 @@ class LimitHistoryAPI {
 
   // }
 
+  Future<String> getLimitRequestApprovalStatus(final context, {String parameter=""}) async {
+    String isGetLimitRequestApprovalStatusSuccess = "";
+    String url = "";
+
+    bool isUrlAddress_1 = false, isUrlAddress_2 = false;
+    String url_address_1 = "", url_address_2 = "";
+
+    url_address_1 = config.baseUrl + "/" + "tesIP.php" + (parameter == "" ? "" : "?" + parameter);
+    url_address_2 = config.baseUrlAlt + "/" + "tesIP.php" + (parameter == "" ? "" : "?" + parameter);
+
+    try {
+		  final conn_1 = await ConnectionTest(url_address_1, context);
+      if(conn_1 == "OK"){
+        isUrlAddress_1 = true;
+      }
+	  } on SocketException {
+      isUrlAddress_1 = false;
+      isGetLimitRequestApprovalStatusSuccess = "Gagal terhubung dengan server";
+      // throw Exception('No Internet connection');
+    }
+
+    if(isUrlAddress_1) {
+      url = config.baseUrl + "/" + "getLimitRequestApprovalStatus.php" + (parameter == "" ? "" : "?" + parameter);
+    } else {
+      try {
+        final conn_2 = await ConnectionTest(url_address_2, context);
+        if(conn_2 == "OK"){
+          isUrlAddress_2 = true;
+        }
+      } on SocketException {
+        isUrlAddress_2 = false;
+        isGetLimitRequestApprovalStatusSuccess = "Gagal terhubung dengan server";
+        // throw Exception('No Internet connection');
+      }
+    }
+    if(isUrlAddress_2){
+      url = config.baseUrlAlt + "/" + "getLimitRequestApprovalStatus.php" + (parameter == "" ? "" : "?" + parameter);
+    }
+
+    if(url != "") {
+      try {
+
+        final response = await client.get(url);
+
+        printHelp("status code "+response.statusCode.toString());
+
+        printHelp("cek body "+response.body);
+
+        isGetLimitRequestApprovalStatusSuccess = response.body.toString();
+
+      } catch (e) {
+        isGetLimitRequestApprovalStatusSuccess = "Gagal terhubung dengan server";
+        print(e);
+      }
+
+    } else {
+      isGetLimitRequestApprovalStatusSuccess = "Gagal terhubung dengan server";
+    }
+
+    return isGetLimitRequestApprovalStatusSuccess;
+
+  }
+
   Future<List<LimitHistory>> getLimitRequestHistoryList(final context, int type, {String parameter = ""}) async {
     
     Result result;
