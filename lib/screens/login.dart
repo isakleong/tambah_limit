@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' show Client;
@@ -45,10 +46,18 @@ class LoginState extends State<Login> {
 
   String fcmToken = "";
 
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+  StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
   FirebaseMessaging messaging;
   @override
   void initState() {
     super.initState();
+    initConnectivity();
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+
     messaging = FirebaseMessaging.instance;
     messaging.getToken().then((value){
         print("token: "+value);
@@ -56,40 +65,39 @@ class LoginState extends State<Login> {
           fcmToken = value;
         });
     });
-
-    //get fcm token
-    // String token = await FirebaseMessaging.instance.getToken();
-
-    // //fcm handler
-    // FirebaseMessaging.onMessage.listen((RemoteMessage event) {
-    //     print("message recieved");
-    //     print(event.notification.body);
-    //     showDialog(
-    //       context: context,
-    //       builder: (BuildContext context) {
-    //         return AlertDialog(
-    //           title: Text("Notification"),
-    //           content: Text(event.notification.body),
-    //           actions: [
-    //             TextButton(
-    //               child: Text("Ok"),
-    //               onPressed: () {
-    //                 Navigator.of(context).pop();
-    //               },
-    //             )
-    //           ],
-    //         );
-    //       });
-      
-    // });
-    // FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    //   print('Message clicked!');
-    // });
   }
 
-  // Future<void> _messageHandler(RemoteMessage message) async {
-  //   print('background message ${message.notification.body}');
-  // }
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
+  }
+
+  Future<void> initConnectivity() async {
+    ConnectivityResult result;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      print(e);
+      return;
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
+  }
 
   @override
   void didChangeDependencies() async {
@@ -184,7 +192,7 @@ class LoginState extends State<Login> {
                         child: Button(
                           loading: loginLoading,
                           backgroundColor: config.darkOpacityBlueColor,
-                          child: TextView("MASUK", 3, color: Colors.white),
+                          child: TextView("MASUK "+_connectionStatus.toString(), 3, color: Colors.white),
                           onTap: () {
                             submitValidation();
                           },
