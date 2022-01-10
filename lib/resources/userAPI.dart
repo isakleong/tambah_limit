@@ -61,16 +61,20 @@ class UserAPI {
 
         final response = await client.get(url);
 
-        var parsedJson = jsonDecode(response.body);
         if(response.body.toString() != "false") {
-          user = User.fromJson(parsedJson[0]);
-          printHelp("CEK MOD "+user.ModuleId.toString());
+          if(response.body.toString() == "autolimit") {
+            isLoginSuccess = "Untuk menaikkan limit dapat menggunakan Program Utility NAV";
+          } else {
+            var parsedJson = jsonDecode(response.body);
 
-          if(user.Id != ""){
-            isLoginSuccess = "OK";
-            await saveToLocalStorage(context, user);
-          } 
+            user = User.fromJson(parsedJson[0]);
+            printHelp("CEK MOD "+user.ModuleId.toString());
 
+            if(user.Id != ""){
+              isLoginSuccess = "OK";
+              await saveToLocalStorage(context, user);
+            }   
+          }
         } else {
           isLoginSuccess = "Username atau Password salah";
         }

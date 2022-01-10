@@ -1052,90 +1052,93 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
     }
 
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: currentIndex !=1 ?
-      PreferredSize(
-        preferredSize: Size.fromHeight(150),
-        // preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * .20),
-        child: AppBar(
-          flexibleSpace: SafeArea(
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextView("Selamat Datang, " + user_login.toUpperCase(), 3),
-                      InkWell(
-                        onTap: () {
-                          Alert(
-                            context: context,
-                            title: "Konfirmasi,",
-                            content: Text("Apakah Anda yakin ingin keluar dari aplikasi?"),
-                            cancel: true,
-                            type: "warning",
-                            defaultAction: () async {
-                              SharedPreferences prefs = await SharedPreferences.getInstance();
-                              await prefs.remove("limit_dmd");
-                              await prefs.remove("request_limit");
-                              await prefs.remove("user_code_request");
-                              await prefs.remove("user_code");
-                              await prefs.remove("max_limit");
-                              await prefs.remove("fcmToken");
-                              await prefs.remove("get_user_login");
-                              await prefs.remove("module_privilege");
-                              await FirebaseMessaging.instance.deleteToken();
-                              await prefs.clear();
-                              Navigator.pushReplacementNamed(
-                                context,
-                                "login",
-                              );
-                            }
-                          );
-                      },
-                      child: Container(
-                        child:Icon (Icons.logout, size: 30, color: Colors.white),
+    return WillPopScope(
+      onWillPop: willPopScope,
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: currentIndex !=1 ?
+        PreferredSize(
+          preferredSize: Size.fromHeight(150),
+          // preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * .20),
+          child: AppBar(
+            flexibleSpace: SafeArea(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextView("Selamat Datang, " + user_login.toUpperCase(), 3),
+                        InkWell(
+                          onTap: () {
+                            Alert(
+                              context: context,
+                              title: "Konfirmasi,",
+                              content: Text("Apakah Anda yakin ingin keluar dari aplikasi?"),
+                              cancel: true,
+                              type: "warning",
+                              defaultAction: () async {
+                                SharedPreferences prefs = await SharedPreferences.getInstance();
+                                await prefs.remove("limit_dmd");
+                                await prefs.remove("request_limit");
+                                await prefs.remove("user_code_request");
+                                await prefs.remove("user_code");
+                                await prefs.remove("max_limit");
+                                await prefs.remove("fcmToken");
+                                await prefs.remove("get_user_login");
+                                await prefs.remove("module_privilege");
+                                await FirebaseMessaging.instance.deleteToken();
+                                await prefs.clear();
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  "login",
+                                );
+                              }
+                            );
+                        },
+                        child: Container(
+                          child:Icon (Icons.logout, size: 30, color: Colors.white),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    child: TextView(dashboardTitle, 1)
-                  ),
-                ],
+                      ],
+                    ),
+                    Container(
+                      child: TextView(dashboardTitle, 1)
+                    ),
+                  ],
+                ),
               ),
             ),
+            automaticallyImplyLeading: false,
           ),
-          automaticallyImplyLeading: false,
-        ),
-      )
-      : null,
-      body: menuList.length > 0 ?
-      // Container(
-      //   child: menuList[currentIndex],
-      // ) : null,
-      Container(
-        // reverse: true,
-        child: menuList[currentIndex], //disini
-      ) : null,
-      bottomNavigationBar: menuList.length > 0 ?
-      BottomNavigationBar(
-        selectedFontSize: 16,
-        unselectedFontSize: 14,
-        selectedIconTheme: IconThemeData(color: config.darkOpacityBlueColor),
-        selectedItemColor: config.darkOpacityBlueColor,
-        selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
-        unselectedIconTheme: IconThemeData(color: config.grayColor),
-        unselectedItemColor: config.grayColor,
-        type: BottomNavigationBarType.fixed,  
-        currentIndex: currentIndex,  
-        onTap: _selectedTab,  
-        elevation: 5,
-        items: bottomNavigationBarList
-      ) : null,
+        )
+        : null,
+        body: menuList.length > 0 ?
+        // Container(
+        //   child: menuList[currentIndex],
+        // ) : null,
+        Container(
+          // reverse: true,
+          child: menuList[currentIndex], //disini
+        ) : null,
+        bottomNavigationBar: menuList.length > 0 ?
+        BottomNavigationBar(
+          selectedFontSize: 16,
+          unselectedFontSize: 14,
+          selectedIconTheme: IconThemeData(color: config.darkOpacityBlueColor),
+          selectedItemColor: config.darkOpacityBlueColor,
+          selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
+          unselectedIconTheme: IconThemeData(color: config.grayColor),
+          unselectedItemColor: config.grayColor,
+          type: BottomNavigationBarType.fixed,  
+          currentIndex: currentIndex,  
+          onTap: _selectedTab,  
+          elevation: 5,
+          items: bottomNavigationBarList
+        ) : null,
+      ),
     );
   }
 
