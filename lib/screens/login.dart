@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' show Client;
 
@@ -114,7 +115,8 @@ class LoginState extends State<Login> {
     return Scaffold(
       body: WillPopScope(
         onWillPop: willPopScope,
-        child: Stack(
+        child: _connectionStatus != ConnectivityResult.none ?
+        Stack(
           children:<Widget>[
             Container(
               height: double.infinity,
@@ -192,7 +194,7 @@ class LoginState extends State<Login> {
                         child: Button(
                           loading: loginLoading,
                           backgroundColor: config.darkOpacityBlueColor,
-                          child: TextView("MASUK "+_connectionStatus.toString(), 3, color: Colors.white),
+                          child: TextView("MASUK ", 3, color: Colors.white),
                           onTap: () {
                             submitValidation();
                           },
@@ -213,10 +215,25 @@ class LoginState extends State<Login> {
                 ),
               ),
             ),
-            
           ],
+        )
+        :
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children:<Widget>[
+            Center(
+              child: Container(
+                child: FlareActor('assets/flare/networking.flr', animation: "no_netwrok"),
+                width: MediaQuery.of(context).size.width*0.8,
+                height: MediaQuery.of(context).size.width*0.8,
+              ),
+            ),
+            Container(
+              child: TextView('Oops, koneksi internet tidak tersedia\nPastikan Anda terhubung dengan internet', 3, color: config.grayColor, align: TextAlign.center),
+            ),
+          ]
         ),
-      )
+      ),
     );
   }
 

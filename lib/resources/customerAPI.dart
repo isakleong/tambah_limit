@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:http/http.dart' show Client, Request;
+import 'package:http/http.dart' show Client;
 import 'package:tambah_limit/models/resultModel.dart';
 import 'package:tambah_limit/models/customerModel.dart';
 import 'package:tambah_limit/settings/configuration.dart';
@@ -81,8 +81,6 @@ class CustomerAPI {
           if(customer.No_ != ""){
             getBlockInfoSuccess = "OK";
           }
-
-          var resultObject = jsonEncode(response.body);
           result = new Result(success: 1, message: "OK", data: response.body.toString());
 
         } else {
@@ -115,7 +113,7 @@ class CustomerAPI {
     Customer customer;
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    http://192.168.10.213/dbrudie-2-0-0/getLimit.php?json={ "user_code" : "isak", "kode_customer" : "01A01010001" }
+    //http://192.168.10.213/dbrudie-2-0-0/getLimit.php?json={ "user_code" : "isak", "kode_customer" : "01A01010001" }
     // String url_address_1 = config.baseUrl + "/" + "getLimit.php" + (parameter == "" ? "" : "?" + parameter);
     // String url_address_2 = config.baseUrlAlt + "/" + "getLimit.php" + (parameter == "" ? "" : "?" + parameter);
 
@@ -246,8 +244,6 @@ class CustomerAPI {
           var parsedJson = jsonDecode(response.body);
 
           customer = Customer.fromJson(parsedJson[0]);
-
-          var resultObject = jsonEncode(response.body);
           result = new Result(success: 1, message: "OK", data: response.body.toString());
 
         } else {
@@ -336,7 +332,6 @@ class CustomerAPI {
 
   Future<String> addRequestLimit(final context, {String parameter=""}) async {
     String isAddRequestLimitSuccess = "";
-    Customer customer;
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
@@ -405,7 +400,6 @@ class CustomerAPI {
 
   Future<String> addRequestLimitGabungan(final context, {String parameter=""}) async {
     String isAddRequestLimitSuccess = "";
-    Customer customer;
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
@@ -473,7 +467,6 @@ class CustomerAPI {
 
   Future<String> updateLimitGabunganRequest(final context, {int command, String parameter=""}) async {
     String isChangeLimitSuccess = "";
-    Customer customer;
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
@@ -566,7 +559,6 @@ class CustomerAPI {
 
   Future<String> updateLimitRequest(final context, {int command, String parameter=""}) async {
     String isChangeLimitSuccess = "";
-    Customer customer;
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
@@ -660,7 +652,6 @@ class CustomerAPI {
 
   Future<String> changeLimit(final context, {String parameter=""}) async {
     String isChangeLimitSuccess = "";
-    Customer customer;
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
@@ -730,7 +721,6 @@ class CustomerAPI {
 
   Future<String> changeLimitGabungan(final context, {String parameter=""}) async {
     String isChangeLimitSuccess = "";
-    Customer customer;
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;

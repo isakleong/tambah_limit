@@ -112,5 +112,7 @@ flutter:
     - assets/flare/warning.flr
     - assets/flare/play-pause.flr
     - assets/flare/loading-button.flr
+    - assets/flare/networking.flr
+
     
     - assets/illustration/

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:bottom_bar_with_sheet/bottom_bar_with_sheet.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/services.dart';
@@ -103,6 +104,10 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   int currentMenuIndex = 0;
 
   bool checkModulePrivilegeLoading = true;
+
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+  StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   void _selectedTab(int index) {
     setState(() {
@@ -279,7 +284,42 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
+  }
+
+  Future<void> initConnectivity() async {
+    ConnectivityResult result;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      print(e);
+      return;
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
+  }
+
+  @override
   void initState() {
+    initConnectivity();
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     tabController = PersistentTabController(initialIndex: 0);
 
     if(widget.indexMenu != null){
@@ -1054,7 +1094,8 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
     return WillPopScope(
       onWillPop: willPopScope,
-      child: Scaffold(
+      child: _connectionStatus != ConnectivityResult.none ?
+      Scaffold(
         key: _scaffoldKey,
         appBar: currentIndex !=1 ?
         PreferredSize(
@@ -1138,6 +1179,24 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           elevation: 5,
           items: bottomNavigationBarList
         ) : null,
+      )
+      :
+      Scaffold(
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children:<Widget>[
+            Center(
+              child: Container(
+                child: FlareActor('assets/flare/networking.flr', animation: "no_netwrok"),
+                width: MediaQuery.of(context).size.width*0.8,
+                height: MediaQuery.of(context).size.width*0.8,
+              ),
+            ),
+            Container(
+              child: TextView('Oops, koneksi internet tidak tersedia\nPastikan Anda terhubung dengan internet', 3, color: config.grayColor, align: TextAlign.center),
+            ),
+          ]
+        ),
       ),
     );
   }

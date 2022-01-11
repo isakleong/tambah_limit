@@ -1,11 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:http/http.dart' show Client, Request;
+import 'package:http/http.dart' show Client;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tambah_limit/models/resultModel.dart';
 
 import 'package:tambah_limit/models/userModel.dart';
-import 'package:tambah_limit/models/resultModel.dart';
 import 'package:tambah_limit/settings/configuration.dart';
 import 'package:tambah_limit/tools/function.dart';
 
@@ -18,9 +16,6 @@ class UserAPI {
     String isLoginSuccess = "";
     User user;
     String url = "";
-
-    SharedPreferences _sharedPreferences = await SharedPreferences.getInstance();
-    final SharedPreferences sharedPreferences = _sharedPreferences;
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
     String url_address_1 = config.baseUrl + "/" + "getUserCoba.php" + (parameter == "" ? "" : "?" + parameter);
@@ -91,7 +86,6 @@ class UserAPI {
 
   Future<String> changePassword(final context, {String parameter=""}) async {
     String isChangePasswordSuccess = "";
-    User user;
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
@@ -215,8 +209,6 @@ class UserAPI {
   }
 
   saveToLocalStorage(final context, User user) async {
-    Configuration config = Configuration.of(context);
-
     final SharedPreferences sharedPreferences = await _sharedPreferences;
     await sharedPreferences.setString("user_code", user.Id);
     await sharedPreferences.setInt("max_limit", int.parse(user.MaxLimit));

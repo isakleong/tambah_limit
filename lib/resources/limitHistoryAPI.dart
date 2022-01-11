@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:http/http.dart' show Client, Request;
+import 'package:http/http.dart' show Client;
 import 'package:tambah_limit/models/limitHistoryModel.dart';
 import 'package:tambah_limit/models/resultModel.dart';
-import 'package:tambah_limit/models/customerModel.dart';
 import 'package:tambah_limit/settings/configuration.dart';
 import 'package:tambah_limit/tools/function.dart';
 
@@ -155,7 +154,6 @@ class LimitHistoryAPI {
     
     Result result;
     List<LimitHistory> limitHistoryList =[];
-    LimitHistory limitHistory;
 
     String getLimitRequestHistorySuccess = "";
     String url = "";

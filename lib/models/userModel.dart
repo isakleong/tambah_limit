@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:tambah_limit/tools/function.dart';
 
 part 'userModel.g.dart';
 

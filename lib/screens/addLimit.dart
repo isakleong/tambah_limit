@@ -1,14 +1,10 @@
-import 'dart:async';
-import 'dart:convert';
 import 'package:http/http.dart' show Client;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tambah_limit/models/resultModel.dart';
-import 'package:tambah_limit/models/userModel.dart';
 import 'package:tambah_limit/resources/customerAPI.dart';
-import 'package:tambah_limit/resources/userAPI.dart';
 import 'package:tambah_limit/settings/configuration.dart';
 import 'package:tambah_limit/tools/function.dart';
 import 'package:tambah_limit/widgets/EditText.dart';
