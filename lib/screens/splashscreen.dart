@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:open_file/open_file.dart';
 // import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
@@ -39,6 +40,7 @@ class SplashScreenState extends State<SplashScreen> {
 
   bool isDownloadNewVersion = false;
   bool isRetryDownload = false;
+  bool toInstall = false;
   double progressValue = 0.0;
   String progressText = "";
 
@@ -96,16 +98,139 @@ class SplashScreenState extends State<SplashScreen> {
       user_code = sharedPreferences.getString("user_code");
     });
 
-    final isPermissionStatusGranted = await checkAppsPermission();
-    if(isPermissionStatusGranted) {
-      doCheckVersion();
-    } else {
-      checkAppsPermission();
-    }
+    await getAppsReady();
+
+    // final isPermissionStatusGranted = await checkAppsPermission();
+    // if(isPermissionStatusGranted) {
+    //   if(!toInstall) {
+    //     doCheckVersion();
+    //   } else {
+    //     String downloadPath = await getFilePath(config.apkName+".apk");
+    //     await OpenFile.open(downloadPath);
+    //   }
+    // } else {
+    //   checkAppsPermission();
+    // }
     
   }
 
+  getAppsReady() async {
+    final isPermissionStatusGranted = await checkAppsPermission();
+    
+    await isReadyToInstall();
+    
+    if(isPermissionStatusGranted) {
+      if(!toInstall) {
+        doCheckVersion();
+      } else {
+        String downloadPath = await getFilePath(config.apkName+".apk");
+        await OpenFile.open(downloadPath);
+      }
+    } else {
+      checkAppsPermission();
+    }
+  }
+
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+
+  Future<void> isReadyToInstall() async {
+    setState(() {
+      toInstall = false;
+    });
+
+    int downloadedSize = 0;
+    int apkSize = 0;
+
+    String url = "";
+    bool isUrlAddress_1 = false, isUrlAddress_2 = false;
+    String url_address_1 = config.baseUrl + "/" + config.apkName+".apk";
+    String url_address_2 = config.baseUrlAlt + "/" + config.apkName+".apk";
+
+    try {
+		  final conn_1 = await ConnectionTest(url_address_1, context);
+      printHelp("GET STATUS 1 "+conn_1);
+      if(conn_1 == "OK"){
+        isUrlAddress_1 = true;
+      }
+	  } on SocketException {
+      isUrlAddress_1 = false;
+      // isGetVersionSuccess = "Gagal terhubung dengan server";
+    }
+
+    if(isUrlAddress_1) {
+      url = url_address_1;
+    } else {
+      try {
+        final conn_2 = await ConnectionTest(url_address_2, context);
+        printHelp("GET STATUS 2 "+conn_2);
+        if(conn_2 == "OK"){
+          isUrlAddress_2 = true;
+        }
+      } on SocketException {
+        isUrlAddress_2 = false;
+        // isGetVersionSuccess = "Gagal terhubung dengan server";
+      }
+    }
+    if(isUrlAddress_2){
+      url = url_address_2;
+    }
+
+    if(url != "") {
+      Client client = Client();
+
+      
+      try {
+        String downloadPath = await getFilePath(config.apkName+".apk");
+
+        printHelp("download path "+downloadPath);
+        printHelp("url download "+ url);
+
+        final request = new Request('HEAD', Uri.parse(url))..followRedirects = false;
+        final response = await client.send(request).timeout(
+          Duration(seconds: 5),
+            onTimeout: () {
+              return null;
+            },
+        );
+        printHelp("full header "+response.headers.toString());
+        printHelp("content length "+response.headers['content-length'].toString());
+
+        apkSize = int.parse(response.headers['content-length'].toString());
+        
+        String path = '';
+        String filename = config.apkName + ".apk";
+        Directory dir = await getExternalStorageDirectory();
+        path = '${dir.path}/$filename';
+
+        if(FileSystemEntity.typeSync(path) != FileSystemEntityType.notFound){
+          var file = File(path);
+          downloadedSize = file.lengthSync();
+        }
+
+        if(apkSize == downloadedSize) {
+          setState(() {
+            toInstall = true;
+          });
+        }
+
+      } catch (e) {
+        print(e);
+      }
+
+    } else {
+      Alert(
+        context: context,
+        title: "Maaf,",
+        content: Text("Gagal terhubung dengan server"),
+        cancel: false,
+        type: "error",
+        errorBtnTitle: "Coba Lagi",
+        defaultAction: () {
+          getAppsReady();
+        }
+      );
+    }
+  }
 
   Future<void> downloadNewVersion() async {
     setState(() {
@@ -153,7 +278,13 @@ class SplashScreenState extends State<SplashScreen> {
 
       if(isPermissionStatusGranted) {
         try {
-          Dio dio = Dio();
+          Dio dio = Dio(
+            BaseOptions(
+              baseUrl: url,
+              connectTimeout: 3000,
+              receiveTimeout: 300000,
+            ),
+          );
 
           String downloadPath = await getFilePath(config.apkName+".apk");
 
@@ -187,48 +318,80 @@ class SplashScreenState extends State<SplashScreen> {
           }
           fileSize += int.parse(response.headers['content-length']);
 
+          try {
+            dio.download(url, downloadPath,
+              onReceiveProgress: (rcv, total) {
+                print(
+                    'received: ${rcv.toStringAsFixed(0)} out of total WOI: ${total.toStringAsFixed(0)}');
+                _setState(() {
+                  progressValue = (rcv / total * 100)/100;
+                  progressText = ((rcv / total) * 100).toStringAsFixed(0);
+                });
 
+                if (progressText == '100') {
+                  _setState(() {
+                    isDownloadNewVersion = true;
+                  });
+                } else if (double.parse(progressText) < 100) {}
+              },
+              deleteOnError: true,
+            ). onError((error, stackTrace) {
+              _setState(() {
+                isRetryDownload = true;
+              });
+              throw('coba thro');
+            }).then((_) async {
+              _setState(() {
+                if (progressText == '100') {
+                  isDownloadNewVersion = true;
+                }
 
-          // await rangeDownload(url, downloadPath);
+                isDownloadNewVersion = false;
+              });
 
-          // _setState(() {
-          //   if (progressText == '100') {
-          //     isDownloadNewVersion = true;
-          //   }
+              Navigator.of(context).pop();
 
-          //   isDownloadNewVersion = false;
-          // });
+              setState(() {
+                isLoadingVersion = false;
+                isDownloadNewVersion = false;
+              });
 
-          // Navigator.of(context).pop();
-          // // var directory = await getApplicationDocumentsDirectory(); OpenFile.open(downloadPath);
+              printHelp("MASUK SELESAI");
+              // SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+              exit(0);
+              OpenFile.open(downloadPath);
+            });
+          } catch (e) {
+            _setState(() {
+              isRetryDownload = true;
+            });
+          }
 
-          // setState(() {
-          //   isLoadingVersion = false;
-          //   isDownloadNewVersion = false;
-          // });
+          
 
-          // printHelp("MASUK SELESAI");
-          // // String downloadPath = await getFilePath(config.apkName+".apk");
-          // OpenFile.open(downloadPath);
-
-          // dio.download(url, downloadPath,
-          //   onReceiveProgress: (rcv, total) {
-          //     print(
-          //         'received: ${rcv.toStringAsFixed(0)} out of total WOI: ${total.toStringAsFixed(0)}');
-          //     _setState(() {
-          //       // totalDownloaded+=rcv;
-          //       progressValue = (rcv / total * 100)/100;
-          //       progressText = ((rcv / total) * 100).toStringAsFixed(0);
-          //     });
-
-          //     if (progressText == '100') {
+          // try {
+          //   await downloadWithChunks(url, downloadPath, total: totalDownloaded, onReceiveProgress: (received, total) {
+          //     if (total != -1) {
+          //       print('${(received / total * 100).floor()}%');
           //       _setState(() {
-          //         isDownloadNewVersion = true;
+          //         // totalDownloaded+=rcv;
+          //         // progressValue = (received / total * 100)/100;
+          //         // progressText = ((received / total) * 100).toStringAsFixed(0);
+
+          //         progressValue = (received / fileSize * 100)/100;
+          //         progressText = ((received / fileSize) * 100).toStringAsFixed(0);
           //       });
-          //     } else if (double.parse(progressText) < 100) {}
-          //   },
-          //   deleteOnError: false,
-          // ).then((_) async {
+
+          //       if (progressText == '100') {
+          //         _setState(() {
+          //           isDownloadNewVersion = true;
+          //         });
+          //       } else if (double.parse(progressText) < 100) {}
+
+
+          //     }
+          //   });
+
           //   _setState(() {
           //     if (progressText == '100') {
           //       isDownloadNewVersion = true;
@@ -246,61 +409,17 @@ class SplashScreenState extends State<SplashScreen> {
           //   });
 
           //   printHelp("MASUK SELESAI");
-          //   String downloadPath = await getFilePath(config.apkName+".apk");
+          //   // String downloadPath = await getFilePath(config.apkName+".apk");
           //   OpenFile.open(downloadPath);
+          //   SystemChannels.platform.invokeMethod('SystemNavigator.pop');
 
-          // });
-
-          try {
-            await downloadWithChunks(url, downloadPath, total: totalDownloaded, onReceiveProgress: (received, total) {
-              if (total != -1) {
-                print('${(received / total * 100).floor()}%');
-                _setState(() {
-                  // totalDownloaded+=rcv;
-                  // progressValue = (received / total * 100)/100;
-                  // progressText = ((received / total) * 100).toStringAsFixed(0);
-
-                  progressValue = (received / fileSize * 100)/100;
-                  progressText = ((received / fileSize) * 100).toStringAsFixed(0);
-                });
-
-                if (progressText == '100') {
-                  _setState(() {
-                    isDownloadNewVersion = true;
-                  });
-                } else if (double.parse(progressText) < 100) {}
-
-
-              }
-            });
-
-            _setState(() {
-              if (progressText == '100') {
-                isDownloadNewVersion = true;
-              }
-
-              isDownloadNewVersion = false;
-            });
-
-            Navigator.of(context).pop();
-            // var directory = await getApplicationDocumentsDirectory(); OpenFile.open(downloadPath);
-
-            setState(() {
-              isLoadingVersion = false;
-              isDownloadNewVersion = false;
-            });
-
-            printHelp("MASUK SELESAI");
-            // String downloadPath = await getFilePath(config.apkName+".apk");
-            OpenFile.open(downloadPath);
-
-          } catch (e) {
-            printHelp("masuk resume");
-            print(e);
-            _setState(() {
-              isRetryDownload = true;
-            });
-          }    
+          // } catch (e) {
+          //   printHelp("masuk resume");
+          //   print(e);
+          //   _setState(() {
+          //     isRetryDownload = true;
+          //   });
+          // }    
 
         } catch (e) {
           _setState(() {
@@ -487,56 +606,6 @@ class SplashScreenState extends State<SplashScreen> {
           type: "warning",
           defaultAction: () {
             preparingNewVersion();
-            // String downloadPath = await getFilePath(config.apkName+".apk");
-            // OpenFile.open(downloadPath);
-
-            // Navigator.of(context).pop();
-            
-
-            // setState(() {
-            //   isLoadingVersion = false;
-            //   isDownloadNewVersion = true;
-            // });
-            // downloadNewVersion();
-            // showDialog (
-            //   context: context,
-            //   barrierDismissible: false,
-            //   builder: (context){
-            //     return WillPopScope(
-            //       onWillPop: null,
-            //       child: AlertDialog(
-            //         shape: RoundedRectangleBorder(
-            //           borderRadius: BorderRadius.all(Radius.circular(7.5)),
-            //         ),
-            //         content: StatefulBuilder(
-            //           builder: (BuildContext context, StateSetter setState) {
-            //           _setState = setState;
-            //           return Column(
-            //             mainAxisSize: MainAxisSize.min,
-            //             children: [
-            //               Center(
-            //                 child: CircularPercentIndicator(
-            //                   radius: 120.0,
-            //                   lineWidth: 13.0,
-            //                   animation: false,
-            //                   percent: progressValue,
-            //                   center: new Text("${progressText}%", style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            //                   footer: Padding(
-            //                     padding: EdgeInsets.only(top: 10),
-            //                     child: new Text("Mengunduh pembaruan aplikasi", style: new TextStyle(fontWeight: FontWeight.bold)),
-            //                   ),
-            //                   circularStrokeCap: CircularStrokeCap.round,
-            //                   progressColor: config.primaryColor,
-            //                 ),
-            //               ),
-            //             ],
-            //           );
-            //         }),
-            //       )
-            //     );
-            //   }
-            // );
-
           }
         );            
       } else {
