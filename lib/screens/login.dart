@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/services.dart';
@@ -47,56 +46,33 @@ class LoginState extends State<Login> {
 
   String fcmToken = "";
 
-  ConnectivityResult _connectionStatus = ConnectivityResult.none;
-  final Connectivity _connectivity = Connectivity();
-  StreamSubscription<ConnectivityResult> _connectivitySubscription;
-
   FirebaseMessaging messaging;
   @override
   void initState() {
     super.initState();
-    initConnectivity();
-    _connectivitySubscription =
-        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
 
+    // messaging = FirebaseMessaging.instance;
+    // messaging.getToken().then((value){
+    //     print("token: "+value);
+    //     setState(() {
+    //       fcmToken = value;
+    //     });
+    // });
+    getFCMToken();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  getFCMToken() {
     messaging = FirebaseMessaging.instance;
     messaging.getToken().then((value){
         print("token: "+value);
         setState(() {
           fcmToken = value;
         });
-    });
-  }
-
-  @override
-  void dispose() {
-    _connectivitySubscription.cancel();
-    super.dispose();
-  }
-
-  Future<void> initConnectivity() async {
-    ConnectivityResult result;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      result = await _connectivity.checkConnectivity();
-    } on PlatformException catch (e) {
-      print(e);
-      return;
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) {
-      return Future.value(null);
-    }
-
-    return _updateConnectionStatus(result);
-  }
-
-  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
-    setState(() {
-      _connectionStatus = result;
     });
   }
 
@@ -115,8 +91,7 @@ class LoginState extends State<Login> {
     return Scaffold(
       body: WillPopScope(
         onWillPop: willPopScope,
-        child: _connectionStatus != ConnectivityResult.none ?
-        Stack(
+        child: Stack(
           children:<Widget>[
             Container(
               height: double.infinity,
@@ -217,22 +192,6 @@ class LoginState extends State<Login> {
             ),
           ],
         )
-        :
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children:<Widget>[
-            Center(
-              child: Container(
-                child: FlareActor('assets/flare/networking.flr', animation: "no_netwrok"),
-                width: MediaQuery.of(context).size.width*0.8,
-                height: MediaQuery.of(context).size.width*0.8,
-              ),
-            ),
-            Container(
-              child: TextView('Oops, koneksi internet tidak tersedia\nPastikan Anda terhubung dengan internet', 3, color: config.grayColor, align: TextAlign.center),
-            ),
-          ]
-        ),
       ),
     );
   }
@@ -282,8 +241,23 @@ class LoginState extends State<Login> {
       passwordController.text.isEmpty ? passwordValid = true : passwordValid = false;
     });
 
-    if(!usernameValid && !passwordValid){
-      doLogin();
+    printHelp("cek token ya "+fcmToken);
+
+    if(fcmToken == "") {
+      Alert(
+        context: context,
+        title: "Maaf,",
+        content: Text("Gagal terhubung dengan server"),
+        cancel: false,
+        type: "error",
+        defaultAction: () {
+          getFCMToken();
+        }
+      );
+    } else {
+      if(!usernameValid && !passwordValid){
+        doLogin();
+      }
     }
   }
 

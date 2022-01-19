@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:isolate';
 import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -7,19 +6,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:open_file/open_file.dart';
-// import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:permission_handler/permission_handler.dart';
-// import 'package:percent_indicator/percent_indicator.dart';
-// import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'package:http/http.dart' show Client, Request;
-import 'package:tambah_limit/models/resultModel.dart';
-import 'package:tambah_limit/resources/PushNotificationService.dart';
-import 'package:tambah_limit/resources/customerAPI.dart';
-
 import 'package:tambah_limit/screens/login.dart';
 import 'package:tambah_limit/settings/configuration.dart';
 import 'package:tambah_limit/tools/function.dart';
@@ -41,6 +33,7 @@ class SplashScreenState extends State<SplashScreen> {
   bool isDownloadNewVersion = false;
   bool isRetryDownload = false;
   bool toInstall = false;
+  bool isPermissionPermanentlyDenied = false;
   double progressValue = 0.0;
   String progressText = "";
 
@@ -83,8 +76,16 @@ class SplashScreenState extends State<SplashScreen> {
   void initState() {
     initializeFlutterFire();
 
-    final firebaseMessaging = PushNotificationService();
-    firebaseMessaging.setNotifications();
+    // final firebaseMessaging = PushNotificationService();
+    // firebaseMessaging.setNotifications();
+
+    messaging = FirebaseMessaging.instance;
+    messaging.getToken().then((value){
+        print("token splash : "+value);
+        setState(() {
+          fcmToken = value;
+        });
+    });
     
     super.initState();
   }
@@ -115,20 +116,78 @@ class SplashScreenState extends State<SplashScreen> {
   }
 
   getAppsReady() async {
+    var isNeedOpenSetting = false;
+    isPermissionPermanentlyDenied = false;
     final isPermissionStatusGranted = await checkAppsPermission();
     
-    await isReadyToInstall();
-    
     if(isPermissionStatusGranted) {
-      if(!toInstall) {
-        doCheckVersion();
-      } else {
-        String downloadPath = await getFilePath(config.apkName+".apk");
-        await OpenFile.open(downloadPath);
-      }
+      doCheckVersion();
     } else {
-      checkAppsPermission();
+      var isPermissionStatusGranted = false;
+      
+
+      while(!isPermissionStatusGranted) {
+        if(!isPermissionPermanentlyDenied) {
+          isPermissionStatusGranted = await checkAppsPermission();
+        } else {
+          printHelp("YUKYUK");
+          // isPermissionStatusGranted = await checkAppsPermission();
+          // isNeedOpenSetting = true;
+          // break;
+        }
+      }
+      // if(isNeedOpenSetting) {
+      //   Alert(
+      //     context: context,
+      //     title: "Maaf,",
+      //     content: Text("Mohon izin"),
+      //     cancel: false,
+      //     type: "error",
+      //     errorBtnTitle: "Coba Lagi",
+      //     defaultAction: () async {
+      //       isNeedOpenSetting = false;
+      //       await getAppsReady();
+      //       Navigator.of(context).pop();
+      //     }
+      //   );
+      // }
     }
+
+    //////////////////
+
+    // final isPermissionStatusGranted = await checkAppsPermission();
+    
+    // await isReadyToInstall();
+    
+    // if(isPermissionStatusGranted) {
+    //   if(!toInstall) {
+    //     doCheckVersion();
+    //   } else {
+    //     String downloadPath = await getFilePath(config.apkName+".apk");
+    //     await OpenFile.open(downloadPath);
+    //   }
+    // } else {
+    //   checkAppsPermission();
+    // }
+
+    ////////////////////////
+    // var isPermissionStatusGranted = await checkAppsPermission();
+    // var isPermissionStatusGranted = false;
+    
+    // await isReadyToInstall();
+
+    // while(!isPermissionStatusGranted) {
+    //   isPermissionStatusGranted = await checkAppsPermission();
+    // }
+    
+    // if(isPermissionStatusGranted) {
+    //   if(!toInstall) {
+    //     doCheckVersion();
+    //   } else {
+    //     String downloadPath = await getFilePath(config.apkName+".apk");
+    //     await OpenFile.open(downloadPath);
+    //   }
+    // }
   }
 
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
@@ -357,9 +416,10 @@ class SplashScreenState extends State<SplashScreen> {
               });
 
               printHelp("MASUK SELESAI");
-              // SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-              exit(0);
+              SystemChannels.platform.invokeMethod('SystemNavigator.pop');
               OpenFile.open(downloadPath);
+              // exit(0);
+              
             });
           } catch (e) {
             _setState(() {
@@ -595,19 +655,25 @@ class SplashScreenState extends State<SplashScreen> {
     });
 
     if(checkVersion == "OK") {
+      await isReadyToInstall();
       if(getCheckVersion != config.apkVersion) {
-        printHelp("getcheckversion "+getCheckVersion);
-        printHelp("apkVersion "+config.apkVersion);
-        Alert(
-          context: context,
-          title: "Info,",
-          content: Text("Terdapat pembaruan versi aplikasi. Otomatis mengunduh pembaruan aplikasi setelah tekan OK"),
-          cancel: false,
-          type: "warning",
-          defaultAction: () {
-            preparingNewVersion();
-          }
-        );            
+        if(!toInstall) {
+          printHelp("getcheckversion "+getCheckVersion);
+          printHelp("apkVersion "+config.apkVersion);
+          Alert(
+            context: context,
+            title: "Info,",
+            content: Text("Terdapat pembaruan versi aplikasi. Otomatis mengunduh pembaruan aplikasi setelah tekan OK"),
+            cancel: false,
+            type: "warning",
+            defaultAction: () {
+              preparingNewVersion();
+            }
+          );   
+        } else {
+          String downloadPath = await getFilePath(config.apkName+".apk");
+          await OpenFile.open(downloadPath);
+        }        
       } else {
         startTimer();
       }
@@ -695,25 +761,34 @@ class SplashScreenState extends State<SplashScreen> {
   }
 
   Future<bool> checkAppsPermission() async {
-    final serviceStatus = await Permission.storage.isGranted;
-
-    bool isPermissionGranted = serviceStatus == ServiceStatus.enabled;
-
-    final status = await Permission.storage.request();
-
-    // if(status == PermissionStatus.granted) {
-    // } else if (status == PermissionStatus.denied) {
-    //   print('Permission denied');
-    // } else if (status == PermissionStatus.permanentlyDenied) {
-    //   print('Permission Permanently Denied');
-    // }
+    setState(() {
+      isPermissionPermanentlyDenied = false;
+    });
+    var status = await Permission.storage.request();
 
     if(status != PermissionStatus.granted) {
-      await openAppSettings();
+      if(status == PermissionStatus.denied) {
+        printHelp("GRRRRR");
+        setState(() {
+          isPermissionPermanentlyDenied = true;
+        });
+      } else {
+        printHelp("ASSSSS "+ status.toString());
+        Alert(
+          context: context,
+          title: "Info,",
+          content: Text("Mohon izin ya"),
+          cancel: false,
+          type: "warning",
+          errorBtnTitle: "Setting",
+          defaultAction: () async {
+            await openAppSettings();
+            return status == PermissionStatus.granted;
+          }
+        );
+      }
     }
-
     return status == PermissionStatus.granted;
-
   }
 
   Future<String> getFilePath(filename) async {

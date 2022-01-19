@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:bottom_sheet/bottom_sheet.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
@@ -48,18 +47,11 @@ class AddLimitDetailState extends State<AddLimitDetail> {
   bool limitRequestValid = false;
   bool changeLimitLoading = false;
 
+  String user_login = "";
+
   final currencyFormatter = NumberFormat('#,##0', 'ID');
 
   final ScrollController _scrollController = ScrollController();
-
-  ConnectivityResult _connectionStatus = ConnectivityResult.none;
-  final Connectivity _connectivity = Connectivity();
-  StreamSubscription<ConnectivityResult> _connectivitySubscription;
-
-  Future<Null> getSharedPrefs() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    currentLimitDMD = prefs.getString("limit_dmd");
-  }
 
   Future<Null> setSharedPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -69,43 +61,12 @@ class AddLimitDetailState extends State<AddLimitDetail> {
 
   @override
   void dispose() {
-    _connectivitySubscription.cancel();
     super.dispose();
-  }
-
-  Future<void> initConnectivity() async {
-    ConnectivityResult result;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      result = await _connectivity.checkConnectivity();
-    } on PlatformException catch (e) {
-      print(e);
-      return;
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) {
-      return Future.value(null);
-    }
-
-    return _updateConnectionStatus(result);
-  }
-
-  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
-    setState(() {
-      _connectionStatus = result;
-    });
   }
 
   @override
   void initState() {
     super.initState();
-    initConnectivity();
-    _connectivitySubscription =
-        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
-
     limitRequestController.text = "0";
 
     result = widget.model;
@@ -138,6 +99,16 @@ class AddLimitDetailState extends State<AddLimitDetail> {
   }
 
   @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      user_login = prefs.getString("get_user_login");
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     List<Widget> changeLimitWidgetList = showChangeLimit(config);
     List<Widget> informationDetailWidgetList = showInformationDetail(config);
@@ -146,8 +117,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
     final resultObject = jsonDecode(result.data.toString());
 
     return Container(
-      child: _connectionStatus != ConnectivityResult.none ?
-      DefaultTabController(
+      child: DefaultTabController(
         length: 2,
         child: Scaffold(
             resizeToAvoidBottomInset: true,
@@ -1667,24 +1637,6 @@ class AddLimitDetailState extends State<AddLimitDetail> {
               ),
             )),
       )
-      :
-      Scaffold(
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children:<Widget>[
-            Center(
-              child: Container(
-                child: FlareActor('assets/flare/networking.flr', animation: "no_netwrok"),
-                width: MediaQuery.of(context).size.width*0.8,
-                height: MediaQuery.of(context).size.width*0.8,
-              ),
-            ),
-            Container(
-              child: TextView('Oops, koneksi internet tidak tersedia\nPastikan Anda terhubung dengan internet', 3, color: config.grayColor, align: TextAlign.center),
-            ),
-          ]
-        ),
-      )
     );
   }
 
@@ -1820,7 +1772,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                       ),
                     ],
                   keyboardType: TextInputType.number,
-                  enabled: true,
+                  enabled: user_login.toLowerCase().contains("kc") ? false : true,
                   controller: limitDMDController,
                   decoration: new InputDecoration(
                     hintStyle: TextStyle(color: Colors.black),
@@ -1838,6 +1790,16 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                         width: 1.5,
                       ),
                     ),
+                    disabledBorder: user_login.toLowerCase().contains("kc") ?
+                    OutlineInputBorder(
+                      borderRadius: new BorderRadius.circular(
+                        5.0,
+                      ),
+                      borderSide: BorderSide(
+                        color: config.grayColor,
+                        width: 1.5,
+                      ),
+                    ) : null,
                   ),
                 ),
               ),
@@ -1943,42 +1905,43 @@ class AddLimitDetailState extends State<AddLimitDetail> {
     printHelp("get limit dmd lama " + limit_dmd_lama.toString());
     printHelp("get max  limit " + max_limit.toString());
 
-    if ((limitDMDController.text.isEmpty ||
+    if(!user_login.toLowerCase().contains("kc")) {
+      if ((limitDMDController.text.isEmpty ||
             limitRequestController.text.isEmpty) ||
-        (limitRequestController.text.isEmpty &&
-            int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')) == limit_dmd_lama)) {
-      Alert(
-          context: context,
-          title: "Info,",
-          content: Text("Limit Baru atau Limit DMD harus diisi"),
-          cancel: false,
-          type: "warning");
-    } else {
-      if (int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')) != 0 &&
-          int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) >
-              int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),''))) {
+          (limitRequestController.text.isEmpty &&
+              int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')) == limit_dmd_lama)) {
         Alert(
             context: context,
             title: "Info,",
-            content: Text("Limit Baru melebihi Limit DMD!"),
+            content: Text("Limit Baru atau Limit DMD harus diisi"),
             cancel: false,
             type: "warning");
-      } else if (int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')) == 0 ||
-          (int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')) != 0 &&
-              int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) <=
-                  int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')))) {
-        if (int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > max_limit) {
+      } else {
+        if (int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')) != 0 &&
+            int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) >
+                int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),''))) {
           Alert(
               context: context,
-              title: "Konfirmasi,",
-              content: Text("Limit melebihi kapasitas. Kirim permintaan?"),
-              cancel: true,
-              type: "warning",
-              defaultAction: () {
-                addRequestLimit();
-              });
-        } else {
-          Alert(
+              title: "Info,",
+              content: Text("Limit Baru melebihi Limit DMD!"),
+              cancel: false,
+              type: "warning");
+        } else if (int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')) == 0 ||
+            (int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')) != 0 &&
+                int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) <=
+                    int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')))) {
+          if (int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > max_limit) {
+            Alert(
+                context: context,
+                title: "Konfirmasi,",
+                content: Text("Limit melebihi kapasitas. Kirim permintaan?"),
+                cancel: true,
+                type: "warning",
+                defaultAction: () {
+                  addRequestLimit();
+                });
+          } else {
+            Alert(
               context: context,
               title: "Konfirmasi,",
               content: Text("Ubah Limit Customer?"),
@@ -1986,10 +1949,62 @@ class AddLimitDetailState extends State<AddLimitDetail> {
               type: "warning",
               defaultAction: () {
                 changeLimit();
-              });
+              }
+            );
+          }
         }
       }
+
+    } else {
+      if (limitRequestController.text.isEmpty) {
+        Alert(
+            context: context,
+            title: "Info,",
+            content: Text("Limit Baru harus diisi"),
+            cancel: false,
+            type: "warning");
+      } else {
+        if (int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')) != 0 &&
+            int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) >
+                int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),''))) {
+          Alert(
+              context: context,
+              title: "Info,",
+              content: Text("Limit Baru melebihi Limit DMD!"),
+              cancel: false,
+              type: "warning");
+        } else if (int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')) == 0 ||
+            (int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')) != 0 &&
+                int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) <=
+                    int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')))) {
+          if (int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > max_limit) {
+            Alert(
+                context: context,
+                title: "Konfirmasi,",
+                content: Text("Limit melebihi kapasitas. Kirim permintaan?"),
+                cancel: true,
+                type: "warning",
+                defaultAction: () {
+                  addRequestLimit();
+                });
+          } else {
+            Alert(
+              context: context,
+              title: "Konfirmasi,",
+              content: Text("Ubah Limit Customer?"),
+              cancel: true,
+              type: "warning",
+              defaultAction: () {
+                changeLimit();
+              }
+            );
+          }
+        }
+      }
+
     }
+
+    
   }
 
   void changeLimit() async {

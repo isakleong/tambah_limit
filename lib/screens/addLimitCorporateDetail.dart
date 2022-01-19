@@ -31,6 +31,8 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
 
   final currencyFormatter = NumberFormat('#,##0', 'ID');
 
+  final _ChangeBlockedStatusFormKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
@@ -41,8 +43,6 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
       resultObject = _resultObject;
     });
   }
-
-  final _ChangeBlockedStatusFormKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
