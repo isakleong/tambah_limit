@@ -87,6 +87,9 @@ class LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     Configuration config = Configuration.of(context);
+    
+    double mediaWidth = MediaQuery.of(context).size.width;
+    double mediaHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: WillPopScope(

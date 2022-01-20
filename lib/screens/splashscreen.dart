@@ -132,25 +132,27 @@ class SplashScreenState extends State<SplashScreen> {
         } else {
           printHelp("YUKYUK");
           // isPermissionStatusGranted = await checkAppsPermission();
-          // isNeedOpenSetting = true;
-          // break;
+          isNeedOpenSetting = true;
+          break;
         }
       }
-      // if(isNeedOpenSetting) {
-      //   Alert(
-      //     context: context,
-      //     title: "Maaf,",
-      //     content: Text("Mohon izin"),
-      //     cancel: false,
-      //     type: "error",
-      //     errorBtnTitle: "Coba Lagi",
-      //     defaultAction: () async {
-      //       isNeedOpenSetting = false;
-      //       await getAppsReady();
-      //       Navigator.of(context).pop();
-      //     }
-      //   );
-      // }
+      if(isNeedOpenSetting) {
+        Alert(
+          context: context,
+          title: "Info,",
+          content: Text("Mohon izinkan aplikasi mengakses file di perangkat"),
+          cancel: false,
+          type: "error",
+          errorBtnTitle: "Pengaturan",
+          defaultAction: () async {
+            isNeedOpenSetting = false;
+            await getAppsReady();
+            Navigator.of(context).pop();
+          }
+        );
+      } else {
+        getAppsReady();
+      }
     }
 
     //////////////////
@@ -602,6 +604,7 @@ class SplashScreenState extends State<SplashScreen> {
                   ),
                 ),
               ),
+              SizedBox(height: 100),
               Center(
                 child: Visibility(
                   maintainSize: !isDownloadNewVersion, 
@@ -634,7 +637,7 @@ class SplashScreenState extends State<SplashScreen> {
                   ),
                 ),
               ),
-
+      
             ],
           ),
         ),
@@ -774,18 +777,8 @@ class SplashScreenState extends State<SplashScreen> {
         });
       } else {
         printHelp("ASSSSS "+ status.toString());
-        Alert(
-          context: context,
-          title: "Info,",
-          content: Text("Mohon izin ya"),
-          cancel: false,
-          type: "warning",
-          errorBtnTitle: "Setting",
-          defaultAction: () async {
-            await openAppSettings();
-            return status == PermissionStatus.granted;
-          }
-        );
+        openAppSettings();
+        return status == PermissionStatus.granted;
       }
     }
     return status == PermissionStatus.granted;
