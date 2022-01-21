@@ -130,7 +130,6 @@ class SplashScreenState extends State<SplashScreen> {
         if(!isPermissionPermanentlyDenied) {
           isPermissionStatusGranted = await checkAppsPermission();
         } else {
-          printHelp("YUKYUK");
           // isPermissionStatusGranted = await checkAppsPermission();
           isNeedOpenSetting = true;
           break;
@@ -585,7 +584,7 @@ class SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Center(
         child: Container(
-          width: mediaWidth-100,
+          width: mediaWidth-120,
           height: mediaHeight,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -771,12 +770,10 @@ class SplashScreenState extends State<SplashScreen> {
 
     if(status != PermissionStatus.granted) {
       if(status == PermissionStatus.denied) {
-        printHelp("GRRRRR");
         setState(() {
           isPermissionPermanentlyDenied = true;
         });
       } else {
-        printHelp("ASSSSS "+ status.toString());
         openAppSettings();
         return status == PermissionStatus.granted;
       }

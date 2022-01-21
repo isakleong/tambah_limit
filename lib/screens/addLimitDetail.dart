@@ -130,15 +130,19 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                     pinned: true,
                     floating: true,
                     bottom: TabBar(
+                      isScrollable: true,
                       indicatorColor: Colors.white,
                       indicatorWeight: 3,
+                      indicatorSize: TabBarIndicatorSize.label,
                       tabs: [
                         Tab(
-                            icon: Icon(Icons.book_rounded),
-                            child: TextView("Ubah Limit", 3)),
+                          icon: Icon(Icons.book_rounded),
+                          child: TextView("Ubah Limit", 3)
+                        ),
                         Tab(
-                            icon: Icon(Icons.info_rounded),
-                            child: TextView("Detail Informasi", 3))
+                          icon: Icon(Icons.info_rounded),
+                          child: TextView("Detail Informasi", 3)
+                        ),
                       ],
                     ),
                   )
@@ -146,240 +150,142 @@ class AddLimitDetailState extends State<AddLimitDetail> {
               },
               body: TabBarView(
                 children: [
-                  changeLimitWidgetList.length == 0
-                      ? Container()
-                      : ListView(
-                          scrollDirection: Axis.vertical,
-                          padding: EdgeInsets.all(8),
-                          physics: ScrollPhysics(),
-                          shrinkWrap: true,
-                          children: changeLimitWidgetList,
-                        ),
-    
+                  changeLimitWidgetList.length == 0 ?
+                  Container()
+                  :
+                  ListView(
+                    scrollDirection: Axis.vertical,
+                    padding: EdgeInsets.all(8),
+                    physics: ScrollPhysics(),
+                    shrinkWrap: true,
+                    children: changeLimitWidgetList,
+                  ),
                   //Detail Informasi section
                   SingleChildScrollView(
                     child: Container(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Container(
-                              child: TextView("Ketepatan Waktu Pembayaran", 1,
-                                  color: config.blueColor),
-                            ),
-                            Center(
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: <Widget>[
-                                    Container(
-                                      child: Column(
-                                        children: [
-                                          Card(
-                                            child: InkWell(
-                                              onTap: () {
-                                                //bottom sheet
-                                                resultObject[1]
-                                                                [
-                                                                "pembayaranc1"] !=
-                                                            0 ||
-                                                        resultObject[1]
-                                                                [
-                                                                "pembayaranc2"] !=
-                                                            0 ||
-                                                        resultObject[1][
-                                                                "pembayaranc3"] !=
-                                                            0 ||
-                                                        resultObject[1][
-                                                                "pembayaranc4"] !=
-                                                            0
-                                                    ? showAvatarModalBottomSheet(
-                                                        expand: true,
-                                                        context: context,
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        builder: (context) =>
-                                                            ModalWithPageView(
-                                                          modalTitle:
-                                                              "Rentang Pembayaran",
-                                                          modalContent: [
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .symmetric(
-                                                                      horizontal:
-                                                                          20,
-                                                                      vertical:
-                                                                          15),
-                                                              child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Container(
-                                                                    child: TextView(
-                                                                        "Rentang Cat 1 (0 - ${resultObject[3]["top_cat"].toString()})",
-                                                                        3,
-                                                                        color: Colors
-                                                                            .black),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height: 30),
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
-                                                                    children: [
-                                                                      TextView(
-                                                                          "Rp " +
-                                                                              currencyFormatter.format(resultObject[1]["pembayaranc1"]),
-                                                                          4),
-                                                                      TextView(
-                                                                          resultObject[1]["pembayaranc1"] !=
-                                                                                  0
-                                                                              ? "100%"
-                                                                              : "0%",
-                                                                          4),
-                                                                    ],
-                                                                  ),
-                                                                  Divider(
-                                                                    height: 60,
-                                                                    thickness: 4,
-                                                                    color: config
-                                                                        .lighterGrayColor,
-                                                                  ),
-                                                                  Container(
-                                                                    child: TextView(
-                                                                        "Rentang Cat 2 (${resultObject[3]["top_cat"] + 1} - 70)",
-                                                                        3,
-                                                                        color: Colors
-                                                                            .black),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height: 30),
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
-                                                                    children: [
-                                                                      TextView(
-                                                                          "Rp " +
-                                                                              currencyFormatter.format(resultObject[1]["pembayaranc2"]),
-                                                                          4),
-                                                                      TextView(
-                                                                          resultObject[1]["pembayaranc2"] !=
-                                                                                  0
-                                                                              ? "100%"
-                                                                              : "0%",
-                                                                          4),
-                                                                    ],
-                                                                  ),
-                                                                  Divider(
-                                                                    height: 60,
-                                                                    thickness: 4,
-                                                                    color: config
-                                                                        .lighterGrayColor,
-                                                                  ),
-                                                                  Container(
-                                                                    child: TextView(
-                                                                        "Rentang Cat 3 (71 - 90)",
-                                                                        3,
-                                                                        color: Colors
-                                                                            .black),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height: 30),
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
-                                                                    children: [
-                                                                      TextView(
-                                                                          "Rp " +
-                                                                              currencyFormatter.format(resultObject[1]["pembayaranc3"]),
-                                                                          4),
-                                                                      TextView(
-                                                                          resultObject[1]["pembayaranc3"] !=
-                                                                                  0
-                                                                              ? "100%"
-                                                                              : "0%",
-                                                                          4),
-                                                                    ],
-                                                                  ),
-                                                                  Divider(
-                                                                    height: 60,
-                                                                    thickness: 4,
-                                                                    color: config
-                                                                        .lighterGrayColor,
-                                                                  ),
-                                                                  Container(
-                                                                    child: TextView(
-                                                                        "Rentang Cat 4 (> 90)",
-                                                                        3,
-                                                                        color: Colors
-                                                                            .black),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height: 30),
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
-                                                                    children: [
-                                                                      TextView(
-                                                                          "Rp " +
-                                                                              currencyFormatter.format(resultObject[1]["pembayaranc4"]),
-                                                                          4),
-                                                                      TextView(
-                                                                          resultObject[1]["pembayaranc4"] !=
-                                                                                  0
-                                                                              ? "100%"
-                                                                              : "0%",
-                                                                          4),
-                                                                    ],
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            )
+                      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Container(
+                            child: TextView("Ketepatan Waktu Pembayaran", 1, color: config.blueColor)
+                          ),
+                          Center(
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: <Widget>[
+                                  Container(
+                                    child: Column(
+                                      children: [
+                                        Card(
+                                          child: InkWell(
+                                            onTap: () {
+                                              //bottom sheet
+                                              resultObject[1]["pembayaranc1"] != 0 || resultObject[1]["pembayaranc2"] != 0 || resultObject[1]["pembayaranc3"] != 0 || resultObject[1]["pembayaranc4"] != 0 ?
+                                              showAvatarModalBottomSheet(
+                                                expand: true,
+                                                context: context,
+                                                backgroundColor: Colors.transparent,
+                                                builder: (context) => ModalWithPageView(
+                                                  modalTitle: "Rentang Pembayaran",
+                                                  modalContent: [
+                                                    Padding(
+                                                      padding:const EdgeInsets.symmetric(horizontal: 20, vertical:15),
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment .start,
+                                                        children: [
+                                                          Container(
+                                                            child: TextView("Rentang Cat 1 (0 - ${resultObject[3]["top_cat"].toString()})", 3, color: Colors .black),
+                                                          ),
+                                                          SizedBox(height: 30),
+                                                          Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              TextView("Rp " + currencyFormatter.format(resultObject[1]["pembayaranc1"]), 4),
+                                                              TextView(resultObject[1]["pembayaranc1"] != 0 ? "100%" : "0%", 4),
+                                                            ],
+                                                          ),
+                                                          Divider(
+                                                            height: 60,
+                                                            thickness: 4,
+                                                            color: config.lighterGrayColor,
+                                                          ),
+                                                          Container(
+                                                            child: TextView("Rentang Cat 2 (${resultObject[3]["top_cat"] + 1} - 70)", 3, color: Colors.black),
+                                                          ),
+                                                          SizedBox(height: 30),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                            MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              TextView("Rp " + currencyFormatter.format(resultObject[1]["pembayaranc2"]), 4),
+                                                              TextView(resultObject[1]["pembayaranc2"] != 0 ? "100%" : "0%", 4),
+                                                            ],
+                                                          ),
+                                                          Divider(
+                                                            height: 60,
+                                                            thickness: 4,
+                                                            color: config.lighterGrayColor,
+                                                          ),
+                                                          Container(
+                                                            child: TextView("Rentang Cat 3 (71 - 90)", 3, color: Colors.black),
+                                                          ),
+                                                          SizedBox(height: 30),
+                                                          Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              TextView("Rp " + currencyFormatter.format(resultObject[1]["pembayaranc3"]), 4),
+                                                              TextView(resultObject[1]["pembayaranc3"] != 0 ? "100%" : "0%", 4),
+                                                            ],
+                                                          ),
+                                                          Divider(
+                                                            height: 60,
+                                                            thickness: 4,
+                                                            color: config.lighterGrayColor),
+                                                            Container(
+                                                              child: TextView("Rentang Cat 4 (> 90)", 3, color: Colors.black),
+                                                            ),
+                                                            SizedBox(height: 30),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                TextView("Rp " + currencyFormatter.format(resultObject[1]["pembayaranc4"]), 4),
+                                                                TextView(resultObject[1]["pembayaranc4"] != 0 ? "100%" : "0%", 4),
+                                                              ],
+                                                            ),
                                                           ],
                                                         ),
                                                       )
-                                                    : Alert(
-                                                        context: context,
-                                                        title: "Info,",
-                                                        content: Text(
-                                                            "Tidak ada data"),
-                                                        cancel: false,
-                                                        type: "warning");
-                                              },
-                                              child: Container(
-                                                height: 75,
-                                                width: 75,
-                                                child: Center(
-                                                  child: Image.asset(
-                                                    "assets/illustration/varnish.png",
-                                                    alignment: Alignment.center,
-                                                    fit: BoxFit.contain,
-                                                    height: 50,
+                                                    ],
                                                   ),
-                                                ),
+                                                )
+                                                : Alert(
+                                                  context: context,
+                                                  title: "Info,",
+                                                  content: Text("Tidak ada data"),
+                                                  cancel: false, type: "warning"
+                                                );
+                                            },
+                                            child: Container(
+                                              height: 75,
+                                              width: 75,
+                                              child: Center(
+                                                child: Image.asset("assets/illustration/varnish.png", alignment: Alignment.center, fit: BoxFit.contain, height: 50),
                                               ),
                                             ),
-                                            elevation: 3,
-                                            shadowColor:
-                                                config.grayNonActiveColor,
-                                            margin: EdgeInsets.all(20),
-                                            shape: CircleBorder(
-                                              side: BorderSide(
-                                                  width: 1, color: Colors.white),
-                                              // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                            ),
                                           ),
-                                          Text("Cat"),
+                                          elevation: 3,
+                                          shadowColor: config.grayNonActiveColor,
+                                          margin: EdgeInsets.all(20),
+                                          shape: CircleBorder(
+                                            side: BorderSide(width: 1, color: Colors.white),
+                                            // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                          ),
+                                        ),
+                                        Text("Cat"),
                                         ],
                                       ),
                                     ),
@@ -389,198 +295,106 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                           Card(
                                             child: InkWell(
                                               onTap: () {
-                                                resultObject[7]
-                                                                [
-                                                                "pembayaranb1"] !=
-                                                            0 ||
-                                                        resultObject[7]
-                                                                [
-                                                                "pembayaranb2"] !=
-                                                            0 ||
-                                                        resultObject[7][
-                                                                "pembayaranb3"] !=
-                                                            0 ||
-                                                        resultObject[7][
-                                                                "pembayaranb4"] !=
-                                                            0
-                                                    ? showAvatarModalBottomSheet(
-                                                        expand: true,
-                                                        context: context,
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        builder: (context) =>
-                                                            ModalWithPageView(
-                                                          modalTitle:
-                                                              "Rentang Pembayaran",
-                                                          modalContent: [
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .symmetric(
-                                                                      horizontal:
-                                                                          20,
-                                                                      vertical:
-                                                                          15),
-                                                              child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Container(
-                                                                    child: TextView(
-                                                                        "Rentang BB 1 (0 - ${resultObject[3]["top_cat"].toString()})",
-                                                                        3,
-                                                                        color: Colors
-                                                                            .black),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height: 30),
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
-                                                                    children: [
-                                                                      TextView(
-                                                                          "Rp " +
-                                                                              currencyFormatter.format(resultObject[7]["pembayaranb1"]),
-                                                                          4),
-                                                                      TextView(
-                                                                          resultObject[7]["pembayaranb1"] !=
-                                                                                  0
-                                                                              ? "100%"
-                                                                              : "0%",
-                                                                          4),
-                                                                    ],
-                                                                  ),
-                                                                  Divider(
-                                                                    height: 60,
-                                                                    thickness: 4,
-                                                                    color: config
-                                                                        .lighterGrayColor,
-                                                                  ),
-                                                                  Container(
-                                                                    child: TextView(
-                                                                        "Rentang BB 2 (${resultObject[3]["top_cat"] + 1} - 70)",
-                                                                        3,
-                                                                        color: Colors
-                                                                            .black),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height: 30),
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
-                                                                    children: [
-                                                                      TextView(
-                                                                          "Rp " +
-                                                                              currencyFormatter.format(resultObject[7]["pembayaranb2"]),
-                                                                          4),
-                                                                      TextView(
-                                                                          resultObject[7]["pembayaranb2"] !=
-                                                                                  0
-                                                                              ? "100%"
-                                                                              : "0%",
-                                                                          4),
-                                                                    ],
-                                                                  ),
-                                                                  Divider(
-                                                                    height: 60,
-                                                                    thickness: 4,
-                                                                    color: config
-                                                                        .lighterGrayColor,
-                                                                  ),
-                                                                  Container(
-                                                                    child: TextView(
-                                                                        "Rentang BB 3 (71 - 90)",
-                                                                        3,
-                                                                        color: Colors
-                                                                            .black),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height: 30),
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
-                                                                    children: [
-                                                                      TextView(
-                                                                          "Rp " +
-                                                                              currencyFormatter.format(resultObject[7]["pembayaranb3"]),
-                                                                          4),
-                                                                      TextView(
-                                                                          resultObject[7]["pembayaranb3"] !=
-                                                                                  0
-                                                                              ? "100%"
-                                                                              : "0%",
-                                                                          4),
-                                                                    ],
-                                                                  ),
-                                                                  Divider(
-                                                                    height: 60,
-                                                                    thickness: 4,
-                                                                    color: config
-                                                                        .lighterGrayColor,
-                                                                  ),
-                                                                  Container(
-                                                                    child: TextView(
-                                                                        "Rentang BB 4 (> 90)",
-                                                                        3,
-                                                                        color: Colors
-                                                                            .black),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height: 30),
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
-                                                                    children: [
-                                                                      TextView(
-                                                                          "Rp " +
-                                                                              currencyFormatter.format(resultObject[7]["pembayaranb4"]),
-                                                                          4),
-                                                                      TextView(
-                                                                          resultObject[7]["pembayaranb4"] !=
-                                                                                  0
-                                                                              ? "100%"
-                                                                              : "0%",
-                                                                          4),
-                                                                    ],
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            )
+                                                resultObject[7]["pembayaranb1"] != 0 || resultObject[7]["pembayaranb2"] != 0 || resultObject[7]["pembayaranb3"] != 0 || resultObject[7]["pembayaranb4"] != 0 ?
+                                                showAvatarModalBottomSheet(
+                                                  expand: true,
+                                                  context: context,
+                                                  backgroundColor: Colors.transparent,
+                                                  builder: (context) => ModalWithPageView(
+                                                    modalTitle: "Rentang Pembayaran",
+                                                    modalContent: [
+                                                      Padding(
+                                                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Container(
+                                                              child: TextView("Rentang BB 1 (0 - ${resultObject[3]["top_cat"].toString()})", 3, color: Colors.black),
+                                                            ),
+                                                            SizedBox(height: 30),
+                                                            Row(
+                                                              mainAxisAlignment:MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                TextView("Rp " + currencyFormatter.format(resultObject[7]["pembayaranb1"]), 4),
+                                                                TextView(resultObject[7]["pembayaranb1"] != 0 ? "100%" : "0%", 4),
+                                                              ],
+                                                            ),
+                                                            Divider(
+                                                              height: 60,
+                                                              thickness: 4,
+                                                              color: config.lighterGrayColor,
+                                                            ),
+                                                            Container(
+                                                              child: TextView("Rentang BB 2 (${resultObject[3]["top_cat"] + 1} - 70)", 3, color: Colors.black),
+                                                            ),
+                                                            SizedBox(height: 30),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                TextView("Rp " + currencyFormatter.format(resultObject[7]["pembayaranb2"]), 4),
+                                                                TextView(resultObject[7]["pembayaranb2"] != 0 ? "100%" : "0%", 4),
+                                                              ],
+                                                            ),
+                                                            Divider(
+                                                              height: 60,
+                                                              thickness: 4,
+                                                              color: config.lighterGrayColor,
+                                                            ),
+                                                            Container(
+                                                              child: TextView("Rentang BB 3 (71 - 90)", 3, color: Colors.black),
+                                                            ),
+                                                            SizedBox(height: 30),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                TextView("Rp " + currencyFormatter.format(resultObject[7]["pembayaranb3"]), 4),
+                                                                TextView(resultObject[7]["pembayaranb3"] != 0 ? "100%" : "0%", 4),
+                                                              ],
+                                                            ),
+                                                            Divider(
+                                                              height: 60,
+                                                              thickness: 4,
+                                                              color: config.lighterGrayColor,
+                                                            ),
+                                                            Container(
+                                                              child: TextView("Rentang BB 4 (> 90)", 3,
+                                                              color: Colors.black),
+                                                            ),
+                                                            SizedBox(height: 30),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                TextView("Rp " + currencyFormatter.format(resultObject[7]["pembayaranb4"]), 4),
+                                                                TextView(resultObject[7]["pembayaranb4"] != 0 ? "100%" : "0%", 4),
+                                                              ],
+                                                            ),
                                                           ],
                                                         ),
                                                       )
-                                                    : Alert(
-                                                        context: context,
-                                                        title: "Info,",
-                                                        content: Text(
-                                                            "Tidak ada data"),
-                                                        cancel: false,
-                                                        type: "warning");
-                                              },
-                                              child: Container(
-                                                height: 75,
-                                                width: 75,
-                                                child: Center(
-                                                  child: Image.asset(
-                                                      "assets/illustration/pipe.png",
-                                                      alignment: Alignment.center,
-                                                      fit: BoxFit.contain,
-                                                      height: 50),
+                                                    ],
+                                                  ),
+                                                )
+                                                : Alert(
+                                                    context: context,
+                                                    title: "Info,",
+                                                    content: Text("Tidak ada data"),
+                                                    cancel: false,
+                                                    type: "warning"
+                                                  );
+                                                },
+                                                child: Container(
+                                                  height: 75,
+                                                  width: 75,
+                                                  child: Center(
+                                                    child: Image.asset("assets/illustration/pipe.png", alignment: Alignment.center, fit: BoxFit.contain, height: 50),
                                                 ),
                                               ),
                                             ),
                                             elevation: 3,
-                                            shadowColor:
-                                                config.grayNonActiveColor,
+                                            shadowColor: config.grayNonActiveColor,
                                             margin: EdgeInsets.all(20),
                                             shape: CircleBorder(
-                                              side: BorderSide(
-                                                  width: 1, color: Colors.white),
+                                              side: BorderSide(width: 1, color: Colors.white),
                                             ),
                                           ),
                                           Text("Bahan Bangunan"),
@@ -593,198 +407,111 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                           Card(
                                             child: InkWell(
                                               onTap: () {
-                                                resultObject[6]
-                                                                [
-                                                                "pembayaranm1"] !=
-                                                            0 ||
-                                                        resultObject[6]
-                                                                [
-                                                                "pembayaranm2"] !=
-                                                            0 ||
-                                                        resultObject[6][
-                                                                "pembayaranm3"] !=
-                                                            0 ||
-                                                        resultObject[6][
-                                                                "pembayaranm4"] !=
-                                                            0
-                                                    ? showAvatarModalBottomSheet(
-                                                        expand: true,
-                                                        context: context,
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        builder: (context) =>
-                                                            ModalWithPageView(
-                                                          modalTitle:
-                                                              "Rentang Pembayaran",
-                                                          modalContent: [
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .symmetric(
-                                                                      horizontal:
-                                                                          20,
-                                                                      vertical:
-                                                                          15),
-                                                              child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Container(
-                                                                    child: TextView(
-                                                                        "Rentang Mebel 1 (0 - ${resultObject[5]["top_mebel"]})",
-                                                                        3,
-                                                                        color: Colors
-                                                                            .black),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height: 30),
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
-                                                                    children: [
-                                                                      TextView(
-                                                                          "Rp " +
-                                                                              currencyFormatter.format(resultObject[6]["pembayaranm1"]),
-                                                                          4),
-                                                                      TextView(
-                                                                          resultObject[6]["pembayaranm1"] !=
-                                                                                  0
-                                                                              ? "100%"
-                                                                              : "0%",
-                                                                          4),
-                                                                    ],
-                                                                  ),
-                                                                  Divider(
-                                                                    height: 60,
-                                                                    thickness: 4,
-                                                                    color: config
-                                                                        .lighterGrayColor,
-                                                                  ),
-                                                                  Container(
-                                                                    child: TextView(
-                                                                        "Rentang Mebel 2 (${resultObject[5]["top_mebel"] + 1} - 70)",
-                                                                        3,
-                                                                        color: Colors
-                                                                            .black),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height: 30),
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
-                                                                    children: [
-                                                                      TextView(
-                                                                          "Rp " +
-                                                                              currencyFormatter.format(resultObject[6]["pembayaranm2"]),
-                                                                          4),
-                                                                      TextView(
-                                                                          resultObject[6]["pembayaranm2"] !=
-                                                                                  0
-                                                                              ? "100%"
-                                                                              : "0%",
-                                                                          4),
-                                                                    ],
-                                                                  ),
-                                                                  Divider(
-                                                                    height: 60,
-                                                                    thickness: 4,
-                                                                    color: config
-                                                                        .lighterGrayColor,
-                                                                  ),
-                                                                  Container(
-                                                                    child: TextView(
-                                                                        "Rentang Mebel 3 (71 - 90)",
-                                                                        3,
-                                                                        color: Colors
-                                                                            .black),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height: 30),
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
-                                                                    children: [
-                                                                      TextView(
-                                                                          "Rp " +
-                                                                              currencyFormatter.format(resultObject[6]["pembayaranm3"]),
-                                                                          4),
-                                                                      TextView(
-                                                                          resultObject[6]["pembayaranm3"] !=
-                                                                                  0
-                                                                              ? "100%"
-                                                                              : "0%",
-                                                                          4),
-                                                                    ],
-                                                                  ),
-                                                                  Divider(
-                                                                    height: 60,
-                                                                    thickness: 4,
-                                                                    color: config
-                                                                        .lighterGrayColor,
-                                                                  ),
-                                                                  Container(
-                                                                    child: TextView(
-                                                                        "Rentang Mebel 4 (> 90)",
-                                                                        3,
-                                                                        color: Colors
-                                                                            .black),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height: 30),
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
-                                                                    children: [
-                                                                      TextView(
-                                                                          "Rp " +
-                                                                              currencyFormatter.format(resultObject[6]["pembayaranm4"]),
-                                                                          4),
-                                                                      TextView(
-                                                                          resultObject[6]["pembayaranm4"] !=
-                                                                                  0
-                                                                              ? "100%"
-                                                                              : "0%",
-                                                                          4),
-                                                                    ],
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            )
+                                                resultObject[6]["pembayaranm1"] != 0 || resultObject[6]["pembayaranm2"] != 0 || resultObject[6]["pembayaranm3"] != 0 || resultObject[6]["pembayaranm4"] != 0
+                                                ? 
+                                                showAvatarModalBottomSheet(
+                                                  expand: true,
+                                                  context: context,
+                                                  backgroundColor: Colors.transparent,
+                                                  builder: (context) => ModalWithPageView(
+                                                    modalTitle: "Rentang Pembayaran",
+                                                    modalContent: [
+                                                      Padding(
+                                                        padding:
+                                                        const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Container(
+                                                              child: TextView("Rentang Mebel 1 (0 - ${resultObject[5]["top_mebel"]})", 3, color: Colors.black),
+                                                            ),
+                                                            SizedBox(height: 30),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                TextView("Rp " + currencyFormatter.format(resultObject[6]["pembayaranm1"]), 4),
+                                                                TextView(resultObject[6]["pembayaranm1"] != 0 ? "100%" : "0%", 4),
+                                                              ],
+                                                            ),
+                                                            Divider(
+                                                              height: 60,
+                                                              thickness: 4,
+                                                              color: config.lighterGrayColor,
+                                                            ),
+                                                            Container(
+                                                              child: TextView("Rentang Mebel 2 (${resultObject[5]["top_mebel"] + 1} - 70)", 3, color: Colors.black),
+                                                            ),
+                                                            SizedBox(height: 30),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                TextView("Rp " + currencyFormatter.format(resultObject[6]["pembayaranm2"]), 4),
+                                                                TextView(resultObject[6]["pembayaranm2"] != 0 ? "100%" : "0%", 4),
+                                                              ],
+                                                            ),
+                                                            Divider(
+                                                              height: 60,
+                                                              thickness: 4,
+                                                              color: config.lighterGrayColor,
+                                                            ),
+                                                            Container(
+                                                              child: TextView("Rentang Mebel 3 (71 - 90)", 3, color: Colors.black),
+                                                            ),
+                                                            SizedBox(height: 30),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                TextView("Rp " + currencyFormatter.format(resultObject[6]["pembayaranm3"]), 4),
+                                                                TextView(resultObject[6]["pembayaranm3"] != 0 ? "100%" : "0%", 4),
+                                                              ],
+                                                            ),
+                                                            Divider(
+                                                              height: 60,
+                                                              thickness: 4,
+                                                              color: config.lighterGrayColor,
+                                                            ),
+                                                            Container(
+                                                              child: TextView("Rentang Mebel 4 (> 90)", 3, color: Colors.black),
+                                                            ),
+                                                            SizedBox(height: 30),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                TextView("Rp " + currencyFormatter.format(resultObject[6]["pembayaranm4"]), 4),
+                                                                TextView(resultObject[6]["pembayaranm4"] != 0 ? "100%" : "0%", 4),
+                                                              ],
+                                                            ),
                                                           ],
                                                         ),
                                                       )
-                                                    : Alert(
-                                                        context: context,
-                                                        title: "Info,",
-                                                        content: Text(
-                                                            "Tidak ada data"),
-                                                        cancel: false,
-                                                        type: "warning");
+                                                    ],
+                                                  ),
+                                                )
+                                                :
+                                                Alert(
+                                                  context: context,
+                                                  title: "Info,",
+                                                  content: Text("Tidak ada data"),
+                                                  cancel: false,
+                                                  type: "warning"
+                                                );
                                               },
                                               child: Container(
                                                 height: 75,
                                                 width: 75,
                                                 child: Center(
-                                                  child: Image.asset(
-                                                      "assets/illustration/furniture.png",
-                                                      alignment: Alignment.center,
-                                                      fit: BoxFit.contain,
-                                                      height: 50),
+                                                  child: Image.asset("assets/illustration/furniture.png", alignment: Alignment.center, fit: BoxFit.contain, height: 50),
                                                 ),
                                               ),
                                             ),
                                             elevation: 3,
-                                            shadowColor:
-                                                config.grayNonActiveColor,
+                                            shadowColor: config.grayNonActiveColor,
                                             margin: EdgeInsets.all(20),
                                             shape: CircleBorder(
                                               side: BorderSide(
-                                                  width: 1, color: Colors.white),
+                                                width: 1,
+                                                color: Colors.white
+                                              ),
                                             ),
                                           ),
                                           Text("Mebel"),
@@ -801,15 +528,13 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                               color: config.lighterGrayColor,
                             ),
                             Container(
-                              child: TextView("Faktur Terdekat Jatuh Tempo", 1,
-                                  color: config.blueColor),
+                              child: TextView("Faktur Terdekat Jatuh Tempo", 1, color: config.blueColor),
                             ),
                             Center(
                               child: SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: <Widget>[
                                     Container(
@@ -818,71 +543,60 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                           Card(
                                             child: InkWell(
                                               onTap: () {
-                                                resultObject[12].length != 0
-                                                    ? showAvatarModalBottomSheet(
-                                                        expand: true,
-                                                        context: context,
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        builder: (context) =>
-                                                            ModalWithPageView(
-                                                          modalTitle:
-                                                              "Faktur Terdekat Jatuh Tempo",
-                                                          modalContent: [
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .symmetric(
-                                                                      horizontal:
-                                                                          20,
-                                                                      vertical:
-                                                                          15),
+                                                resultObject[12].length != 0 ?
+                                                showAvatarModalBottomSheet(
+                                                  expand: true,
+                                                  context: context,
+                                                  backgroundColor: Colors.transparent,
+                                                  builder: (context) => ModalWithPageView(
+                                                    modalTitle: "Faktur Terdekat Jatuh Tempo",
+                                                    modalContent: [
+                                                      Padding(
+                                                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Container(
+                                                              child: TextView("Cat (${resultObject[12][0]["due_date"]})", 3, color: Colors.black),
+                                                            ),
+                                                            SizedBox(height: 30),
+                                                            Container(
+                                                              child: TextView("Document No", 3, color: Colors.black),
+                                                            ),
+                                                            SizedBox(height: 15),
+                                                            Container(
                                                               child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Container(
-                                                                    child: TextView(
-                                                                        "Cat (${resultObject[12][0]["due_date"]})",
-                                                                        3,
-                                                                        color: Colors
-                                                                            .black),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height: 30),
-                                                                  DataTable(
-                                                                    columns: [
-                                                                      DataColumn(
-                                                                          label:
-                                                                              TextView(
-                                                                        "Document No",
-                                                                        4,
-                                                                      )),
-                                                                      DataColumn(
-                                                                          label: TextView(
-                                                                              "Sisa",
-                                                                              4)),
-                                                                    ],
-                                                                    rows: List.generate(
-                                                                        resultObject[
-                                                                                12]
-                                                                            .length,
-                                                                        (index) {
-                                                                      return DataRow(
-                                                                          cells: [
-                                                                            DataCell(TextView(
-                                                                                "${resultObject[12][index]["document_no"]}",
-                                                                                4)),
-                                                                            DataCell(TextView(
-                                                                                "Rp " + currencyFormatter.format(double.parse(resultObject[12][index]["sisa"])),
-                                                                                4)),
-                                                                          ]);
-                                                                    }),
-                                                                  ),
-                                                                ],
+                                                                children: List.generate(resultObject[12].length,(index){
+                                                                  return Container(
+                                                                    margin: EdgeInsets.only(top: 10),
+                                                                    child: TextView(resultObject[12][index]["document_no"], 4)
+                                                                  );
+                                                                }),
                                                               ),
-                                                            )
+                                                            ),
+                                                            Divider(
+                                                              height: 40,
+                                                              thickness: 4,
+                                                              color: config.lighterGrayColor,
+                                                            ),
+                                                            Container(
+                                                              child: TextView("Sisa", 3, color: Colors.black),
+                                                            ),
+                                                            SizedBox(height: 15),
+                                                            Container(
+                                                              child: Column(
+                                                                children:
+                                                                List.generate(resultObject[12].length,(index){
+                                                                  return Container(
+                                                                    margin: EdgeInsets.only(top: 10),
+                                                                    child: TextView("Rp "+ currencyFormatter.format(double.parse(resultObject[12][index]["sisa"])), 4)
+                                                                  );
+                                                                }),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )
                                                           ],
                                                         ),
                                                       )
@@ -940,50 +654,68 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                                   "Faktur Terdekat Jatuh Tempo",
                                                               modalContent: [
                                                                 Padding(
-                                                                  padding: const EdgeInsets
-                                                                          .symmetric(
-                                                                      horizontal:
-                                                                          20,
-                                                                      vertical:
-                                                                          15),
+                                                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                                                                   child: Column(
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
+                                                                    crossAxisAlignment: CrossAxisAlignment.start,
                                                                     children: [
                                                                       Container(
-                                                                        child: TextView(
-                                                                            "BB (${resultObject[13][0]["due_date"]})",
-                                                                            3,
-                                                                            color:
-                                                                                Colors.black),
+                                                                        child: TextView("BB (${resultObject[13][0]["due_date"]})", 3, color: Colors.black),
                                                                       ),
-                                                                      SizedBox(
-                                                                          height:
-                                                                              30),
-                                                                      DataTable(
-                                                                        columns: [
-                                                                          DataColumn(
-                                                                              label:
-                                                                                  TextView(
-                                                                            "Document No",
-                                                                            4,
-                                                                          )),
-                                                                          DataColumn(
-                                                                              label:
-                                                                                  TextView("Sisa", 4)),
-                                                                        ],
-                                                                        rows: List.generate(
-                                                                            resultObject[13]
-                                                                                .length,
-                                                                            (index) {
-                                                                          return DataRow(
-                                                                              cells: [
-                                                                                DataCell(TextView("${resultObject[13][index]["document_no"]}", 4)),
-                                                                                DataCell(TextView("Rp " + currencyFormatter.format(double.parse(resultObject[13][index]["sisa"])), 4)),
-                                                                              ]);
-                                                                        }),
+                                                                      SizedBox(height: 30),
+                                                                      Container(
+                                                                        child: TextView("Document No", 3, color: Colors.black),
                                                                       ),
+                                                                      SizedBox(height: 15),
+                                                                      Container(
+                                                                        child: Column(
+                                                                          children: List.generate(resultObject[13].length,(index){
+                                                                            return Container(
+                                                                              margin: EdgeInsets.only(top: 10),
+                                                                              child: TextView(resultObject[13][index]["document_no"], 4)
+                                                                            );
+                                                                          }),
+                                                                        ),
+                                                                      ),
+                                                                      Divider(
+                                                                        height: 40,
+                                                                        thickness: 4,
+                                                                        color: config.lighterGrayColor,
+                                                                      ),
+                                                                      Container(
+                                                                        child: TextView("Sisa", 3, color: Colors.black),
+                                                                      ),
+                                                                      SizedBox(height: 15),
+                                                                      Container(
+                                                                        child: Column(
+                                                                          children:
+                                                                          List.generate(resultObject[13].length,(index){
+                                                                            return Container(
+                                                                              margin: EdgeInsets.only(top: 10),
+                                                                              child: TextView("Rp "+ currencyFormatter.format(double.parse(resultObject[13][index]["sisa"])), 4)
+                                                                            );
+                                                                          }),
+                                                                        ),
+                                                                      ),
+
+                                                                      // DataTable(
+                                                                      //   columns: [
+                                                                      //     DataColumn(
+                                                                      //       label: TextView("Document No", 4,)
+                                                                      //     ),
+                                                                      //     DataColumn(
+                                                                      //       label: TextView("Sisa", 4)
+                                                                      //     ),
+                                                                      //   ],
+                                                                      //   rows: List.generate(resultObject[13].length,(index){
+                                                                      //     return DataRow(
+                                                                      //       cells: [
+                                                                      //         DataCell(TextView("${resultObject[13][index]["document_no"]}", 4)),
+                                                                      //         DataCell(TextView("Rp "+ currencyFormatter.format(double.parse(resultObject[13][index]["sisa"])), 4)),
+                                                                      //       ]
+                                                                      //     );
+                                                                      //   }),
+                                                                      // ),
+
                                                                     ],
                                                                   ),
                                                                 )
@@ -1045,55 +777,47 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                               "Faktur Terdekat Jatuh Tempo",
                                                           modalContent: [
                                                             Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .symmetric(
-                                                                      horizontal:
-                                                                          20,
-                                                                      vertical:
-                                                                          15),
+                                                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                                                               child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                                 children: [
                                                                   Container(
-                                                                    child: TextView(
-                                                                        "Mebel (${resultObject[14][0]["due_date"]})",
-                                                                        3,
-                                                                        color: Colors
-                                                                            .black),
+                                                                    child: TextView("Mebel (${resultObject[14][0]["due_date"]})", 3, color: Colors.black),
                                                                   ),
-                                                                  SizedBox(
-                                                                      height: 30),
-                                                                  DataTable(
-                                                                    columns: [
-                                                                      DataColumn(
-                                                                          label:
-                                                                              TextView(
-                                                                        "Document No",
-                                                                        4,
-                                                                      )),
-                                                                      DataColumn(
-                                                                          label: TextView(
-                                                                              "Sisa",
-                                                                              4)),
-                                                                    ],
-                                                                    rows: List.generate(
-                                                                        resultObject[
-                                                                                14]
-                                                                            .length,
-                                                                        (index) {
-                                                                      return DataRow(
-                                                                          cells: [
-                                                                            DataCell(TextView(
-                                                                                "${resultObject[14][index]["document_no"]}",
-                                                                                4)),
-                                                                            DataCell(TextView(
-                                                                                "Rp " + currencyFormatter.format(double.parse(resultObject[14][index]["sisa"])),
-                                                                                4)),
-                                                                          ]);
-                                                                    }),
+                                                                  SizedBox(height: 30),
+                                                                  Container(
+                                                                    child: TextView("Document No", 3, color: Colors.black),
+                                                                  ),
+                                                                  SizedBox(height: 15),
+                                                                  Container(
+                                                                    child: Column(
+                                                                      children: List.generate(resultObject[14].length,(index){
+                                                                        return Container(
+                                                                          margin: EdgeInsets.only(top: 10),
+                                                                          child: TextView(resultObject[14][index]["document_no"], 4)
+                                                                        );
+                                                                      }),
+                                                                    ),
+                                                                  ),
+                                                                  Divider(
+                                                                    height: 40,
+                                                                    thickness: 4,
+                                                                    color: config.lighterGrayColor,
+                                                                  ),
+                                                                  Container(
+                                                                    child: TextView("Sisa", 3, color: Colors.black),
+                                                                  ),
+                                                                  SizedBox(height: 15),
+                                                                  Container(
+                                                                    child: Column(
+                                                                      children:
+                                                                      List.generate(resultObject[14].length,(index){
+                                                                        return Container(
+                                                                          margin: EdgeInsets.only(top: 10),
+                                                                          child: TextView("Rp "+ currencyFormatter.format(double.parse(resultObject[14][index]["sisa"])), 4)
+                                                                        );
+                                                                      }),
+                                                                    ),
                                                                   ),
                                                                 ],
                                                               ),
@@ -1172,85 +896,63 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                           modalTitle: "Omzet",
                                                           modalContent: [
                                                             Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .symmetric(
-                                                                      horizontal:
-                                                                          20,
-                                                                      vertical:
-                                                                          15),
+                                                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                                                               child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                                 children: [
                                                                   Container(
-                                                                    child: TextView(
-                                                                        "Cat", 3,
-                                                                        color: Colors
-                                                                            .black),
+                                                                    child: TextView("Cat", 3, color: Colors.black),
                                                                   ),
-                                                                  SizedBox(
-                                                                      height: 30),
+                                                                  SizedBox(height: 30),
                                                                   Container(
                                                                     child: Column(
+                                                                      crossAxisAlignment: CrossAxisAlignment.start,
                                                                       children: [
                                                                         Container(
-                                                                          child: Row(
-                                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                                            children: [
-                                                                              Container(
-                                                                                child: TextView("Pengambilan Tertinggi", 4),
-                                                                              ),
-                                                                              Container(
-                                                                                child: Column(
-                                                                                  children: List.generate(resultObject[15].length, (index) {
-                                                                                    return Container(
-                                                                                      margin: EdgeInsets.only(top: 10),
-                                                                                      child: TextView("Rp " + currencyFormatter.format(resultObject[15][index]["jum_byr"]), 4)
-                                                                                      );  
-                                                                                    },
-                                                                                  )
-                                                                                ),
-                                                                              )
-                                                                            ],
+                                                                          child: TextView("Pengambilan Tertinggi", 3, color: Colors.black),
+                                                                        ),
+                                                                        SizedBox(height: 15),
+                                                                        Container(
+                                                                          child: Column(
+                                                                            children: List.generate(resultObject[15].length, (index) {
+                                                                              return Container(
+                                                                                margin: EdgeInsets.only(top: 10),
+                                                                                child: TextView("Rp " + currencyFormatter.format(resultObject[15][index]["jum_byr"]), 4)
+                                                                                );  
+                                                                              },
+                                                                            )
                                                                           ),
                                                                         ),
-                                                                        SizedBox(height: 40),
+                                                                        Divider(
+                                                                          height: 40,
+                                                                          thickness: 4,
+                                                                          color: config.lighterGrayColor,
+                                                                        ),
                                                                         Container(
-                                                                          child: Row(
-                                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                            children: [
-                                                                              Container(
-                                                                                child: TextView("Rata-rata Payment", 4),
-                                                                              ),
-                                                                              Container(
-                                                                                child: Column(
-                                                                                  children: List.generate(resultObject[15].length, (index) {
-                                                                                    return Container(
-                                                                                      child: TextView("Rp " + currencyFormatter.format(resultObject[15][index]["rata2"]) + "\n(" + "${resultObject[15][index]["pengali"]} x)", 4, align: TextAlign.end)
-                                                                                      );  
-                                                                                    },
-                                                                                  )
-                                                                                ),
-                                                                              )
-                                                                            ],
+                                                                          child: TextView("Rata-rata Payment", 3, color: Colors.black),
+                                                                        ),
+                                                                        SizedBox(height: 15),
+                                                                        Container(
+                                                                          child: Column(
+                                                                            children: List.generate(resultObject[15].length, (index) {
+                                                                              return Container(
+                                                                                child: TextView("Rp " + currencyFormatter.format(resultObject[15][index]["rata2"]) + " (" + "${resultObject[15][index]["pengali"]} x)", 4, align: TextAlign.end)
+                                                                                );  
+                                                                              },
+                                                                            )
                                                                           ),
                                                                         ),
-                                                                        SizedBox(height: 40),
+                                                                        Divider(
+                                                                          height: 40,
+                                                                          thickness: 4,
+                                                                          color: config.lighterGrayColor,
+                                                                        ),
                                                                         Container(
-                                                                          child: Row(
-                                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                            children: [
-                                                                              Container(
-                                                                                child: TextView("Total Omzet", 4),
-                                                                              ),
-                                                                              Container(
-                                                                                child: TextView("Rp " + currencyFormatter.format(resultObject[18]["total_omzet_cat"]), 4),
-                                                                              )
-                                                                            ],
-                                                                          ),
+                                                                          child: TextView("Total Omzet", 3, color: Colors.black),
+                                                                        ),
+                                                                        SizedBox(height: 15),
+                                                                        Container(
+                                                                          child: TextView("Rp " + currencyFormatter.format(resultObject[18]["total_omzet_cat"]), 4),
                                                                         ),
                                                                       ],
                                                                     ),
@@ -1311,89 +1013,132 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                           modalTitle: "Omzet",
                                                           modalContent: [
                                                             Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .symmetric(
-                                                                      horizontal:
-                                                                          20,
-                                                                      vertical:
-                                                                          15),
+                                                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                                                               child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                                 children: [
                                                                   Container(
-                                                                    child: TextView(
-                                                                        "BB", 3,
-                                                                        color: Colors
-                                                                            .black),
+                                                                    child: TextView("BB", 3, color: Colors.black),
                                                                   ),
-                                                                  SizedBox(
-                                                                      height: 30),
+                                                                  SizedBox(height: 30),
                                                                   Container(
                                                                     child: Column(
+                                                                      crossAxisAlignment: CrossAxisAlignment.start,
                                                                       children: [
                                                                         Container(
-                                                                          child: Row(
-                                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                                            children: [
-                                                                              Container(
-                                                                                child: TextView("Pengambilan Tertinggi", 4),
-                                                                              ),
-                                                                              Container(
-                                                                                child: Column(
-                                                                                  children: List.generate(resultObject[16].length, (index) {
-                                                                                    return Container(
-                                                                                      margin: EdgeInsets.only(top: 10),
-                                                                                      child: TextView("Rp " + currencyFormatter.format(resultObject[16][index]["jum_byr"]), 4)
-                                                                                      );  
-                                                                                    },
-                                                                                  )
-                                                                                ),
-                                                                              )
-                                                                            ],
+                                                                          child: TextView("Pengambilan Tertinggi", 3, color: Colors.black),
+                                                                        ),
+                                                                        SizedBox(height: 15),
+                                                                        Container(
+                                                                          child: Column(
+                                                                            children: List.generate(resultObject[15].length, (index) {
+                                                                              return Container(
+                                                                                margin: EdgeInsets.only(top: 10),
+                                                                                child: TextView("Rp " + currencyFormatter.format(resultObject[16][index]["jum_byr"]), 4)
+                                                                                );  
+                                                                              },
+                                                                            )
                                                                           ),
                                                                         ),
-                                                                        SizedBox(height: 40),
+                                                                        Divider(
+                                                                          height: 40,
+                                                                          thickness: 4,
+                                                                          color: config.lighterGrayColor,
+                                                                        ),
                                                                         Container(
-                                                                          child: Row(
-                                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                            children: [
-                                                                              Container(
-                                                                                child: TextView("Rata-rata Payment", 4),
-                                                                              ),
-                                                                              Container(
-                                                                                child: Column(
-                                                                                  children: List.generate(resultObject[16].length, (index) {
-                                                                                    return Container(
-                                                                                      child: TextView("Rp " + currencyFormatter.format(resultObject[16][index]["rata2"]) + "\n(" + "${resultObject[16][index]["pengali"]} x)", 4, align: TextAlign.end)
-                                                                                      );  
-                                                                                    },
-                                                                                  )
-                                                                                ),
-                                                                              )
-                                                                            ],
+                                                                          child: TextView("Rata-rata Payment", 3, color: Colors.black),
+                                                                        ),
+                                                                        SizedBox(height: 15),
+                                                                        Container(
+                                                                          child: Column(
+                                                                            children: List.generate(resultObject[15].length, (index) {
+                                                                              return Container(
+                                                                                child: TextView("Rp " + currencyFormatter.format(resultObject[16][index]["rata2"]) + " (" + "${resultObject[16][index]["pengali"]} x)", 4, align: TextAlign.end)
+                                                                                );  
+                                                                              },
+                                                                            )
                                                                           ),
                                                                         ),
-                                                                        SizedBox(height: 40),
+                                                                        Divider(
+                                                                          height: 40,
+                                                                          thickness: 4,
+                                                                          color: config.lighterGrayColor,
+                                                                        ),
                                                                         Container(
-                                                                          child: Row(
-                                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                            children: [
-                                                                              Container(
-                                                                                child: TextView("Total Omzet", 4),
-                                                                              ),
-                                                                              Container(
-                                                                                child: TextView("Rp " + currencyFormatter.format(resultObject[19]["total_omzet_bb"]), 4),
-                                                                              )
-                                                                            ],
-                                                                          ),
+                                                                          child: TextView("Total Omzet", 3, color: Colors.black),
+                                                                        ),
+                                                                        SizedBox(height: 15),
+                                                                        Container(
+                                                                          child: TextView("Rp " + currencyFormatter.format(resultObject[19]["total_omzet_bb"]), 4),
                                                                         ),
                                                                       ],
                                                                     ),
                                                                   ),
+                                                                  
+                                                                  // Container(
+                                                                  //   child: Column(
+                                                                  //     children: [
+                                                                  //       Container(
+                                                                  //         child: Row(
+                                                                  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  //           crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  //           children: [
+                                                                  //             Container(
+                                                                  //               child: TextView("Pengambilan Tertinggi", 4),
+                                                                  //             ),
+                                                                  //             Container(
+                                                                  //               child: Column(
+                                                                  //                 children: List.generate(resultObject[16].length, (index) {
+                                                                  //                   return Container(
+                                                                  //                     margin: EdgeInsets.only(top: 10),
+                                                                  //                     child: TextView("Rp " + currencyFormatter.format(resultObject[16][index]["jum_byr"]), 4)
+                                                                  //                     );  
+                                                                  //                   },
+                                                                  //                 )
+                                                                  //               ),
+                                                                  //             )
+                                                                  //           ],
+                                                                  //         ),
+                                                                  //       ),
+                                                                  //       SizedBox(height: 40),
+                                                                  //       Container(
+                                                                  //         child: Row(
+                                                                  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  //           children: [
+                                                                  //             Container(
+                                                                  //               child: TextView("Rata-rata Payment", 4),
+                                                                  //             ),
+                                                                  //             Container(
+                                                                  //               child: Column(
+                                                                  //                 children: List.generate(resultObject[16].length, (index) {
+                                                                  //                   return Container(
+                                                                  //                     child: TextView("Rp " + currencyFormatter.format(resultObject[16][index]["rata2"]) + "\n(" + "${resultObject[16][index]["pengali"]} x)", 4, align: TextAlign.end)
+                                                                  //                     );  
+                                                                  //                   },
+                                                                  //                 )
+                                                                  //               ),
+                                                                  //             )
+                                                                  //           ],
+                                                                  //         ),
+                                                                  //       ),
+                                                                  //       SizedBox(height: 40),
+                                                                  //       Container(
+                                                                  //         child: Row(
+                                                                  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  //           children: [
+                                                                  //             Container(
+                                                                  //               child: TextView("Total Omzet", 4),
+                                                                  //             ),
+                                                                  //             Container(
+                                                                  //               child: TextView("Rp " + currencyFormatter.format(resultObject[19]["total_omzet_bb"]), 4),
+                                                                  //             )
+                                                                  //           ],
+                                                                  //         ),
+                                                                  //       ),
+                                                                  //     ],
+                                                                  //   ),
+                                                                  // ),
+
                                                                 ],
                                                               ),
                                                             )
@@ -1450,86 +1195,63 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                           modalTitle: "Omzet",
                                                           modalContent: [
                                                             Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .symmetric(
-                                                                      horizontal:
-                                                                          20,
-                                                                      vertical:
-                                                                          15),
+                                                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                                                               child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                                 children: [
                                                                   Container(
-                                                                    child: TextView(
-                                                                        "Mebel",
-                                                                        3,
-                                                                        color: Colors
-                                                                            .black),
+                                                                    child: TextView("Mebel", 3, color: Colors.black),
                                                                   ),
-                                                                  SizedBox(
-                                                                      height: 30),
+                                                                  SizedBox(height: 30),
                                                                   Container(
                                                                     child: Column(
+                                                                      crossAxisAlignment: CrossAxisAlignment.start,
                                                                       children: [
                                                                         Container(
-                                                                          child: Row(
-                                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                                            children: [
-                                                                              Container(
-                                                                                child: TextView("Pengambilan Tertinggi", 4),
-                                                                              ),
-                                                                              Container(
-                                                                                child: Column(
-                                                                                  children: List.generate(resultObject[17].length, (index) {
-                                                                                    return Container(
-                                                                                      margin: EdgeInsets.only(top: 10),
-                                                                                      child: TextView("Rp " + currencyFormatter.format(resultObject[17][index]["jum_byr"]), 4)
-                                                                                      );  
-                                                                                    },
-                                                                                  )
-                                                                                ),
-                                                                              )
-                                                                            ],
+                                                                          child: TextView("Pengambilan Tertinggi", 3, color: Colors.black),
+                                                                        ),
+                                                                        SizedBox(height: 15),
+                                                                        Container(
+                                                                          child: Column(
+                                                                            children: List.generate(resultObject[15].length, (index) {
+                                                                              return Container(
+                                                                                margin: EdgeInsets.only(top: 10),
+                                                                                child: TextView("Rp " + currencyFormatter.format(resultObject[17][index]["jum_byr"]), 4)
+                                                                                );  
+                                                                              },
+                                                                            )
                                                                           ),
                                                                         ),
-                                                                        SizedBox(height: 40),
+                                                                        Divider(
+                                                                          height: 40,
+                                                                          thickness: 4,
+                                                                          color: config.lighterGrayColor,
+                                                                        ),
                                                                         Container(
-                                                                          child: Row(
-                                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                            children: [
-                                                                              Container(
-                                                                                child: TextView("Rata-rata Payment", 4),
-                                                                              ),
-                                                                              Container(
-                                                                                child: Column(
-                                                                                  children: List.generate(resultObject[17].length, (index) {
-                                                                                    return Container(
-                                                                                      child: TextView("Rp " + currencyFormatter.format(resultObject[17][index]["rata2"]) + "\n(" + "${resultObject[17][index]["pengali"]} x)", 4, align: TextAlign.end)
-                                                                                      );  
-                                                                                    },
-                                                                                  )
-                                                                                ),
-                                                                              )
-                                                                            ],
+                                                                          child: TextView("Rata-rata Payment", 3, color: Colors.black),
+                                                                        ),
+                                                                        SizedBox(height: 15),
+                                                                        Container(
+                                                                          child: Column(
+                                                                            children: List.generate(resultObject[15].length, (index) {
+                                                                              return Container(
+                                                                                child: TextView("Rp " + currencyFormatter.format(resultObject[17][index]["rata2"]) + " (" + "${resultObject[17][index]["pengali"]} x)", 4, align: TextAlign.end)
+                                                                                );  
+                                                                              },
+                                                                            )
                                                                           ),
                                                                         ),
-                                                                        SizedBox(height: 40),
+                                                                        Divider(
+                                                                          height: 40,
+                                                                          thickness: 4,
+                                                                          color: config.lighterGrayColor,
+                                                                        ),
                                                                         Container(
-                                                                          child: Row(
-                                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                            children: [
-                                                                              Container(
-                                                                                child: TextView("Total Omzet", 4),
-                                                                              ),
-                                                                              Container(
-                                                                                child: TextView("Rp " + currencyFormatter.format(resultObject[20]["total_omzet_mebel"]), 4),
-                                                                              )
-                                                                            ],
-                                                                          ),
+                                                                          child: TextView("Total Omzet", 3, color: Colors.black),
+                                                                        ),
+                                                                        SizedBox(height: 15),
+                                                                        Container(
+                                                                          child: TextView("Rp " + currencyFormatter.format(resultObject[20]["total_omzet_mebel"]), 4),
                                                                         ),
                                                                       ],
                                                                     ),
@@ -1587,34 +1309,24 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                             ),
                             Container(
                               child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  ListTile(
-                                    title: TextView("SO Outstanding", 4),
-                                    trailing: Container(
-                                      child: TextView("Rp " + currencyFormatter.format(resultObject[11]["ov"]),4)
-                                    ),
-                                  ),
-    
-                                  ListTile(
-                                    title: TextView("Shipment Not Invoiced", 4),
-                                    trailing: Container(
-                                      child: TextView("Rp " + currencyFormatter.format(resultObject[9]["jum"]),4)
-                                    ),
-                                  ),
-    
-                                  ListTile(
-                                    title: TextView("Total Retur", 4),
-                                    trailing: Container(
-                                      child: TextView("Rp " + currencyFormatter.format(resultObject[8]["retur"]),4)
-                                    ),
-                                  ),
-    
-                                  ListTile(
-                                    title: TextView("Piutang", 4),
-                                    trailing: Container(
-                                      child: TextView("Rp " + currencyFormatter.format(resultObject[10]["piutang"]),4)
-                                    ),
-                                  ),
+                                  SizedBox(height: 15),
+                                  TextView("SO Outstanding", 3, color: Colors.black),
+                                  SizedBox(height: 10),
+                                  TextView("Rp " + currencyFormatter.format(resultObject[11]["ov"]),4),
+                                  SizedBox(height: 30),
+                                  TextView("Shipment Not Invoiced", 3, color: Colors.black),
+                                  SizedBox(height: 10),
+                                  TextView("Rp " + currencyFormatter.format(resultObject[9]["jum"]),4),
+                                  SizedBox(height: 30),
+                                  TextView("Total Retur", 3, color: Colors.black),
+                                  SizedBox(height: 10),
+                                  TextView("Rp " + currencyFormatter.format(resultObject[8]["retur"]),4),
+                                  SizedBox(height: 30),
+                                  TextView("Piutang", 3, color: Colors.black),
+                                  SizedBox(height: 10),
+                                  TextView("Rp " + currencyFormatter.format(resultObject[10]["piutang"]),4),
                                 ],
                               ),
                             ),
@@ -1778,7 +1490,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                     hintStyle: TextStyle(color: Colors.black),
                     labelStyle: TextStyle(color: Colors.black),
                     floatingLabelBehavior: FloatingLabelBehavior.always,
-                    labelText: "Limit DMD",
+                    labelText: "Limit DSD",
                     // hintText: resultObject[0]["limit_dmd"].toString(),
                     icon: TextView("Rp ", 5),
                     enabledBorder: OutlineInputBorder(
@@ -1913,7 +1625,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
         Alert(
             context: context,
             title: "Info,",
-            content: Text("Limit Baru atau Limit DMD harus diisi"),
+            content: Text("Limit Baru atau Limit DSD harus diisi"),
             cancel: false,
             type: "warning");
       } else {
@@ -1923,7 +1635,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
           Alert(
               context: context,
               title: "Info,",
-              content: Text("Limit Baru melebihi Limit DMD!"),
+              content: Text("Limit Baru melebihi Limit DSD!"),
               cancel: false,
               type: "warning");
         } else if (int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')) == 0 ||
@@ -1970,7 +1682,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
           Alert(
               context: context,
               title: "Info,",
-              content: Text("Limit Baru melebihi Limit DMD!"),
+              content: Text("Limit Baru melebihi Limit DSD!"),
               cancel: false,
               type: "warning");
         } else if (int.parse(limitDMDController.text.replaceAll(new RegExp('\\.'),'')) == 0 ||

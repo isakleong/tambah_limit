@@ -1085,11 +1085,16 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                   goToHistoryLimitDetail(requestLimitHistoryList[i], 1);
                 },
                 child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: ListTile(
-                    title: TextView(requestLimitHistoryList[i].customer_code, 4),
-                    subtitle: TextView(requestLimitHistoryList[i].customer_name, 4),
-                    trailing: TextView("Rp " + currencyFormatter.format(int.parse(requestLimitHistoryList[i].limit)), 4),
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      TextView(requestLimitHistoryList[i].customer_name, 4, align: TextAlign.center),
+                      SizedBox(height: 5),
+                      TextView("("+requestLimitHistoryList[i].customer_code+")", 4, align: TextAlign.center),
+                      SizedBox(height: 10),
+                      TextView("Rp " + currencyFormatter.format(int.parse(requestLimitHistoryList[i].limit)), 4, align: TextAlign.center),
+                    ]
                   ),
                 ),
               ),
@@ -1110,11 +1115,16 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                     goToHistoryLimitDetail(requestLimitHistoryList[i], 1);
                   },
                   child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: ListTile(
-                      title: TextView(requestLimitHistoryList[i].customer_code, 4),
-                      subtitle: TextView(requestLimitHistoryList[i].customer_name, 4),
-                      trailing: TextView("Rp " + currencyFormatter.format(int.parse(requestLimitHistoryList[i].limit)), 4),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        TextView(requestLimitHistoryList[i].customer_name, 4, align: TextAlign.center),
+                        SizedBox(height: 5),
+                        TextView("("+requestLimitHistoryList[i].customer_code+")", 4, align: TextAlign.center),
+                        SizedBox(height: 10),
+                        TextView("Rp " + currencyFormatter.format(int.parse(requestLimitHistoryList[i].limit)), 4, align: TextAlign.center),
+                      ]
                     ),
                   ),
                 ),
@@ -1135,11 +1145,16 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                     goToHistoryLimitDetail(requestLimitHistoryList[i], 1);
                   },
                   child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: ListTile(
-                      title: TextView(requestLimitHistoryList[i].customer_code, 4),
-                      subtitle: TextView(requestLimitHistoryList[i].customer_name, 4),
-                      trailing: TextView("Rp " + currencyFormatter.format(int.parse(requestLimitHistoryList[i].limit)), 4),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        TextView(requestLimitHistoryList[i].customer_name, 4, align: TextAlign.center),
+                        SizedBox(height: 5),
+                        TextView("("+requestLimitHistoryList[i].customer_code+")", 4, align: TextAlign.center),
+                        SizedBox(height: 10),
+                        TextView("Rp " + currencyFormatter.format(int.parse(requestLimitHistoryList[i].limit)), 4, align: TextAlign.center),
+                      ]
                     ),
                   ),
                 ),
@@ -1160,11 +1175,16 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                 goToHistoryLimitDetail(requestLimitHistoryList[i], 1);
               },
               child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: ListTile(
-                  title: TextView(requestLimitHistoryList[i].customer_code, 4),
-                  subtitle: TextView(requestLimitHistoryList[i].customer_name, 4),
-                  trailing: TextView("Rp " + currencyFormatter.format(int.parse(requestLimitHistoryList[i].limit)), 4),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    TextView(requestLimitHistoryList[i].customer_name, 4, align: TextAlign.center),
+                    SizedBox(height: 5),
+                    TextView("("+requestLimitHistoryList[i].customer_code+")", 4, align: TextAlign.center),
+                    SizedBox(height: 10),
+                    TextView("Rp " + currencyFormatter.format(int.parse(requestLimitHistoryList[i].limit)), 4, align: TextAlign.center),
+                  ]
                 ),
               ),
             ),
@@ -1225,7 +1245,7 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
     } else {
       Alert(context: context, loading: true, disableBackButton: true);
 
-      result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${tempLimitHistory.customer_code}","user_code":"$user_login"}');
+      result_ = await customerAPI.getLimit(context, parameter: 'json={"page_type":"history","kode_customer":"${tempLimitHistory.customer_code}","user_code":"$user_login"}', pageType: "history");
 
       final SharedPreferences sharedPreferences = await _sharedPreferences;
       await sharedPreferences.setInt("request_limit", int.parse(tempLimitHistory.limit));
@@ -1325,11 +1345,16 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                   goToHistoryLimitDetail(approvedLimitHistoryList[i], 2);
                 },
                 child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: ListTile(
-                    title: TextView(approvedLimitHistoryList[i].customer_code, 4),
-                    subtitle: TextView(approvedLimitHistoryList[i].customer_name, 4),
-                    trailing: TextView("Rp " + currencyFormatter.format(int.parse(approvedLimitHistoryList[i].limit)), 4),
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      TextView(approvedLimitHistoryList[i].customer_name, 4, align: TextAlign.center),
+                      SizedBox(height: 5),
+                      TextView("("+approvedLimitHistoryList[i].customer_code+")", 4, align: TextAlign.center),
+                      SizedBox(height: 10),
+                      TextView("Rp " + currencyFormatter.format(int.parse(approvedLimitHistoryList[i].limit)), 4, align: TextAlign.center),
+                    ]
                   ),
                 ),
               ),
@@ -1349,11 +1374,16 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                     goToHistoryLimitDetail(approvedLimitHistoryList[i], 2);
                   },
                   child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: ListTile(
-                      title: TextView(approvedLimitHistoryList[i].customer_code, 4),
-                      subtitle: TextView(approvedLimitHistoryList[i].customer_name, 4),
-                      trailing: TextView("Rp " + currencyFormatter.format(int.parse(approvedLimitHistoryList[i].limit)), 4),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        TextView(approvedLimitHistoryList[i].customer_name, 4, align: TextAlign.center),
+                        SizedBox(height: 5),
+                        TextView("("+approvedLimitHistoryList[i].customer_code+")", 4, align: TextAlign.center),
+                        SizedBox(height: 10),
+                        TextView("Rp " + currencyFormatter.format(int.parse(approvedLimitHistoryList[i].limit)), 4, align: TextAlign.center),
+                      ]
                     ),
                   ),
                 ),
@@ -1374,11 +1404,16 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                     goToHistoryLimitDetail(approvedLimitHistoryList[i], 2);
                   },
                   child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: ListTile(
-                      title: TextView(approvedLimitHistoryList[i].customer_code, 4),
-                      subtitle: TextView(approvedLimitHistoryList[i].customer_name, 4),
-                      trailing: TextView("Rp " + currencyFormatter.format(int.parse(approvedLimitHistoryList[i].limit)), 4),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        TextView(approvedLimitHistoryList[i].customer_name, 4, align: TextAlign.center),
+                        SizedBox(height: 5),
+                        TextView("("+approvedLimitHistoryList[i].customer_code+")", 4, align: TextAlign.center),
+                        SizedBox(height: 10),
+                        TextView("Rp " + currencyFormatter.format(int.parse(approvedLimitHistoryList[i].limit)), 4, align: TextAlign.center),
+                      ]
                     ),
                   ),
                 ),
@@ -1399,11 +1434,16 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                 goToHistoryLimitDetail(approvedLimitHistoryList[i], 2);
               },
               child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: ListTile(
-                  title: TextView(approvedLimitHistoryList[i].customer_code, 4),
-                  subtitle: TextView(approvedLimitHistoryList[i].customer_name, 4),
-                  trailing: TextView("Rp " + currencyFormatter.format(int.parse(approvedLimitHistoryList[i].limit)), 4),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    TextView(approvedLimitHistoryList[i].customer_name, 4, align: TextAlign.center),
+                    SizedBox(height: 5),
+                    TextView("("+approvedLimitHistoryList[i].customer_code+")", 4, align: TextAlign.center),
+                    SizedBox(height: 10),
+                    TextView("Rp " + currencyFormatter.format(int.parse(approvedLimitHistoryList[i].limit)), 4, align: TextAlign.center),
+                  ]
                 ),
               ),
             ),
@@ -1480,14 +1520,19 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
               elevation: 3,
               child: InkWell(
                 onTap: (){
-                  goToHistoryLimitDetail(rejectedLimitHistoryList[i], 2);
+                  goToHistoryLimitDetail(rejectedLimitHistoryList[i], 3);
                 },
                 child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: ListTile(
-                    title: TextView(rejectedLimitHistoryList[i].customer_code, 4),
-                    subtitle: TextView(rejectedLimitHistoryList[i].customer_name, 4),
-                    trailing: TextView("Rp " + currencyFormatter.format(int.parse(rejectedLimitHistoryList[i].limit)), 4),
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      TextView(rejectedLimitHistoryList[i].customer_name, 4, align: TextAlign.center),
+                      SizedBox(height: 5),
+                      TextView("("+rejectedLimitHistoryList[i].customer_code+")", 4, align: TextAlign.center),
+                      SizedBox(height: 10),
+                      TextView("Rp " + currencyFormatter.format(int.parse(rejectedLimitHistoryList[i].limit)), 4, align: TextAlign.center),
+                    ]
                   ),
                 ),
               ),
@@ -1504,14 +1549,19 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                 elevation: 3,
                 child: InkWell(
                   onTap: (){
-                    goToHistoryLimitDetail(rejectedLimitHistoryList[i], 2);
+                    goToHistoryLimitDetail(rejectedLimitHistoryList[i], 3);
                   },
                   child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: ListTile(
-                      title: TextView(rejectedLimitHistoryList[i].customer_code, 4),
-                      subtitle: TextView(rejectedLimitHistoryList[i].customer_name, 4),
-                      trailing: TextView("Rp " + currencyFormatter.format(int.parse(rejectedLimitHistoryList[i].limit)), 4),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        TextView(rejectedLimitHistoryList[i].customer_name, 4, align: TextAlign.center),
+                        SizedBox(height: 5),
+                        TextView("("+rejectedLimitHistoryList[i].customer_code+")", 4, align: TextAlign.center),
+                        SizedBox(height: 10),
+                        TextView("Rp " + currencyFormatter.format(int.parse(rejectedLimitHistoryList[i].limit)), 4, align: TextAlign.center),
+                      ]
                     ),
                   ),
                 ),
@@ -1529,14 +1579,19 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
                 elevation: 3,
                 child: InkWell(
                   onTap: (){
-                    goToHistoryLimitDetail(rejectedLimitHistoryList[i], 2);
+                    goToHistoryLimitDetail(rejectedLimitHistoryList[i], 3);
                   },
                   child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: ListTile(
-                      title: TextView(rejectedLimitHistoryList[i].customer_code, 4),
-                      subtitle: TextView(rejectedLimitHistoryList[i].customer_name, 4),
-                      trailing: TextView("Rp " + currencyFormatter.format(int.parse(rejectedLimitHistoryList[i].limit)), 4),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        TextView(rejectedLimitHistoryList[i].customer_name, 4, align: TextAlign.center),
+                        SizedBox(height: 5),
+                        TextView("("+rejectedLimitHistoryList[i].customer_code+")", 4, align: TextAlign.center),
+                        SizedBox(height: 10),
+                        TextView("Rp " + currencyFormatter.format(int.parse(rejectedLimitHistoryList[i].limit)), 4, align: TextAlign.center),
+                      ]
                     ),
                   ),
                 ),
@@ -1554,14 +1609,19 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
             elevation: 3,
             child: InkWell(
               onTap: (){
-                goToHistoryLimitDetail(rejectedLimitHistoryList[i], 2);
+                goToHistoryLimitDetail(rejectedLimitHistoryList[i], 3);
               },
               child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: ListTile(
-                  title: TextView(rejectedLimitHistoryList[i].customer_code, 4),
-                  subtitle: TextView(rejectedLimitHistoryList[i].customer_name, 4),
-                  trailing: TextView("Rp " + currencyFormatter.format(int.parse(rejectedLimitHistoryList[i].limit)), 4),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    TextView(rejectedLimitHistoryList[i].customer_name, 4, align: TextAlign.center),
+                    SizedBox(height: 5),
+                    TextView("("+rejectedLimitHistoryList[i].customer_code+")", 4, align: TextAlign.center),
+                    SizedBox(height: 10),
+                    TextView("Rp " + currencyFormatter.format(int.parse(rejectedLimitHistoryList[i].limit)), 4, align: TextAlign.center),
+                  ]
                 ),
               ),
             ),

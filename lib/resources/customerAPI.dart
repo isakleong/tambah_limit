@@ -107,7 +107,7 @@ class CustomerAPI {
 
   }
 
-  Future<Result> getLimit(final context, {String parameter=""}) async {
+  Future<Result> getLimit(final context, {String parameter="", String pageType=""}) async {
     Result result;
     String url = "";
     Customer customer;
@@ -152,24 +152,18 @@ class CustomerAPI {
       var response;
       try {
         response = await client.get(url);
-
-        printHelp("CEK YAAAAA "+ url);
-
-        printHelp("status code "+response.statusCode.toString());
-        printHelp("cek body "+response.body);
-
-        printHelp(url);
-
+        printHelp("cmon "+response.body.toString());
         if(response.body.toString() != "false" && response.body.toString() != "otoritas") {
           if(!response.body.toString().contains("corporate")) {
+            printHelp("masuk sini ");
             var parsedJson = jsonDecode(response.body);
 
             customer = Customer.fromJson(parsedJson[0]);
             result = new Result(success: 1, message: "OK", data: response.body.toString());
 
           } else {
-            var str_split = response.body.toString().split('|');
-            result = new Result(success: 0, message: "Customer ini memiliki kode corporate " + str_split[1] + ". Proses tambah limit akan dilanjutkan menggunakan kode corporate tersebut", data: str_split[1]);
+              var str_split = response.body.toString().split('|');
+              result = new Result(success: 0, message: "Customer ini memiliki kode corporate " + str_split[1] + ". Proses tambah limit akan dilanjutkan menggunakan kode corporate tersebut", data: str_split[1]); 
           }
           
         } else {
@@ -181,6 +175,7 @@ class CustomerAPI {
         }
           
       } catch (e) {
+        printHelp("masuk sini catch");
         result = new Result(success: -1, message: "Gagal terhubung dengan server");
         print(e);
       }
