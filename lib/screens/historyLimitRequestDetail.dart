@@ -1614,6 +1614,29 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                 child: TextFormField(
                   enabled: false,
                   decoration: new InputDecoration(
+                    hintStyle: TextStyle(color: Colors.black),
+                    labelStyle: TextStyle(color: Colors.black),
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    labelText: "Piutang",
+                    hintText: currencyFormatter.format(resultObject[0]["piutang"]),
+                    icon: TextView("Rp ", 4, color: config.grayColor),
+                    disabledBorder: OutlineInputBorder(
+                      borderRadius: new BorderRadius.circular(
+                        5.0,
+                      ),
+                      borderSide: BorderSide(
+                        color: config.grayColor,
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                child: TextFormField(
+                  enabled: false,
+                  decoration: new InputDecoration(
                     hintStyle: TextStyle(
                       color: Colors.black
                     ),
