@@ -123,6 +123,8 @@ class UserAPI {
       try {
         final response = await client.get(url);
 
+        printHelp("tes bodu "+response.body.toString());
+
         if(response.body.toString() == "success") {
           isChangePasswordSuccess = "OK";
         
@@ -188,6 +190,7 @@ class UserAPI {
           printHelp("CEK LENGTH "+parsedJson.toString());
 
           if(user.Id != ""){
+            print("yuhuuuuu");
             isGetPasswordSuccess = "OK";
             await saveToLocalStorage(context, user);
           } 
@@ -198,7 +201,7 @@ class UserAPI {
 
        } catch (e) {
          isGetPasswordSuccess = "Gagal terhubung dengan server";
-         printHelp(e)   ;
+         printHelp("err")   ;
        }
 
     } else {

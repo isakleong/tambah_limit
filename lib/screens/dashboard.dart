@@ -1678,10 +1678,15 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     setState(() {
       changePasswordLoading = true;
     });
+    
 
     Alert(context: context, loading: true, disableBackButton: true);
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    String coba1 = "${newPasswordController.text}";
+      String coba2 = "${prefs.getString('user_code')}";
+      printHelp("coba 1 "+ coba1);
+      printHelp("coba 2 "+ coba2);
 
     String getOldPassword = await userAPI.getPassword(context, parameter: 'user_code=${prefs.getString('user_code')}&old_pass=${oldPasswordController.text}');
 
@@ -1690,6 +1695,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     if(getOldPassword == "OK"){
 
       String getChangePassword = await userAPI.changePassword(context, parameter: 'json={"new_pass":"${newPasswordController.text}","user_code":"${prefs.getString('user_code')}"}');
+
 
       if(getChangePassword == "OK"){
         Alert(

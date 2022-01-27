@@ -116,6 +116,26 @@ class AddLimitDetailState extends State<AddLimitDetail> {
     final currencyFormatter = NumberFormat('#,##0', 'ID');
     final resultObject = jsonDecode(result.data.toString());
 
+    //prosentase rentang pembayaran
+    final totalPembayaranCat = resultObject[1]["pembayaranc1"] + resultObject[1]["pembayaranc2"] + resultObject[1]["pembayaranc3"] + resultObject[1]["pembayaranc4"];
+    final totalPembayaranBB = resultObject[7]["pembayaranb1"] + resultObject[7]["pembayaranb2"] + resultObject[7]["pembayaranb3"] + resultObject[7]["pembayaranb4"];
+    final totalPembayaranMebel = resultObject[6]["pembayaranm1"] + resultObject[6]["pembayaranm2"] + resultObject[6]["pembayaranm3"] + resultObject[6]["pembayaranm4"];
+
+    final prosentasePembayaranC1 = ((resultObject[1]["pembayaranc1"] / totalPembayaranCat)*100).toStringAsFixed(2)+"%";
+    final prosentasePembayaranC2 = ((resultObject[1]["pembayaranc2"] / totalPembayaranCat)*100).toStringAsFixed(2)+"%";
+    final prosentasePembayaranC3 = ((resultObject[1]["pembayaranc3"] / totalPembayaranCat)*100).toStringAsFixed(2)+"%";
+    final prosentasePembayaranC4 = ((resultObject[1]["pembayaranc4"] / totalPembayaranCat)*100).toStringAsFixed(2)+"%";
+
+    final prosentasePembayaranB1 = ((resultObject[7]["pembayaranb1"] / totalPembayaranBB)*100).toStringAsFixed(2)+"%";
+    final prosentasePembayaranB2 = ((resultObject[7]["pembayaranb2"] / totalPembayaranBB)*100).toStringAsFixed(2)+"%";
+    final prosentasePembayaranB3 = ((resultObject[7]["pembayaranb3"] / totalPembayaranBB)*100).toStringAsFixed(2)+"%";
+    final prosentasePembayaranB4 = ((resultObject[7]["pembayaranb4"] / totalPembayaranBB)*100).toStringAsFixed(2)+"%";
+
+    final prosentasePembayaranM1 = ((resultObject[6]["pembayaranm1"] / totalPembayaranMebel)*100).toStringAsFixed(2)+"%";
+    final prosentasePembayaranM2 = ((resultObject[6]["pembayaranm2"] / totalPembayaranMebel)*100).toStringAsFixed(2)+"%";
+    final prosentasePembayaranM3 = ((resultObject[6]["pembayaranm3"] / totalPembayaranMebel)*100).toStringAsFixed(2)+"%";
+    final prosentasePembayaranM4 = ((resultObject[6]["pembayaranm4"] / totalPembayaranMebel)*100).toStringAsFixed(2)+"%";
+
     return Container(
       child: DefaultTabController(
         length: 2,
@@ -205,7 +225,8 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                             children: [
                                                               TextView("Rp " + currencyFormatter.format(resultObject[1]["pembayaranc1"]), 4),
-                                                              TextView(resultObject[1]["pembayaranc1"] != 0 ? "100%" : "0%", 4),
+                                                              // TextView(resultObject[1]["pembayaranc1"] != 0 ? "100%" : "0%", 4),
+                                                              TextView(resultObject[1]["pembayaranc1"] != 0 ? prosentasePembayaranC1 : "0%", 4),
                                                             ],
                                                           ),
                                                           Divider(
@@ -222,7 +243,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                             MainAxisAlignment.spaceBetween,
                                                             children: [
                                                               TextView("Rp " + currencyFormatter.format(resultObject[1]["pembayaranc2"]), 4),
-                                                              TextView(resultObject[1]["pembayaranc2"] != 0 ? "100%" : "0%", 4),
+                                                              TextView(resultObject[1]["pembayaranc2"] != 0 ? prosentasePembayaranC2 : "0%", 4),
                                                             ],
                                                           ),
                                                           Divider(
@@ -238,7 +259,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                             children: [
                                                               TextView("Rp " + currencyFormatter.format(resultObject[1]["pembayaranc3"]), 4),
-                                                              TextView(resultObject[1]["pembayaranc3"] != 0 ? "100%" : "0%", 4),
+                                                              TextView(resultObject[1]["pembayaranc3"] != 0 ? prosentasePembayaranC3 : "0%", 4),
                                                             ],
                                                           ),
                                                           Divider(
@@ -253,7 +274,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                               children: [
                                                                 TextView("Rp " + currencyFormatter.format(resultObject[1]["pembayaranc4"]), 4),
-                                                                TextView(resultObject[1]["pembayaranc4"] != 0 ? "100%" : "0%", 4),
+                                                                TextView(resultObject[1]["pembayaranc4"] != 0 ? prosentasePembayaranC4 : "0%", 4),
                                                               ],
                                                             ),
                                                           ],
@@ -316,7 +337,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                               mainAxisAlignment:MainAxisAlignment.spaceBetween,
                                                               children: [
                                                                 TextView("Rp " + currencyFormatter.format(resultObject[7]["pembayaranb1"]), 4),
-                                                                TextView(resultObject[7]["pembayaranb1"] != 0 ? "100%" : "0%", 4),
+                                                                TextView(resultObject[7]["pembayaranb1"] != 0 ? prosentasePembayaranB1 : "0%", 4),
                                                               ],
                                                             ),
                                                             Divider(
@@ -332,7 +353,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                               children: [
                                                                 TextView("Rp " + currencyFormatter.format(resultObject[7]["pembayaranb2"]), 4),
-                                                                TextView(resultObject[7]["pembayaranb2"] != 0 ? "100%" : "0%", 4),
+                                                                TextView(resultObject[7]["pembayaranb2"] != 0 ? prosentasePembayaranB2 : "0%", 4),
                                                               ],
                                                             ),
                                                             Divider(
@@ -348,7 +369,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                               children: [
                                                                 TextView("Rp " + currencyFormatter.format(resultObject[7]["pembayaranb3"]), 4),
-                                                                TextView(resultObject[7]["pembayaranb3"] != 0 ? "100%" : "0%", 4),
+                                                                TextView(resultObject[7]["pembayaranb3"] != 0 ? prosentasePembayaranB3 : "0%", 4),
                                                               ],
                                                             ),
                                                             Divider(
@@ -365,7 +386,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                               children: [
                                                                 TextView("Rp " + currencyFormatter.format(resultObject[7]["pembayaranb4"]), 4),
-                                                                TextView(resultObject[7]["pembayaranb4"] != 0 ? "100%" : "0%", 4),
+                                                                TextView(resultObject[7]["pembayaranb4"] != 0 ? prosentasePembayaranB4 : "0%", 4),
                                                               ],
                                                             ),
                                                           ],
@@ -430,7 +451,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                               children: [
                                                                 TextView("Rp " + currencyFormatter.format(resultObject[6]["pembayaranm1"]), 4),
-                                                                TextView(resultObject[6]["pembayaranm1"] != 0 ? "100%" : "0%", 4),
+                                                                TextView(resultObject[6]["pembayaranm1"] != 0 ? prosentasePembayaranM1 : "0%", 4),
                                                               ],
                                                             ),
                                                             Divider(
@@ -446,7 +467,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                               children: [
                                                                 TextView("Rp " + currencyFormatter.format(resultObject[6]["pembayaranm2"]), 4),
-                                                                TextView(resultObject[6]["pembayaranm2"] != 0 ? "100%" : "0%", 4),
+                                                                TextView(resultObject[6]["pembayaranm2"] != 0 ? prosentasePembayaranM2 : "0%", 4),
                                                               ],
                                                             ),
                                                             Divider(
@@ -462,7 +483,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                               children: [
                                                                 TextView("Rp " + currencyFormatter.format(resultObject[6]["pembayaranm3"]), 4),
-                                                                TextView(resultObject[6]["pembayaranm3"] != 0 ? "100%" : "0%", 4),
+                                                                TextView(resultObject[6]["pembayaranm3"] != 0 ? prosentasePembayaranM3 : "0%", 4),
                                                               ],
                                                             ),
                                                             Divider(
@@ -478,7 +499,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                               children: [
                                                                 TextView("Rp " + currencyFormatter.format(resultObject[6]["pembayaranm4"]), 4),
-                                                                TextView(resultObject[6]["pembayaranm4"] != 0 ? "100%" : "0%", 4),
+                                                                TextView(resultObject[6]["pembayaranm4"] != 0 ? prosentasePembayaranM4 : "0%", 4),
                                                               ],
                                                             ),
                                                           ],
