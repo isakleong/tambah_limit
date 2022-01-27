@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:http/http.dart' show Client, Request;
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:tambah_limit/settings/configuration.dart';
 import 'dart:io';
 import 'package:tambah_limit/widgets/TextView.dart';
@@ -222,13 +223,26 @@ void Alert({
           onWillPop: disableBackButton ? () {
 
           }:null,
-          child:Center(
-            child: CircularProgressIndicator(
-              backgroundColor: config.primaryColor,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              value: value,
-            ),
+          child: ListView(
+            children: [
+              SizedBox(height: 30),
+              Container(
+                child: Lottie.asset('assets/illustration/waiting.json', width: 220, height: 220, fit: BoxFit.contain)
+              ),
+            ],
           )
+
+          
+          
+          // Lottie.asset('assets/illustration/loading.json', width: 80, height: 80, fit: BoxFit.contain, options: LottieOptions(enableMergePaths: false)),
+          
+          // Center(
+          //   child: CircularProgressIndicator(
+          //     backgroundColor: config.primaryColor,
+          //     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          //     value: value,
+          //   ),
+          // )
         );
       }
     );

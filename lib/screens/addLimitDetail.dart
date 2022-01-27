@@ -285,7 +285,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                             // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                           ),
                                         ),
-                                        Text("Cat"),
+                                        TextView("Cat", 6),
                                         ],
                                       ),
                                     ),
@@ -397,7 +397,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                               side: BorderSide(width: 1, color: Colors.white),
                                             ),
                                           ),
-                                          Text("Bahan Bangunan"),
+                                          TextView("Bahan Bangunan", 6),
                                         ],
                                       ),
                                     ),
@@ -514,7 +514,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                               ),
                                             ),
                                           ),
-                                          Text("Mebel"),
+                                          TextView("Mebel", 6),
                                         ],
                                       ),
                                     )
@@ -559,37 +559,37 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                             Container(
                                                               child: TextView("Cat (${resultObject[12][0]["due_date"]})", 3, color: Colors.black),
                                                             ),
-                                                            SizedBox(height: 30),
-                                                            Container(
-                                                              child: TextView("Document No", 3, color: Colors.black),
-                                                            ),
                                                             SizedBox(height: 15),
+                                                            Container(                                                                        
+                                                              margin: EdgeInsets.symmetric(vertical: 10),
+                                                              child: Divider(
+                                                                height: 20,
+                                                                thickness: 4,
+                                                                color: config.lighterGrayColor,
+                                                              ),
+                                                            ),
                                                             Container(
                                                               child: Column(
                                                                 children: List.generate(resultObject[12].length,(index){
-                                                                  return Container(
-                                                                    margin: EdgeInsets.only(top: 10),
-                                                                    child: TextView(resultObject[12][index]["document_no"], 4)
-                                                                  );
-                                                                }),
-                                                              ),
-                                                            ),
-                                                            Divider(
-                                                              height: 40,
-                                                              thickness: 4,
-                                                              color: config.lighterGrayColor,
-                                                            ),
-                                                            Container(
-                                                              child: TextView("Sisa", 3, color: Colors.black),
-                                                            ),
-                                                            SizedBox(height: 15),
-                                                            Container(
-                                                              child: Column(
-                                                                children:
-                                                                List.generate(resultObject[12].length,(index){
-                                                                  return Container(
-                                                                    margin: EdgeInsets.only(top: 10),
-                                                                    child: TextView("Rp "+ currencyFormatter.format(double.parse(resultObject[12][index]["sisa"])), 4)
+                                                                  return Column(
+                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                    children: [
+                                                                      Container(
+                                                                        child: TextView(resultObject[12][index]["document_no"], 4)
+                                                                      ),
+                                                                      Container(
+                                                                        margin: EdgeInsets.only(top: 10),
+                                                                        child: TextView("Rp "+ currencyFormatter.format(double.parse(resultObject[12][index]["sisa"])), 4)
+                                                                      ),
+                                                                      Container(                                                                        
+                                                                        margin: EdgeInsets.symmetric(vertical: 10),
+                                                                        child: Divider(
+                                                                          height: 20,
+                                                                          thickness: 4,
+                                                                          color: config.lighterGrayColor,
+                                                                        ),
+                                                                      ),
+                                                                    ],
                                                                   );
                                                                 }),
                                                               ),
@@ -597,16 +597,16 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                           ],
                                                         ),
                                                       )
-                                                          ],
-                                                        ),
-                                                      )
-                                                    : Alert(
-                                                        context: context,
-                                                        title: "Info,",
-                                                        content: Text(
-                                                            "Tidak ada data"),
-                                                        cancel: false,
-                                                        type: "warning");
+                                                    ],
+                                                  ),
+                                                )
+                                              : Alert(
+                                                  context: context,
+                                                  title: "Info,",
+                                                  content: Text(
+                                                      "Tidak ada data"),
+                                                  cancel: false,
+                                                  type: "warning");
                                               },
                                               child: Container(
                                                 height: 75,
@@ -629,7 +629,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                   width: 1, color: Colors.white),
                                             ),
                                           ),
-                                          Text("Cat"),
+                                          TextView("Cat", 6),
                                         ],
                                       ),
                                     ),
@@ -661,42 +661,41 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                                       Container(
                                                                         child: TextView("BB (${resultObject[13][0]["due_date"]})", 3, color: Colors.black),
                                                                       ),
-                                                                      SizedBox(height: 30),
-                                                                      Container(
-                                                                        child: TextView("Document No", 3, color: Colors.black),
-                                                                      ),
                                                                       SizedBox(height: 15),
+                                                                      Container(                                                                        
+                                                                        margin: EdgeInsets.symmetric(vertical: 10),
+                                                                        child: Divider(
+                                                                          height: 20,
+                                                                          thickness: 4,
+                                                                          color: config.lighterGrayColor,
+                                                                        ),
+                                                                      ),
                                                                       Container(
                                                                         child: Column(
                                                                           children: List.generate(resultObject[13].length,(index){
-                                                                            return Container(
-                                                                              margin: EdgeInsets.only(top: 10),
-                                                                              child: TextView(resultObject[13][index]["document_no"], 4)
+                                                                            return Column(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                                Container(
+                                                                                  child: TextView(resultObject[13][index]["document_no"], 4)
+                                                                                ),
+                                                                                Container(
+                                                                                  margin: EdgeInsets.only(top: 10),
+                                                                                  child: TextView("Rp "+ currencyFormatter.format(double.parse(resultObject[13][index]["sisa"])), 4)
+                                                                                ),
+                                                                                Container(                                                                        
+                                                                                  margin: EdgeInsets.symmetric(vertical: 10),
+                                                                                  child: Divider(
+                                                                                    height: 20,
+                                                                                    thickness: 4,
+                                                                                    color: config.lighterGrayColor,
+                                                                                  ),
+                                                                                ),
+                                                                              ],
                                                                             );
                                                                           }),
                                                                         ),
                                                                       ),
-                                                                      Divider(
-                                                                        height: 40,
-                                                                        thickness: 4,
-                                                                        color: config.lighterGrayColor,
-                                                                      ),
-                                                                      Container(
-                                                                        child: TextView("Sisa", 3, color: Colors.black),
-                                                                      ),
-                                                                      SizedBox(height: 15),
-                                                                      Container(
-                                                                        child: Column(
-                                                                          children:
-                                                                          List.generate(resultObject[13].length,(index){
-                                                                            return Container(
-                                                                              margin: EdgeInsets.only(top: 10),
-                                                                              child: TextView("Rp "+ currencyFormatter.format(double.parse(resultObject[13][index]["sisa"])), 4)
-                                                                            );
-                                                                          }),
-                                                                        ),
-                                                                      ),
-
                                                                       // DataTable(
                                                                       //   columns: [
                                                                       //     DataColumn(
@@ -715,7 +714,6 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                                       //     );
                                                                       //   }),
                                                                       // ),
-
                                                                     ],
                                                                   ),
                                                                 )
@@ -755,7 +753,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                               )
                                             ],
                                           ),
-                                          Text("Bahan Bangunan"),
+                                          TextView("Bahan Bangunan", 6),
                                         ],
                                       ),
                                     ),
@@ -784,37 +782,37 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                                   Container(
                                                                     child: TextView("Mebel (${resultObject[14][0]["due_date"]})", 3, color: Colors.black),
                                                                   ),
-                                                                  SizedBox(height: 30),
-                                                                  Container(
-                                                                    child: TextView("Document No", 3, color: Colors.black),
-                                                                  ),
                                                                   SizedBox(height: 15),
+                                                                  Container(                                                                        
+                                                                    margin: EdgeInsets.symmetric(vertical: 10),
+                                                                    child: Divider(
+                                                                      height: 20,
+                                                                      thickness: 4,
+                                                                      color: config.lighterGrayColor,
+                                                                    ),
+                                                                  ),
                                                                   Container(
                                                                     child: Column(
                                                                       children: List.generate(resultObject[14].length,(index){
-                                                                        return Container(
-                                                                          margin: EdgeInsets.only(top: 10),
-                                                                          child: TextView(resultObject[14][index]["document_no"], 4)
-                                                                        );
-                                                                      }),
-                                                                    ),
-                                                                  ),
-                                                                  Divider(
-                                                                    height: 40,
-                                                                    thickness: 4,
-                                                                    color: config.lighterGrayColor,
-                                                                  ),
-                                                                  Container(
-                                                                    child: TextView("Sisa", 3, color: Colors.black),
-                                                                  ),
-                                                                  SizedBox(height: 15),
-                                                                  Container(
-                                                                    child: Column(
-                                                                      children:
-                                                                      List.generate(resultObject[14].length,(index){
-                                                                        return Container(
-                                                                          margin: EdgeInsets.only(top: 10),
-                                                                          child: TextView("Rp "+ currencyFormatter.format(double.parse(resultObject[14][index]["sisa"])), 4)
+                                                                        return Column(
+                                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                                          children: [
+                                                                            Container(
+                                                                              child: TextView(resultObject[14][index]["document_no"], 4)
+                                                                            ),
+                                                                            Container(
+                                                                              margin: EdgeInsets.only(top: 10),
+                                                                              child: TextView("Rp "+ currencyFormatter.format(double.parse(resultObject[14][index]["sisa"])), 4)
+                                                                            ),
+                                                                            Container(                                                                        
+                                                                              margin: EdgeInsets.symmetric(vertical: 10),
+                                                                              child: Divider(
+                                                                                height: 20,
+                                                                                thickness: 4,
+                                                                                color: config.lighterGrayColor,
+                                                                              ),
+                                                                            ),
+                                                                          ],
                                                                         );
                                                                       }),
                                                                     ),
@@ -854,7 +852,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                   width: 1, color: Colors.white),
                                             ),
                                           ),
-                                          Text("Mebel"),
+                                          TextView("Mebel", 6),
                                         ],
                                       ),
                                     )
@@ -992,7 +990,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                   width: 1, color: Colors.white),
                                             ),
                                           ),
-                                          Text("Cat"),
+                                          TextView("Cat", 6),
                                         ],
                                       ),
                                     ),
@@ -1174,7 +1172,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                   width: 1, color: Colors.white),
                                             ),
                                           ),
-                                          Text("Bahan Bangunan"),
+                                          TextView("Bahan Bangunan", 6),
                                         ],
                                       ),
                                     ),
@@ -1291,7 +1289,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                                                   width: 1, color: Colors.white),
                                             ),
                                           ),
-                                          Text("Mebel"),
+                                          TextView("Mebel", 6),
                                         ],
                                       ),
                                     )
