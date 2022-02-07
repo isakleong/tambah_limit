@@ -18,8 +18,8 @@ class UserAPI {
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    String url_address_1 = config.baseUrl + "/" + "getUserCoba.php" + (parameter == "" ? "" : "?" + parameter);
-    String url_address_2 = config.baseUrlAlt + "/" + "getUserCoba.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_1 = config.baseUrl + "/" + "cobalogin.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_2 = config.baseUrlAlt + "/" + "cobalogin.php" + (parameter == "" ? "" : "?" + parameter);
 
     try {
 		  final conn_1 = await ConnectionTest(url_address_1, context);
