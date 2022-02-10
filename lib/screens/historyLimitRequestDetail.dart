@@ -202,7 +202,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
           isLimitRequestApprovalExist = true;
           var jsonObject = json.decode(getLimitRequestApprovalStatus);
           final dateTime = DateTime.parse(jsonObject['date'].toString()); 
-          final dateFormat = DateFormat('dd-MM-yyyy H:m:s');
+          final dateFormat = DateFormat('dd-MM-yyyy HH:m:s');
           final dateApproval = dateFormat.format(dateTime);
           print(dateApproval);
           

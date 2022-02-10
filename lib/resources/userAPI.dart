@@ -12,6 +12,64 @@ Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstance();
 class UserAPI {
   Client client = Client();
 
+  Future<String> checkAuth(final context, {String parameter=""}) async {
+    String isAuthorized = "";
+    User user;
+    String url = "";
+
+    bool isUrlAddress_1 = false, isUrlAddress_2 = false;
+    String url_address_1 = config.baseUrl + "/" + "authorize.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_2 = config.baseUrlAlt + "/" + "authorize.php" + (parameter == "" ? "" : "?" + parameter);
+
+    try {
+		  final conn_1 = await ConnectionTest(url_address_1, context);
+      printHelp("GET STATUS 1 "+conn_1);
+      if(conn_1 == "OK"){
+        isUrlAddress_1 = true;
+      }
+	  } on SocketException {
+      isUrlAddress_1 = false;
+      isAuthorized = "Gagal terhubung dengan server";
+    }
+
+    if(isUrlAddress_1) {
+      url = url_address_1;
+    } else {
+      try {
+        final conn_2 = await ConnectionTest(url_address_2, context);
+        printHelp("GET STATUS 2 "+conn_2);
+        if(conn_2 == "OK"){
+          isUrlAddress_2 = true;
+        }
+      } on SocketException {
+        isUrlAddress_2 = false;
+        isAuthorized = "Gagal terhubung dengan server";
+      }
+    }
+    if(isUrlAddress_2){
+      url = url_address_2;
+    }
+
+    if(url != "") {
+      try {
+        final response = await client.get(url);
+
+        if(response.body.toString() != "false") {
+          isAuthorized = "OK";
+        } else {
+          isAuthorized = "Anda tidak lagi memiliki izin untuk mengakses aplikasi ini.";
+        }
+      } catch (e) {
+        isAuthorized = "Gagal terhubung dengan server";
+        printHelp(e);
+      }
+    } else {
+      isAuthorized = "Gagal terhubung dengan server";
+    }
+
+    return isAuthorized;
+  }
+
   Future<String> login(final context, {String parameter=""}) async {
     String isLoginSuccess = "";
     User user;
@@ -52,8 +110,6 @@ class UserAPI {
 
     if(url != "") {
       try {
-        // final response = await client.get(url);
-
         final response = await client.get(url);
 
         if(response.body.toString() != "false") {
@@ -213,7 +269,9 @@ class UserAPI {
 
   saveToLocalStorage(final context, User user) async {
     final SharedPreferences sharedPreferences = await _sharedPreferences;
+    await sharedPreferences.setString("get_user_login", user.Id);
     await sharedPreferences.setString("user_code", user.Id);
+    await sharedPreferences.setString("nik", user.NIK);
     await sharedPreferences.setInt("max_limit", int.parse(user.MaxLimit));
     await sharedPreferences.setStringList("module_privilege", user.ModuleId);
   }

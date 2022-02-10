@@ -34,7 +34,8 @@ class Dashboard extends StatefulWidget {
   DashboardState createState() => DashboardState();
 }
 
-class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
+// class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
+class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   PersistentTabController tabController;
   List<BottomNavigationBarItem> bottomNavigationBarList = [];
 
@@ -285,6 +286,8 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
+
     tabController = PersistentTabController(initialIndex: 0);
 
     if(widget.indexMenu != null){
@@ -292,11 +295,6 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         currentIndex = widget.indexMenu;
       });
     }
-
-    //get privilege
-
-
-    // initializeNotification();
 
     //handling onbackground notification
     FirebaseMessaging.onMessageOpenedApp.listen((message) async {
@@ -635,6 +633,73 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     // }
     
     super.initState();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+
+    // These are the callbacks
+    switch (state) {
+      case AppLifecycleState.resumed:
+        printHelp("resumed");
+        
+        final SharedPreferences sharedPreferences = await _sharedPreferences;
+        if(sharedPreferences.containsKey("nik")) {
+          Alert(context: context, loading: true, disableBackButton: true);
+
+          String nik = sharedPreferences.getString("nik");
+
+          String getAuth = await userAPI.checkAuth(context, parameter: 'json={"nik":"$nik"}');
+
+          Navigator.of(context).pop();
+
+          if(getAuth == "OK") {
+            Navigator.pushReplacementNamed(
+              context,
+              'dashboard'
+            );
+          } else {
+            Alert(
+              context: context,
+              title: "Maaf,",
+              content: Text(getAuth),
+              cancel: false,
+              type: "error",
+              defaultAction: () async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                await prefs.remove("limit_dmd");
+                await prefs.remove("request_limit");
+                await prefs.remove("user_code_request");
+                await prefs.remove("user_code");
+                await prefs.remove("max_limit");
+                await prefs.remove("fcmToken");
+                await prefs.remove("get_user_login");
+                await prefs.remove("nik");
+                await prefs.remove("module_privilege");
+                await FirebaseMessaging.instance.deleteToken();
+                await prefs.clear();
+                Navigator.pushReplacementNamed(
+                  context,
+                  "login",
+                );
+              }
+            );
+          }
+          
+        }
+
+        break;
+      case AppLifecycleState.inactive:
+        printHelp("inactive");
+        break;
+      case AppLifecycleState.paused:
+        printHelp("paused");
+        break;
+      case AppLifecycleState.detached:
+        printHelp("detached");
+        break;
+    }
   }
 
   @override
@@ -1093,6 +1158,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                 await prefs.remove("max_limit");
                                 await prefs.remove("fcmToken");
                                 await prefs.remove("get_user_login");
+                                await prefs.remove("nik");
                                 await prefs.remove("module_privilege");
                                 await FirebaseMessaging.instance.deleteToken();
                                 await prefs.clear();
@@ -1713,6 +1779,7 @@ class DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               await prefs.remove("max_limit");
               await prefs.remove("fcmToken");
               await prefs.remove("get_user_login");
+              await prefs.remove("nik");
               await FirebaseMessaging.instance.deleteToken();
               await prefs.clear();
               Navigator.pushReplacementNamed(

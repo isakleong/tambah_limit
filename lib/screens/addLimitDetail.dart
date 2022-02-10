@@ -83,7 +83,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
         ),
       );
     } else {
-      final _newValue = _resultObject[0]["limit_dmd"].toString();
+      final _newValue = currencyFormatter.format(_resultObject[0]["limit_dmd"]).toString();
       limitDMDController.value = TextEditingValue(
         text: _newValue,
         selection: TextSelection.fromPosition(

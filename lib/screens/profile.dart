@@ -271,6 +271,8 @@ class ProfileState extends State<Profile> {
               await prefs.remove("max_limit");
               await prefs.remove("fcmToken");
               await prefs.remove("get_user_login");
+              await prefs.remove("nik");
+              await prefs.remove("module_privilege");
               await FirebaseMessaging.instance.deleteToken();
               await prefs.clear();
               Navigator.pushReplacementNamed(

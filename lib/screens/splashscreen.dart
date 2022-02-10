@@ -12,6 +12,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'package:http/http.dart' show Client, Request;
+import 'package:tambah_limit/resources/userAPI.dart';
 import 'package:tambah_limit/screens/login.dart';
 import 'package:tambah_limit/settings/configuration.dart';
 import 'package:tambah_limit/tools/function.dart';
@@ -861,12 +862,56 @@ class SplashScreenState extends State<SplashScreen> {
   void navigate() async {
     final SharedPreferences sharedPreferences = await _sharedPreferences;
     if(sharedPreferences.containsKey("user_code")) {
-      final SharedPreferences sharedPreferences = await _sharedPreferences;
       await sharedPreferences.setString("get_user_login", sharedPreferences.getString("user_code"));
-      Navigator.pushReplacementNamed(
-        context,
-        'dashboard'
-      );
+
+      if(sharedPreferences.containsKey("nik")) {
+        String nik = sharedPreferences.getString("nik");
+
+        String getAuth = await userAPI.checkAuth(context, parameter: 'json={"nik":"$nik"}');
+
+        if(getAuth == "OK") {
+          Navigator.pushReplacementNamed(
+            context,
+            'dashboard'
+          );
+        } else {
+          Alert(
+            context: context,
+            title: "Maaf,",
+            content: Text(getAuth),
+            cancel: false,
+            type: "error",
+            defaultAction: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.remove("limit_dmd");
+              await prefs.remove("request_limit");
+              await prefs.remove("user_code_request");
+              await prefs.remove("user_code");
+              await prefs.remove("max_limit");
+              await prefs.remove("fcmToken");
+              await prefs.remove("get_user_login");
+              await prefs.remove("nik");
+              await prefs.remove("module_privilege");
+              await FirebaseMessaging.instance.deleteToken();
+              await prefs.clear();
+              Navigator.pushReplacementNamed(
+                context,
+                "login",
+              );
+            }
+          );
+        }
+        
+      } else {
+        Navigator.pushReplacementNamed(
+          context,
+          'dashboard'
+        );
+      }
+      
+      
+
+      
     } else {
       
       Navigator.pushReplacement(
