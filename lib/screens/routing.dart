@@ -33,7 +33,10 @@ MaterialPageRoute routing(int mode, int id, List<String> pages, int notification
       return MaterialPageRoute(builder: (context)=> HistoryLimitRequestDetail(mode: mode, id: id, model: settings.arguments, notificationType: notificationType));
       break;
     case 'addLimitDetail':
-      return MaterialPageRoute(builder: (context)=> AddLimitDetail(model: settings.arguments, callMode: "addLimitDetail"));
+      return MaterialPageRoute(builder: (context)=> AddLimitDetail(model: settings.arguments, callMode: "addLimitDetail", guestMode: false));
+      break;
+    case 'guestAddLimitDetail':
+      return MaterialPageRoute(builder: (context)=> AddLimitDetail(model: settings.arguments, callMode: "addLimitDetail", guestMode: true));
       break;
     case 'addLimitCorporateDetail':
       return MaterialPageRoute(builder: (context)=> AddLimitCorporateDetail(model: settings.arguments));

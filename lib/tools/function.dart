@@ -201,14 +201,14 @@ void Alert({
             :
             [
               // kalau ada pilihan tombol lain, akan otomatis mengeluarkan tulisan cancel
-              Button(
-                key: Key("cancel"),
-                child: TextView("Tidak", 2, size: 10, caps: true,),
-                fill: false,
-                onTap: () {
-                  Navigator.of(context).pop();
-                },
-              )
+              // Button(
+              //   key: Key("cancel"),
+              //   child: TextView("Tidak", 2, size: 12, caps: false, color: Colors.white),
+              //   fill: false,
+              //   onTap: () {
+              //     Navigator.of(context).pop();
+              //   },
+              // )
             ]..addAll(actions)..add(Padding(padding: EdgeInsets.only(right:5)))
           )
         );

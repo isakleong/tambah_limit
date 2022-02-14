@@ -107,7 +107,7 @@ class CustomerAPI {
 
   }
 
-  Future<Result> getLimit(final context, {String parameter="", String pageType=""}) async {
+  Future<Result> getLimit(final context, {String parameter=""}) async {
     Result result;
     String url = "";
     Customer customer;

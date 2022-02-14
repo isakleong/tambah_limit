@@ -1594,9 +1594,41 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
             content: Text(result_.message),
             cancel: false,
             type: "warning",
-            defaultAction: () {
-              getLimitCorporate(customerCorporateId: result_.data);
-            }
+            actions: [
+              Button(
+                key: Key("detail"),
+                child: TextView("Detail Limit", 2, size: 12, caps: false, color: Colors.white),
+                fill: false,
+                onTap: () async {
+                  Alert(context: context, loading: true, disableBackButton: true);
+
+                  Result detailResult = await customerAPI.getLimit(context, parameter: 'json={"guest_mode":"true","kode_customer":"${customerIdController.text}","user_code":"${user_code}"}');
+
+                  Navigator.of(context).pop();
+
+                  if(detailResult.success == 1){
+                    setState(() {
+                      resultLimit = detailResult;
+                      customerIdController.clear();
+                    });
+
+                    Navigator.pushNamed(
+                      context,
+                      "guestAddLimitDetail",
+                      arguments: resultLimit,
+                    );
+                  }
+                },
+              ),
+              Button(
+                key: Key("ok"),
+                child: TextView("Lanjutkan", 2, size: 12, caps: false, color: Colors.white),
+                fill: false,
+                onTap: () {
+                  getLimitCorporate(customerCorporateId: result_.data);
+                },
+              )
+            ],
           );
 
         } else {

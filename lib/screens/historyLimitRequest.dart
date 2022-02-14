@@ -1245,7 +1245,7 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
     } else {
       Alert(context: context, loading: true, disableBackButton: true);
 
-      result_ = await customerAPI.getLimit(context, parameter: 'json={"page_type":"history","kode_customer":"${tempLimitHistory.customer_code}","user_code":"$user_login"}', pageType: "history");
+      result_ = await customerAPI.getLimit(context, parameter: 'json={"guest_mode":"true","kode_customer":"${tempLimitHistory.customer_code}","user_code":"$user_login"}');
 
       final SharedPreferences sharedPreferences = await _sharedPreferences;
       await sharedPreferences.setInt("request_limit", int.parse(tempLimitHistory.limit));

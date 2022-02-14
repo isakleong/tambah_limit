@@ -23,8 +23,9 @@ Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstance();
 class AddLimitDetail extends StatefulWidget {
   final Result model;
   final String callMode;
+  final bool guestMode;
 
-  AddLimitDetail({Key key, this.model, this.callMode}) : super(key: key);
+  AddLimitDetail({Key key, this.model, this.callMode, this.guestMode}) : super(key: key);
 
   @override
   AddLimitDetailState createState() => AddLimitDetailState();
@@ -33,6 +34,7 @@ class AddLimitDetail extends StatefulWidget {
 class AddLimitDetailState extends State<AddLimitDetail> {
   Result result;
   String callMode;
+  bool guestMode = true; //default true, jika hanya untuk keperluan preview guestMode false, kenapa berlawanan karna mengikuti attribut Visibility dari flutter
 
   final _AddLimitFormKey = GlobalKey<FormState>();
   final limitDMDController = TextEditingController();
@@ -71,6 +73,10 @@ class AddLimitDetailState extends State<AddLimitDetail> {
 
     result = widget.model;
     callMode = widget.callMode;
+    if(widget.guestMode != null) {
+      guestMode = widget.guestMode;
+      printHelp("GUEST MODE "+guestMode.toString());
+    }
 
     final _resultObject = jsonDecode(result.data.toString());
 
@@ -1589,29 +1595,35 @@ class AddLimitDetailState extends State<AddLimitDetail> {
                   ),
                 ),
               ),
-              Center(
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  padding: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-                  child: Button(
-                    key: Key("submit"),
-                    loading: changeLimitLoading,
-                    backgroundColor: config.darkOpacityBlueColor,
-                    child: TextView(
-                      "UBAH",
-                      3,
-                      caps: true,
+              Visibility(
+                maintainSize: true, 
+                maintainAnimation: true,
+                maintainState: true,
+                visible: !guestMode,
+                child: Center(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
+                    child: Button(
+                      key: Key("submit"),
+                      loading: changeLimitLoading,
+                      backgroundColor: config.darkOpacityBlueColor,
+                      child: TextView(
+                        "UBAH",
+                        3,
+                        caps: true,
+                      ),
+                      onTap: () {
+                        updateLimit();
+                        // Alert(
+                        //   context: context,
+                        //   title: "Alert",
+                        //   content: Text(limitDMDController.text.toString()),
+                        //   cancel: false,
+                        //   type: "warning"
+                        // );
+                      },
                     ),
-                    onTap: () {
-                      updateLimit();
-                      // Alert(
-                      //   context: context,
-                      //   title: "Alert",
-                      //   content: Text(limitDMDController.text.toString()),
-                      //   cancel: false,
-                      //   type: "warning"
-                      // );
-                    },
                   ),
                 ),
               )
