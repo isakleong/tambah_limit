@@ -104,6 +104,8 @@ void Alert({
     VoidCallback willPopAction, loading = false, double value, String errorBtnTitle = "Ok"
   }) {
 
+    bool isShowing = false;
+
   Configuration config = new Configuration();
   
   if (loading == false) {

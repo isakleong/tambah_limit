@@ -1385,14 +1385,14 @@ class AddLimitDetailState extends State<AddLimitDetail> {
     if (result != null) {
       final resultObject = jsonDecode(result.data.toString());
 
-      var blockedType = resultObject[0]["blocked"];
+      var blockedType = resultObject[0]["Blocked"].toString();
       var blockedTypeSelected;
 
-      if (blockedType == 3) {
+      if (int.parse(blockedType) == 3) {
         blockedTypeSelected = "Blocked All";
-      } else if (blockedType == 2) {
+      } else if (int.parse(blockedType) == 2) {
         blockedTypeSelected = "Blocked Invoice";
-      } else if (blockedType == 1) {
+      } else if (int.parse(blockedType) == 1) {
         blockedTypeSelected = "Blocked Ship";
       } else {
         blockedTypeSelected = "Not Blocked";

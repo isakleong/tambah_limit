@@ -57,7 +57,7 @@ class UserAPI {
         if(response.body.toString() != "false") {
           isAuthorized = "OK";
         } else {
-          isAuthorized = "Anda tidak lagi memiliki izin untuk mengakses aplikasi ini.";
+          isAuthorized = "Anda tidak lagi memiliki izin untuk menggunakan aplikasi ini";
         }
       } catch (e) {
         isAuthorized = "Gagal terhubung dengan server";
@@ -76,8 +76,8 @@ class UserAPI {
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    String url_address_1 = config.baseUrl + "/" + "cobalogin.php" + (parameter == "" ? "" : "?" + parameter);
-    String url_address_2 = config.baseUrlAlt + "/" + "cobalogin.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_1 = config.baseUrl + "/" + "getUserCoba.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_2 = config.baseUrlAlt + "/" + "getUserCoba.php" + (parameter == "" ? "" : "?" + parameter);
 
     try {
 		  final conn_1 = await ConnectionTest(url_address_1, context);
@@ -112,22 +112,26 @@ class UserAPI {
       try {
         final response = await client.get(url);
 
-        if(response.body.toString() != "false") {
-          if(response.body.toString() == "autolimit") {
-            isLoginSuccess = "Untuk menaikkan limit dapat menggunakan Program Utility NAV";
-          } else {
-            var parsedJson = jsonDecode(response.body);
-
-            user = User.fromJson(parsedJson[0]);
-            printHelp("CEK MOD "+user.ModuleId.toString());
-
-            if(user.Id != ""){
-              isLoginSuccess = "OK";
-              await saveToLocalStorage(context, user);
-            }   
-          }
+        if(response.body.toString() == "restricted") {
+          isLoginSuccess = "Cabang Anda belum dapat menggunakan aplikasi ini";
         } else {
-          isLoginSuccess = "Username atau Password salah";
+          if(response.body.toString() != "false") {
+            if(response.body.toString() == "autolimit") {
+              isLoginSuccess = "Untuk menaikkan limit dapat menggunakan Program Utility NAV";
+            } else {
+              var parsedJson = jsonDecode(response.body);
+
+              user = User.fromJson(parsedJson[0]);
+              printHelp("CEK MOD "+user.ModuleId.toString());
+
+              if(user.Id != ""){
+                isLoginSuccess = "OK";
+                await saveToLocalStorage(context, user);
+              }   
+            }
+          } else {
+            isLoginSuccess = "Username atau Password salah";
+          }
         }
       } catch (e) {
         isLoginSuccess = "Gagal terhubung dengan server";
@@ -271,7 +275,10 @@ class UserAPI {
     final SharedPreferences sharedPreferences = await _sharedPreferences;
     await sharedPreferences.setString("get_user_login", user.Id);
     await sharedPreferences.setString("user_code", user.Id);
-    await sharedPreferences.setString("nik", user.NIK);
+    if(user.NIK!="") {
+      await sharedPreferences.setString("nik", user.NIK);
+    }
+    
     await sharedPreferences.setInt("max_limit", int.parse(user.MaxLimit));
     await sharedPreferences.setStringList("module_privilege", user.ModuleId);
   }

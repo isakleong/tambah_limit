@@ -867,40 +867,58 @@ class SplashScreenState extends State<SplashScreen> {
       if(sharedPreferences.containsKey("nik")) {
         String nik = sharedPreferences.getString("nik");
 
+        printHelp("NIK NYA "+nik);
+
         String getAuth = await userAPI.checkAuth(context, parameter: 'json={"nik":"$nik"}');
 
-        if(getAuth == "OK") {
-          Navigator.pushReplacementNamed(
-            context,
-            'dashboard'
-          );
-        } else {
+        if(getAuth.contains("server")) {
           Alert(
             context: context,
             title: "Maaf,",
-            content: Text(getAuth),
+            content: Text("Gagal terhubung dengan server"),
             cancel: false,
             type: "error",
-            defaultAction: () async {
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              await prefs.remove("limit_dmd");
-              await prefs.remove("request_limit");
-              await prefs.remove("user_code_request");
-              await prefs.remove("user_code");
-              await prefs.remove("max_limit");
-              await prefs.remove("fcmToken");
-              await prefs.remove("get_user_login");
-              await prefs.remove("nik");
-              await prefs.remove("module_privilege");
-              await FirebaseMessaging.instance.deleteToken();
-              await prefs.clear();
-              Navigator.pushReplacementNamed(
-                context,
-                "login",
-              );
+            errorBtnTitle: "Coba Lagi",
+            defaultAction: () {
+              startTimer();
             }
           );
+        } else {
+          if(getAuth == "OK") {
+            Navigator.pushReplacementNamed(
+              context,
+              'dashboard'
+            );
+          } else {
+            Alert(
+              context: context,
+              title: "Maaf,",
+              content: Text(getAuth),
+              cancel: false,
+              type: "error",
+              disableBackButton: true,
+              defaultAction: () async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                await prefs.remove("limit_dmd");
+                await prefs.remove("request_limit");
+                await prefs.remove("user_code_request");
+                await prefs.remove("user_code");
+                await prefs.remove("max_limit");
+                await prefs.remove("fcmToken");
+                await prefs.remove("get_user_login");
+                await prefs.remove("nik");
+                await prefs.remove("module_privilege");
+                await FirebaseMessaging.instance.deleteToken();
+                await prefs.clear();
+                Navigator.pushReplacementNamed(
+                  context,
+                  "login",
+                );
+              }
+            );
+          }
         }
+        
         
       } else {
         Navigator.pushReplacementNamed(

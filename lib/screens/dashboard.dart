@@ -6,6 +6,7 @@ import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tambah_limit/models/resultModel.dart';
@@ -104,6 +105,8 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   int currentMenuIndex = 0;
 
   bool checkModulePrivilegeLoading = true;
+
+  bool isAlertShowing = false;
 
   void _selectedTab(int index) {
     setState(() {
@@ -644,50 +647,65 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       case AppLifecycleState.resumed:
         printHelp("resumed");
         
-        final SharedPreferences sharedPreferences = await _sharedPreferences;
-        if(sharedPreferences.containsKey("nik")) {
-          Alert(context: context, loading: true, disableBackButton: true);
+        // final SharedPreferences sharedPreferences = await _sharedPreferences;
+        // if(sharedPreferences.containsKey("nik")) {
+        //   Alert(context: context, loading: true, disableBackButton: true);
 
-          String nik = sharedPreferences.getString("nik");
+        //   String nik = sharedPreferences.getString("nik");
 
-          String getAuth = await userAPI.checkAuth(context, parameter: 'json={"nik":"$nik"}');
+        //   String getAuth = await userAPI.checkAuth(context, parameter: 'json={"nik":"$nik"}');
 
-          Navigator.of(context).pop();
+        //   Navigator.of(context).pop();
 
-          if(getAuth == "OK") {
-            Navigator.pushReplacementNamed(
-              context,
-              'dashboard'
-            );
-          } else {
-            Alert(
-              context: context,
-              title: "Maaf,",
-              content: Text(getAuth),
-              cancel: false,
-              type: "error",
-              defaultAction: () async {
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                await prefs.remove("limit_dmd");
-                await prefs.remove("request_limit");
-                await prefs.remove("user_code_request");
-                await prefs.remove("user_code");
-                await prefs.remove("max_limit");
-                await prefs.remove("fcmToken");
-                await prefs.remove("get_user_login");
-                await prefs.remove("nik");
-                await prefs.remove("module_privilege");
-                await FirebaseMessaging.instance.deleteToken();
-                await prefs.clear();
-                Navigator.pushReplacementNamed(
-                  context,
-                  "login",
-                );
-              }
-            );
-          }
-          
-        }
+        //   if(getAuth.contains("server")) {
+        //     Alert(
+        //       context: context,
+        //       title: "Maaf,",
+        //       content: Text(getAuth),
+        //       cancel: false,
+        //       type: "error",
+        //       errorBtnTitle: "Coba Lagi",
+        //       disableBackButton: true,
+        //       defaultAction: () {
+        //         retryAuth();
+        //       }
+        //     );
+        //   } else {
+        //     if(getAuth == "OK") {
+        //       //welcome back
+        //       printHelp("HMMMM");
+        //     } else {
+        //       Alert(
+        //         context: context,
+        //         title: "Maaf,",
+        //         content: Text(getAuth),
+        //         cancel: false,
+        //         type: "error",
+        //         // disableBackButton: true,
+        //         defaultAction: () async {
+        //           SharedPreferences prefs = await SharedPreferences.getInstance();
+        //           await prefs.remove("limit_dmd");
+        //           await prefs.remove("request_limit");
+        //           await prefs.remove("user_code_request");
+        //           await prefs.remove("user_code");
+        //           await prefs.remove("max_limit");
+        //           await prefs.remove("fcmToken");
+        //           await prefs.remove("get_user_login");
+        //           await prefs.remove("nik");
+        //           await prefs.remove("module_privilege");
+        //           await FirebaseMessaging.instance.deleteToken();
+        //           await prefs.clear();
+        //           Navigator.pushReplacementNamed(
+        //             context,
+        //             "login",
+        //           );
+        //         }
+        //       );
+        //     }
+        //   } 
+        // }
+
+        retryAuth();
 
         break;
       case AppLifecycleState.inactive:
@@ -699,6 +717,70 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       case AppLifecycleState.detached:
         printHelp("detached");
         break;
+    }
+  }
+
+  retryAuth() async {
+    final SharedPreferences sharedPreferences = await _sharedPreferences;
+    if(sharedPreferences.containsKey("nik")) {
+      Alert(context: context, loading: true, disableBackButton: true);
+
+      String nik = sharedPreferences.getString("nik");
+
+      String getAuth = await userAPI.checkAuth(context, parameter: 'json={"nik":"$nik"}');
+
+      Navigator.of(context, rootNavigator: true).pop();
+
+      if(getAuth.contains("server")) {
+        showAlert(
+          context: context,
+          title: "Maaf,",
+          content: Text(getAuth),
+          cancel: false,
+          type: "error",
+          errorBtnTitle: "Coba Lagi",
+          disableBackButton: true,
+          defaultAction: () {
+            retryAuth();
+          }
+        );
+      } else {
+        if(getAuth == "OK") {
+          //welcome back
+          printHelp("HMMMM");
+          if(isAlertShowing) {
+            Navigator.of(context, rootNavigator: true).pop();
+            isAlertShowing = false;
+          }
+        } else {
+          showAlert(
+            context: context,
+            title: "Maaf,",
+            content: Text(getAuth),
+            cancel: false,
+            type: "error",
+            disableBackButton: true,
+            defaultAction: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.remove("limit_dmd");
+              await prefs.remove("request_limit");
+              await prefs.remove("user_code_request");
+              await prefs.remove("user_code");
+              await prefs.remove("max_limit");
+              await prefs.remove("fcmToken");
+              await prefs.remove("get_user_login");
+              await prefs.remove("nik");
+              await prefs.remove("module_privilege");
+              await FirebaseMessaging.instance.deleteToken();
+              await prefs.clear();
+              Navigator.pushReplacementNamed(
+                context,
+                "login",
+              );
+            }
+          );
+        }
+      } 
     }
   }
 
@@ -1600,6 +1682,8 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                 child: TextView("Detail Limit", 2, size: 12, caps: false, color: Colors.white),
                 fill: false,
                 onTap: () async {
+                  Navigator.of(context).pop();
+
                   Alert(context: context, loading: true, disableBackButton: true);
 
                   Result detailResult = await customerAPI.getLimit(context, parameter: 'json={"guest_mode":"true","kode_customer":"${customerIdController.text}","user_code":"${user_code}"}');
@@ -1625,6 +1709,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                 child: TextView("Lanjutkan", 2, size: 12, caps: false, color: Colors.white),
                 fill: false,
                 onTap: () {
+                  Navigator.of(context).pop();
                   getLimitCorporate(customerCorporateId: result_.data);
                 },
               )
@@ -1883,6 +1968,149 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       SystemChannels.platform.invokeMethod('SystemNavigator.pop');
     }
     return Future.value(false);
+  }
+
+  void showAlert({
+      context, String title, Widget content, List<Widget> actions, VoidCallback defaultAction,
+      bool cancel = true, String type = "warning", bool showIcon = true, bool disableBackButton = false,
+      VoidCallback willPopAction, loading = false, double value, String errorBtnTitle = "Ok"
+    }) {
+
+    Configuration config = new Configuration();
+    
+    if (loading == false) {
+      if (actions == null) {
+        actions = [];
+      }
+
+      if (defaultAction == null) {
+        defaultAction = () {};
+      }
+
+      Widget icon;
+      double iconWidth = 40, iconHeight = 40;
+      if (type == "success") {
+        icon = Container(
+          child: FlareActor('assets/flare/success.flr', animation: "Play"),
+          width: iconWidth,
+          height: iconHeight,
+        );
+      } else if (type == "warning") {
+        icon = Container(
+          child: FlareActor('assets/flare/warning.flr', animation: "Play"),
+          width: iconWidth,
+          height: iconHeight,
+        );
+      } else if (type == "error") {
+        icon = Container(
+          child: FlareActor('assets/flare/error.flr', animation: "Play"),
+          width: iconWidth,
+          height: iconHeight,
+        );
+      }
+
+      Widget titleWidget;
+      // kalau titlenya gak null, judulnya ada
+      if (title != null) {
+        // kalau titlenya kosongan, brarti gk ada judulnya
+        if (title == "") {
+          titleWidget = null;
+        } else {
+          titleWidget = Row(
+            children: <Widget>[
+              showIcon ? Padding(padding: EdgeInsets.only(right: 20), child:icon) : Container(),
+              Expanded(child: TextView(title, 2)),
+            ],
+          );
+          
+        }
+      } else {
+        // kalau titlenya null berarti auto generate tergantung typenya
+        titleWidget = Row(
+          children: <Widget>[
+            showIcon ? Padding(padding: EdgeInsets.only(right: 20), child:icon) : Container(),
+            Expanded(child: TextView("Warning", 2)),
+          ],
+        );
+      }
+      
+      isAlertShowing = true;
+      showDialog (
+        context: context,
+        barrierDismissible: false,
+        builder: (context){
+          return WillPopScope(
+            onWillPop: disableBackButton ? () {
+            }:willPopAction,
+            child:AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(7.5)),
+              ),
+              title: titleWidget,
+              content: content == null ? null:content,
+              // kalau actions nya kosong akan otomatis mengeluarkan tombol ok untuk menutup alert
+              actions: actions.length == 0 ?
+              [
+                defaultAction != null && cancel ?
+                Button(
+                  key: Key("cancel"),
+                  child: TextView("Tidak", 2, size: 12, caps: false, color: Colors.white),
+                  fill: false,
+                  onTap: () {
+                    isAlertShowing = false;
+                    Navigator.of(context).pop();
+                  },
+                ) : Container(),
+                Button(
+                  key: Key("ok"),
+                  child: cancel ? TextView("Ya", 2, size: 12, caps: false, color: Colors.white) : type == "error" ? TextView(errorBtnTitle, 2, size: 12, caps: false, color: Colors.white) : TextView("Ok", 2, size: 12, caps: false, color: Colors.white),
+                  fill: true,
+                  onTap: () {
+                    isAlertShowing = false;
+                    Navigator.of(context).pop();
+                    defaultAction();
+                  },
+                ),
+                // kalau ada default action akan otomatis menampilkan tombol cancel, jadi akan muncul ok dan cancel
+              ]
+              :
+              [
+                // kalau ada pilihan tombol lain, akan otomatis mengeluarkan tulisan cancel
+                // Button(
+                //   key: Key("cancel"),
+                //   child: TextView("Tidak", 2, size: 12, caps: false, color: Colors.white),
+                //   fill: false,
+                //   onTap: () {
+                //     Navigator.of(context).pop();
+                //   },
+                // )
+              ]..addAll(actions)..add(Padding(padding: EdgeInsets.only(right:5)))
+            )
+          );
+        }
+      );    
+    } else if (loading) {
+      showDialog (
+        context: context,
+        barrierDismissible: false,
+        builder: (context){
+          return WillPopScope(
+            onWillPop: disableBackButton ? () {
+
+            }:null,
+            child: ListView(
+              children: [
+                SizedBox(height: 30),
+                Container(
+                  child: Lottie.asset('assets/illustration/waiting.json', width: 220, height: 220, fit: BoxFit.contain)
+                ),
+              ],
+            )
+          );
+        }
+      );
+    }
+
   }
 
 }
