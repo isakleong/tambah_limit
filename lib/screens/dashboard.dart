@@ -747,7 +747,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       } else {
         if(getAuth == "OK") {
           //welcome back
-          printHelp("HMMMM");
           if(isAlertShowing) {
             Navigator.of(context, rootNavigator: true).pop();
             isAlertShowing = false;

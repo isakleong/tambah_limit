@@ -616,27 +616,27 @@ class SplashScreenState extends State<SplashScreen> {
                   ),
                 ),
               ),
-              Center(
-                child: Visibility(
-                  maintainSize: true, 
-                  maintainAnimation: true,
-                  maintainState: true,
-                  visible: isDownloadNewVersion,
-                  child: CircularPercentIndicator(
-                    radius: 120.0,
-                    lineWidth: 13.0,
-                    animation: true,
-                    percent: progressValue,
-                    center: Text("${progressText}%", style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                    footer: Padding(
-                      padding: EdgeInsets.only(top: 30),
-                      child: Text("Mengunduh pembaruan aplikasi", style: new TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                    circularStrokeCap: CircularStrokeCap.round,
-                    progressColor: config.primaryColor,
-                  ),
-                ),
-              ),
+              // Center(
+              //   child: Visibility(
+              //     maintainSize: true, 
+              //     maintainAnimation: true,
+              //     maintainState: true,
+              //     visible: isDownloadNewVersion,
+              //     child: CircularPercentIndicator(
+              //       radius: 120.0,
+              //       lineWidth: 13.0,
+              //       animation: true,
+              //       percent: progressValue,
+              //       center: Text("${progressText}%", style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              //       footer: Padding(
+              //         padding: EdgeInsets.only(top: 30),
+              //         child: Text("Mengunduh pembaruan aplikasi", style: new TextStyle(fontWeight: FontWeight.bold)),
+              //       ),
+              //       circularStrokeCap: CircularStrokeCap.round,
+              //       progressColor: config.primaryColor,
+              //     ),
+              //   ),
+              // ),
       
             ],
           ),
@@ -866,8 +866,6 @@ class SplashScreenState extends State<SplashScreen> {
 
       if(sharedPreferences.containsKey("nik")) {
         String nik = sharedPreferences.getString("nik");
-
-        printHelp("NIK NYA "+nik);
 
         String getAuth = await userAPI.checkAuth(context, parameter: 'json={"nik":"$nik"}');
 
