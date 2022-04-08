@@ -199,7 +199,6 @@ class LoginState extends State<Login> {
     );
   }
 
-
   void doLogin() async {
     FocusScope.of(context).requestFocus(FocusNode());
     setState(() {
@@ -211,7 +210,11 @@ class LoginState extends State<Login> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String fcmToken = prefs.getString("fcmToken");
 
-    String getLogin = await userAPI.login(context, parameter: 'json={"user_code":"${usernameController.text}","user_pass":"${passwordController.text}","token":"${fcmToken}"}');
+    final usernameData = encryptData(usernameController.text.toUpperCase());
+    final passwordData = encryptData(passwordController.text);
+    final tokenData = encryptData(fcmToken);
+
+    String getLogin = await userAPI.login(context, parameter: 'json={"user_code":"$usernameData","user_pass":"$passwordData","token":"$tokenData"}');
 
     Navigator.of(context).pop();
 

@@ -1,5 +1,7 @@
 import 'dart:async';
-
+import 'package:encrypt/encrypt.dart' as EncryptionPackage;
+import 'package:crypto/crypto.dart' as CryptoPackage;
+import 'dart:convert' as ConvertPackage;
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' show Client, Request;
 import 'package:flare_flutter/flare_actor.dart';
@@ -17,6 +19,54 @@ printHelp(final print) {
   debugPrint(print.toString());
   debugPrint("---------------------------------");
 }
+
+String decryptData(String data) {
+  String strPwd = "snwO+67pWwpuypbyeazkkK6CNAfpsOivLuSwR/rd4uM=";
+  String strIv = 'K8IgRZtkuepdGc1VnOp6eA==';
+  var iv = CryptoPackage.sha256
+    .convert(ConvertPackage.utf8.encode(strIv))
+    .toString()
+    .substring(0, 16); // Consider the first 16 bytes of all 64 bytes
+  var key = CryptoPackage.sha256
+    .convert(ConvertPackage.utf8.encode(strPwd))
+    .toString()
+    .substring(0, 32); // Consider the first 32 bytes of all 64 bytes
+  EncryptionPackage.IV ivObj = EncryptionPackage.IV.fromUtf8(iv);
+  EncryptionPackage.Key keyObj = EncryptionPackage.Key.fromUtf8(key);
+  final encrypter = EncryptionPackage.Encrypter(
+      EncryptionPackage.AES(keyObj, mode: EncryptionPackage.AESMode.cbc)); // Apply CBC mode
+  String firstBase64Decoding = new String.fromCharCodes(
+      ConvertPackage.base64.decode(data)); // First Base64 decoding
+  final decrypted = encrypter.decrypt(
+      EncryptionPackage.Encrypted.fromBase64(firstBase64Decoding),
+      iv: ivObj); // Second Base64 decoding (during decryption)
+  return decrypted;
+}
+
+  String encryptData(String data) {
+    // String strPwd = "6P8yHVfeZ5JKaXQ6AyaBge";
+    // String strIv = 'cHaa5y7pQF5uqA2N';
+    String strPwd = "snwO+67pWwpuypbyeazkkK6CNAfpsOivLuSwR/rd4uM=";
+      String strIv = 'K8IgRZtkuepdGc1VnOp6eA==';
+    var iv = CryptoPackage.sha256
+        .convert(ConvertPackage.utf8.encode(strIv))
+        .toString()
+        .substring(0, 16); // Consider the first 16 bytes of all 64 bytes
+    var key = CryptoPackage.sha256
+        .convert(ConvertPackage.utf8.encode(strPwd))
+        .toString()
+        .substring(0, 32); // Consider the first 32 bytes of all 64 bytes
+    EncryptionPackage.IV ivObj = EncryptionPackage.IV.fromUtf8(iv);
+    EncryptionPackage.Key keyObj = EncryptionPackage.Key.fromUtf8(key);
+
+    final encrypter = EncryptionPackage.Encrypter(
+        EncryptionPackage.AES(keyObj, mode: EncryptionPackage.AESMode.cbc));
+
+    final encrypted = encrypter.encrypt(data.toString(), iv: ivObj);
+
+    // return encrypted.base64; //try base16 too
+    return ConvertPackage.base64.encode(ConvertPackage.utf8.encode(encrypted.base64)); // Base64 encode twice // ZFNkckFEL2R5cW5ycTJpbWs0Ky9xQT09
+  }
 
 Future<String> ConnectionTest(String url, BuildContext context) async {
   Client client = Client();

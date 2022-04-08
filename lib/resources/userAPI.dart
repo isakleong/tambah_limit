@@ -12,6 +12,60 @@ Future<SharedPreferences> _sharedPreferences = SharedPreferences.getInstance();
 class UserAPI {
   Client client = Client();
 
+  // Future<String> testing(final context, {String parameter=""}) async {
+  //   String isLoginSuccess = "";
+  //   User user;
+  //   String url = "";
+
+  //   bool isUrlAddress_1 = false, isUrlAddress_2 = false;
+  //   String url_address_1 = config.baseUrl + "/" + "hmmm.php" + (parameter == "" ? "" : "?" + parameter);
+  //   String url_address_2 = config.baseUrlAlt + "/" + "hmmm.php" + (parameter == "" ? "" : "?" + parameter);
+
+  //   try {
+	// 	  final conn_1 = await ConnectionTest(url_address_1, context);
+  //     printHelp("GET STATUS 1 "+conn_1);
+  //     if(conn_1 == "OK"){
+  //       isUrlAddress_1 = true;
+  //     }
+	//   } on SocketException {
+  //     isUrlAddress_1 = false;
+  //     isLoginSuccess = "Gagal terhubung dengan server";
+  //   }
+
+  //   if(isUrlAddress_1) {
+  //     url = url_address_1;
+  //   } else {
+  //     try {
+  //       final conn_2 = await ConnectionTest(url_address_2, context);
+  //       printHelp("GET STATUS 2 "+conn_2);
+  //       if(conn_2 == "OK"){
+  //         isUrlAddress_2 = true;
+  //       }
+  //     } on SocketException {
+  //       isUrlAddress_2 = false;
+  //       isLoginSuccess = "Gagal terhubung dengan server";
+  //     }
+  //   }
+  //   if(isUrlAddress_2){
+  //     url = url_address_2;
+  //   }
+
+  //   if(url != "") {
+  //     try {
+  //       final response = await client.get(url);
+
+  //       printHelp("response decrypt "+response.body.toString());
+  //     } catch (e) {
+  //       isLoginSuccess = "Gagal terhubung dengan server";
+  //       printHelp(e);
+  //     }
+  //   } else {
+  //     isLoginSuccess = "Gagal terhubung dengan server";
+  //   }
+
+  //   return isLoginSuccess;
+  // }
+
   Future<String> checkAuth(final context, {String parameter=""}) async {
     String isAuthorized = "";
     User user;
@@ -111,15 +165,16 @@ class UserAPI {
     if(url != "") {
       try {
         final response = await client.get(url);
+        final responseData = decryptData(response.body.toString());
 
-        if(response.body.toString() == "restricted") {
+        if(responseData == "restricted") {
           isLoginSuccess = "Cabang Anda belum dapat menggunakan aplikasi ini";
         } else {
-          if(response.body.toString() != "false") {
-            if(response.body.toString() == "autolimit") {
+          if(responseData != "false") {
+            if(responseData == "autolimit") {
               isLoginSuccess = "Untuk menaikkan limit dapat menggunakan Program Utility NAV";
             } else {
-              var parsedJson = jsonDecode(response.body);
+              var parsedJson = jsonDecode(responseData);
 
               user = User.fromJson(parsedJson[0]);
               printHelp("CEK MOD "+user.ModuleId.toString());
