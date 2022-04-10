@@ -106,7 +106,8 @@ class UserAPI {
 
     if(url != "") {
       try {
-        final response = await client.get(url);
+        var urlData = Uri.parse(url);
+        final response = await client.get(urlData);
 
         if(response.body.toString() != "false") {
           isAuthorized = "OK";
@@ -164,7 +165,8 @@ class UserAPI {
 
     if(url != "") {
       try {
-        final response = await client.get(url);
+        var urlData = Uri.parse(url);
+        final response = await client.get(urlData);
         final responseData = decryptData(response.body.toString());
 
         if(responseData == "restricted") {
@@ -236,7 +238,8 @@ class UserAPI {
 
     if(url != "") {
       try {
-        final response = await client.get(url);
+        var urlData = Uri.parse(url);
+        final response = await client.get(urlData);
 
         printHelp("tes bodu "+response.body.toString());
 
@@ -297,8 +300,9 @@ class UserAPI {
 
     if(url != "") {
       try {
-         final response = await client.get(url);
-         var parsedJson = jsonDecode(response.body);
+        var urlData = Uri.parse(url);
+        final response = await client.get(urlData);
+        var parsedJson = jsonDecode(response.body);
 
         if(response.body.toString() != "false") {
           user = User.fromJson(parsedJson[0]);

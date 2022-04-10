@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:encrypt/encrypt.dart' as EncryptionPackage;
 import 'package:crypto/crypto.dart' as CryptoPackage;
 import 'dart:convert' as ConvertPackage;
-import 'package:dio/dio.dart';
 import 'package:http/http.dart' show Client, Request;
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';

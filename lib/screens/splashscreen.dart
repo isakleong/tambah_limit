@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'dart:ui';
-import 'package:dio/dio.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:open_file/open_file.dart';
+import 'package:ota_update/ota_update.dart';
+// import 'package:open_file/open_file.dart';
+// import 'package:ota_update/ota_update.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -28,6 +30,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class SplashScreenState extends State<SplashScreen> {
+  OtaEvent currentEvent;
+
   String getCheckVersion = "";
   bool isLoadingVersion = false;
 
@@ -73,12 +77,10 @@ class SplashScreenState extends State<SplashScreen> {
   }
 
   FirebaseMessaging messaging;
+  Timer timer;
   @override
   void initState() {
     initializeFlutterFire();
-
-    // final firebaseMessaging = PushNotificationService();
-    // firebaseMessaging.setNotifications();
 
     messaging = FirebaseMessaging.instance;
     messaging.getToken().then((value){
@@ -91,6 +93,11 @@ class SplashScreenState extends State<SplashScreen> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   didChangeDependencies() async {
     super.didChangeDependencies();
     final SharedPreferences sharedPreferences = await _sharedPreferences;
@@ -101,18 +108,6 @@ class SplashScreenState extends State<SplashScreen> {
     });
 
     await getAppsReady();
-
-    // final isPermissionStatusGranted = await checkAppsPermission();
-    // if(isPermissionStatusGranted) {
-    //   if(!toInstall) {
-    //     doCheckVersion();
-    //   } else {
-    //     String downloadPath = await getFilePath(config.apkName+".apk");
-    //     await OpenFile.open(downloadPath);
-    //   }
-    // } else {
-    //   checkAppsPermission();
-    // }
     
   }
 
@@ -131,7 +126,6 @@ class SplashScreenState extends State<SplashScreen> {
         if(!isPermissionPermanentlyDenied) {
           isPermissionStatusGranted = await checkAppsPermission();
         } else {
-          // isPermissionStatusGranted = await checkAppsPermission();
           isNeedOpenSetting = true;
           break;
         }
@@ -154,42 +148,6 @@ class SplashScreenState extends State<SplashScreen> {
         getAppsReady();
       }
     }
-
-    //////////////////
-
-    // final isPermissionStatusGranted = await checkAppsPermission();
-    
-    // await isReadyToInstall();
-    
-    // if(isPermissionStatusGranted) {
-    //   if(!toInstall) {
-    //     doCheckVersion();
-    //   } else {
-    //     String downloadPath = await getFilePath(config.apkName+".apk");
-    //     await OpenFile.open(downloadPath);
-    //   }
-    // } else {
-    //   checkAppsPermission();
-    // }
-
-    ////////////////////////
-    // var isPermissionStatusGranted = await checkAppsPermission();
-    // var isPermissionStatusGranted = false;
-    
-    // await isReadyToInstall();
-
-    // while(!isPermissionStatusGranted) {
-    //   isPermissionStatusGranted = await checkAppsPermission();
-    // }
-    
-    // if(isPermissionStatusGranted) {
-    //   if(!toInstall) {
-    //     doCheckVersion();
-    //   } else {
-    //     String downloadPath = await getFilePath(config.apkName+".apk");
-    //     await OpenFile.open(downloadPath);
-    //   }
-    // }
   }
 
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
@@ -293,7 +251,43 @@ class SplashScreenState extends State<SplashScreen> {
     }
   }
 
-  Future<void> downloadNewVersion() async {
+  Future<bool> isInternet() async {
+    printHelp("isinternet");
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile) {
+      // connected to mobile network
+      if (await DataConnectionChecker().hasConnection) {
+        // mobile data detected & internet connection confirmed.
+        return true;
+      } else {
+        // mobile data detected but no internet connection found.
+        _setState(() {
+          isRetryDownload = true;
+        });
+        return false;
+      }
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      // connected to wifi network
+      if (await DataConnectionChecker().hasConnection) {
+        // wifi detected & internet connection confirmed.
+        return true;
+      } else {
+        // wifi detected but no internet connection found.
+        _setState(() {
+          isRetryDownload = true;
+        });
+        return false;
+      }
+    } else {
+      // neither mobile data or wifi detected, not internet connection found.
+      _setState(() {
+        isRetryDownload = true;
+      });
+      return false;
+    }
+  }
+
+  Future<void> downloadApps() async {
     setState(() {
       isRetryDownload = false;
     });
@@ -306,13 +300,12 @@ class SplashScreenState extends State<SplashScreen> {
 
     try {
 		  final conn_1 = await ConnectionTest(url_address_1, context);
-      printHelp("GET STATUS 1 "+conn_1);
+      printHelp("GET STATUS 1 apps "+conn_1);
       if(conn_1 == "OK"){
         isUrlAddress_1 = true;
       }
 	  } on SocketException {
       isUrlAddress_1 = false;
-      // isGetVersionSuccess = "Gagal terhubung dengan server";
     }
 
     if(isUrlAddress_1) {
@@ -326,7 +319,6 @@ class SplashScreenState extends State<SplashScreen> {
         }
       } on SocketException {
         isUrlAddress_2 = false;
-        // isGetVersionSuccess = "Gagal terhubung dengan server";
       }
     }
     if(isUrlAddress_2){
@@ -339,156 +331,23 @@ class SplashScreenState extends State<SplashScreen> {
 
       if(isPermissionStatusGranted) {
         try {
-          Dio dio = Dio(
-            BaseOptions(
-              baseUrl: url,
-              connectTimeout: 3000,
-              receiveTimeout: 300000,
-            ),
-          );
-
-          String downloadPath = await getFilePath(config.apkName+".apk");
-
-          printHelp("download path "+downloadPath);
-          printHelp("url download "+ url);
-
-          // final response = await client.get(url);
-          // // Response response = await client.get(url);
-          // printHelp("content length "+response.headers.toString());
-
-          var fileSize=0;
-          var totalDownloaded = 0;
-          var totalProgress = 0;
-
-          final request = new Request('HEAD', Uri.parse(url))..followRedirects = false;
-          final response = await client.send(request).timeout(
-            Duration(seconds: 5),
-              onTimeout: () {
-                return null;
-              },
-          );
-          printHelp("full header "+response.headers.toString());
-          printHelp("content length "+response.headers['content-length'].toString());
-
-          fileDownloaded = isInCompleteDownload(downloadPath);
-          printHelp("tes fileDownloaded "+fileDownloaded.toString());
-          if(fileDownloaded > 0) {
-            printHelp("masuk if");
-            totalDownloaded = fileDownloaded;
-            fileSize = fileDownloaded;
-          }
-          fileSize += int.parse(response.headers['content-length']);
-
-          try {
-            dio.download(url, downloadPath,
-              onReceiveProgress: (rcv, total) {
-                print(
-                    'received: ${rcv.toStringAsFixed(0)} out of total WOI: ${total.toStringAsFixed(0)}');
-                _setState(() {
-                  progressValue = (rcv / total * 100)/100;
-                  progressText = ((rcv / total) * 100).toStringAsFixed(0);
-                });
-
-                if (progressText == '100') {
-                  _setState(() {
-                    isDownloadNewVersion = true;
-                  });
-                } else if (double.parse(progressText) < 100) {}
-              },
-              deleteOnError: true,
-            ). onError((error, stackTrace) {
+          OtaUpdate().execute(
+            url,
+            destinationFilename: config.apkName+".apk"
+          ).listen(
+            (OtaEvent event) async{
               _setState(() {
-                isRetryDownload = true;
+                  progressValue = double.parse(event.value)/100;
+                  progressText = event.value;
               });
-              throw('coba thro');
-            }).then((_) async {
-              _setState(() {
-                if (progressText == '100') {
-                  isDownloadNewVersion = true;
-                }
-
-                isDownloadNewVersion = false;
-              });
-
-              Navigator.of(context).pop();
-
-              setState(() {
-                isLoadingVersion = false;
-                isDownloadNewVersion = false;
-              });
-
-              printHelp("MASUK SELESAI");
-              SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-              OpenFile.open(downloadPath);
-              // exit(0);
-              
-            });
-          } catch (e) {
+            }, onDone: () => timer.cancel()
+          );
+        } catch (e) {
+            print('Failed to make OTA update. Details: $e');
             _setState(() {
               isRetryDownload = true;
             });
-          }
-
-          
-
-          // try {
-          //   await downloadWithChunks(url, downloadPath, total: totalDownloaded, onReceiveProgress: (received, total) {
-          //     if (total != -1) {
-          //       print('${(received / total * 100).floor()}%');
-          //       _setState(() {
-          //         // totalDownloaded+=rcv;
-          //         // progressValue = (received / total * 100)/100;
-          //         // progressText = ((received / total) * 100).toStringAsFixed(0);
-
-          //         progressValue = (received / fileSize * 100)/100;
-          //         progressText = ((received / fileSize) * 100).toStringAsFixed(0);
-          //       });
-
-          //       if (progressText == '100') {
-          //         _setState(() {
-          //           isDownloadNewVersion = true;
-          //         });
-          //       } else if (double.parse(progressText) < 100) {}
-
-
-          //     }
-          //   });
-
-          //   _setState(() {
-          //     if (progressText == '100') {
-          //       isDownloadNewVersion = true;
-          //     }
-
-          //     isDownloadNewVersion = false;
-          //   });
-
-          //   Navigator.of(context).pop();
-          //   // var directory = await getApplicationDocumentsDirectory(); OpenFile.open(downloadPath);
-
-          //   setState(() {
-          //     isLoadingVersion = false;
-          //     isDownloadNewVersion = false;
-          //   });
-
-          //   printHelp("MASUK SELESAI");
-          //   // String downloadPath = await getFilePath(config.apkName+".apk");
-          //   OpenFile.open(downloadPath);
-          //   SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-
-          // } catch (e) {
-          //   printHelp("masuk resume");
-          //   print(e);
-          //   _setState(() {
-          //     isRetryDownload = true;
-          //   });
-          // }    
-
-        } catch (e) {
-          _setState(() {
-            isRetryDownload = true;
-          });
         }
-
       }
 
     } else {
@@ -497,83 +356,6 @@ class SplashScreenState extends State<SplashScreen> {
         isRetryDownload = true;
       });
     }
-  }
-
-  Future downloadWithChunks(url, savePath, {ProgressCallback onReceiveProgress, var total}) async {
-    const firstChunkSize = 102;
-    const maxChunk = 3;
-
-    // var total = 0;
-    var dio = Dio();
-    var progress = <int>[];
-
-    void Function(int, int) createCallback(no) {
-      return (int received, int _) {
-        progress[no] = received;
-        if (onReceiveProgress != null && total != 0) {
-          onReceiveProgress(progress.reduce((a, b) => a + b), total);
-        }
-      };
-    }
-
-    Future<Response> downloadChunk(url, start, end, no) async {
-      progress.add(0);
-      --end;
-      return dio.download(
-        url,
-        savePath + 'temp$no',
-        onReceiveProgress: createCallback(no),
-        options: Options(
-          headers: {'range': 'bytes=$start-$end'},
-          // headers: {'range': 'bytes=$start-'},
-        ),
-      );
-    }
-
-    Future mergeTempFiles(chunk) async {
-      var f = File(savePath + 'temp0');
-      var ioSink = f.openWrite(mode: FileMode.writeOnlyAppend);
-      for (var i = 1; i < chunk; ++i) {
-        var _f = File(savePath + 'temp$i');
-        await ioSink.addStream(_f.openRead());
-        await _f.delete();
-      }
-      await ioSink.close();
-      await f.rename(savePath);
-    }
-
-    var response = await downloadChunk(url, 0, firstChunkSize, 0);
-    if (response.statusCode == 206) {
-      total = int.parse(
-          response.headers.value(HttpHeaders.contentRangeHeader).split('/').last);
-      var reserved =
-          total - int.parse(response.headers.value(Headers.contentLengthHeader));
-      var chunk = (reserved / firstChunkSize).ceil() + 1;
-      if (chunk > 1) {
-        var chunkSize = firstChunkSize;
-        if (chunk > maxChunk + 1) {
-          chunk = maxChunk + 1;
-          chunkSize = (reserved / maxChunk).ceil();
-        }
-        var futures = <Future>[];
-        for (var i = 0; i < maxChunk; ++i) {
-          var start = firstChunkSize + i * chunkSize;
-          futures.add(downloadChunk(url, start, start + chunkSize, i + 1));
-        }
-        await Future.wait(futures);
-      }
-      await mergeTempFiles(chunk);
-    }
-  }
-
-  int isInCompleteDownload(String downloadPath) {
-    if(FileSystemEntity.typeSync(downloadPath) != FileSystemEntityType.notFound){
-      var file = File(downloadPath);
-      printHelp("masuk exist "+file.lengthSync().toString());
-      return file.lengthSync();
-    }
-    printHelp("masuk not exist");
-    return 0;
   }
 
   @override
@@ -673,10 +455,7 @@ class SplashScreenState extends State<SplashScreen> {
               preparingNewVersion();
             }
           );   
-        } else {
-          String downloadPath = await getFilePath(config.apkName+".apk");
-          await OpenFile.open(downloadPath);
-        }        
+        }       
       } else {
         startTimer();
       }
@@ -700,13 +479,17 @@ class SplashScreenState extends State<SplashScreen> {
       isLoadingVersion = false;
       isDownloadNewVersion = true;
     });
-    downloadNewVersion();
+    // downloadNewVersion();
+    timer = Timer.periodic(Duration(seconds: 5), (Timer t) => isInternet());
+    downloadApps();
     showDialog (
       context: context,
       barrierDismissible: false,
       builder: (context){
         return WillPopScope(
-          onWillPop: null,
+          onWillPop: () async {
+            return false;
+          },
           child: AlertDialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(7.5)),
@@ -742,7 +525,7 @@ class SplashScreenState extends State<SplashScreen> {
                                   backgroundColor: config.darkOpacityBlueColor,
                                   child: TextView("Coba Lagi", 3, color: Colors.white),
                                   onTap: () {
-                                    downloadNewVersion();
+                                    downloadApps();
                                   },
                                 ),
                               ),
@@ -833,7 +616,8 @@ class SplashScreenState extends State<SplashScreen> {
     var response;
     if(url != "") {
       try {
-        response = await client.get(url);
+        var urlData = Uri.parse(url);
+        response = await client.get(urlData);
 
         if(response.body.toString() != "false") {
           isGetVersionSuccess = "OK";
@@ -915,21 +699,14 @@ class SplashScreenState extends State<SplashScreen> {
               }
             );
           }
-        }
-        
-        
+        }  
       } else {
         Navigator.pushReplacementNamed(
           context,
           'dashboard'
         );
       }
-      
-      
-
-      
     } else {
-      
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(

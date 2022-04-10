@@ -128,8 +128,8 @@ class LimitHistoryAPI {
 
     if(url != "") {
       try {
-
-        final response = await client.get(url);
+        var urlData = Uri.parse(url);
+        final response = await client.get(urlData);
 
         printHelp("status code "+response.statusCode.toString());
 
@@ -203,7 +203,8 @@ class LimitHistoryAPI {
 
     if(url != ""){
       try {
-        final response = await client.get(url);
+        var urlData = Uri.parse(url);
+        final response = await client.get(urlData);
 
         printHelp("status code "+response.statusCode.toString());
         printHelp("cek body "+response.body);

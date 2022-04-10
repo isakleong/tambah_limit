@@ -11,7 +11,7 @@ class Configuration extends InheritedWidget {
   // String ip_public = "192.168.10.216";
   String ip_public_alt = "apps.tirtakencana.com";
   // String ip_port = "80" ;
-  String serverName = "dbrudie-2-0-0-dev/old";
+  String serverName = "dbrudie-2-0-0-dev";
   String apkName = "Tambah Limit";
   String apkVersion = "1.1";
   String getMessage = "";

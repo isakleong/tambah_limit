@@ -67,8 +67,8 @@ class CustomerAPI {
       // }
 
       try {
-
-        final response = await client.get(url);
+        var urlData = Uri.parse(url);
+        final response = await client.get(urlData);
 
         printHelp("status code "+response.statusCode.toString());
 
@@ -131,7 +131,7 @@ class CustomerAPI {
     }
 
     if(isUrlAddress_1) {
-      url = config.baseUrl + "/" + "getLimitCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrl + "/" + "getLimitNew.php" + (parameter == "" ? "" : "?" + parameter);
     } else {
       try {
         final conn_2 = await ConnectionTest(url_address_2, context);
@@ -144,32 +144,35 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = config.baseUrlAlt + "/" + "getLimitCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrlAlt + "/" + "getLimitNew.php" + (parameter == "" ? "" : "?" + parameter);
     }
 
     if(url != "") {
 
       var response;
       try {
-        response = await client.get(url);
+        var urlData = Uri.parse(url);
+        response = await client.get(urlData);
+        final responseData = decryptData(response.body.toString());
+
         printHelp("cmon "+response.body.toString());
-        if(response.body.toString() != "false" && response.body.toString() != "otoritas") {
-          if(!response.body.toString().contains("corporate")) {
+        if(responseData != "false" && responseData != "otoritas") {
+          if(!responseData.contains("corporate")) {
             printHelp("masuk sini ");
-            var parsedJson = jsonDecode(response.body);
+            var parsedJson = jsonDecode(responseData);
 
             customer = Customer.fromJson(parsedJson[0]);
-            result = new Result(success: 1, message: "OK", data: response.body.toString());
+            result = new Result(success: 1, message: "OK", data: responseData);
 
           } else {
-              var str_split = response.body.toString().split('|');
+              var str_split = responseData.split('|');
               result = new Result(success: 0, message: "Customer ini memiliki kode corporate " + str_split[1] + ". Proses tambah limit akan dilanjutkan menggunakan kode corporate tersebut", data: str_split[1]); 
           }
           
         } else {
-          if(response.body.toString() == "false") {
+          if(responseData == "false") {
             result = new Result(success: 0, message: "Data Customer tidak ditemukan");
-          } else if(response.body.toString() == "otoritas") {
+          } else if(responseData == "otoritas") {
             result = new Result(success: 0, message: "Anda tidak mempunyai otoritas untuk merubah limit pada pelanggan ini");
           }
         }
@@ -229,8 +232,8 @@ class CustomerAPI {
 
     if(url != "") {
       try {
-
-        final response = await client.get(url);
+        var urlData = Uri.parse(url);
+        final response = await client.get(urlData);
 
         printHelp("status code "+response.statusCode.toString());
         printHelp("cek body "+response.body);
@@ -301,8 +304,8 @@ class CustomerAPI {
     if(url != "") {
 
       try {
-
-        final response = await client.get(url);
+        var urlData = Uri.parse(url);
+        final response = await client.get(urlData);
 
         printHelp("status code "+response.statusCode.toString());
 
@@ -366,8 +369,8 @@ class CustomerAPI {
 
     if(url != "") {
       try {
-
-        final response = await client.get(url);
+        var urlData = Uri.parse(url);
+        final response = await client.get(urlData);
 
         printHelp("status code "+response.statusCode.toString());
 
@@ -434,7 +437,8 @@ class CustomerAPI {
 
     if(url != "") {
       try {
-        final response = await client.get(url);
+        var urlData = Uri.parse(url);
+        final response = await client.get(urlData);
 
         printHelp("status code "+response.statusCode.toString());
 
@@ -510,7 +514,8 @@ class CustomerAPI {
     if(url != "") {
       if(command == 1) {
         try {
-          final response = await client.get(url);
+          var urlData = Uri.parse(url);
+          final response = await client.get(urlData);
 
           printHelp("status code "+response.statusCode.toString());
 
@@ -529,7 +534,8 @@ class CustomerAPI {
 
       } else {
         try {
-          final response = await client.get(url);
+          var urlData = Uri.parse(url);
+          final response = await client.get(urlData);
 
           printHelp("status code "+response.statusCode.toString());
 
@@ -602,7 +608,8 @@ class CustomerAPI {
     if(url != "") {
       if(command == 1) {
         try {
-          final response = await client.get(url);
+          var urlData = Uri.parse(url);
+          final response = await client.get(urlData);
 
           printHelp("status code "+response.statusCode.toString());
 
@@ -621,7 +628,8 @@ class CustomerAPI {
 
       } else {
         try {
-          final response = await client.get(url);
+          var urlData = Uri.parse(url);
+          final response = await client.get(urlData);
 
           printHelp("status code "+response.statusCode.toString());
 
@@ -686,8 +694,8 @@ class CustomerAPI {
 
     if(url != "") {
       try {
-
-        final response = await client.get(url);
+        var urlData = Uri.parse(url);
+        final response = await client.get(urlData);
 
         printHelp("status code "+response.statusCode.toString());
 
@@ -755,7 +763,8 @@ class CustomerAPI {
 
     if(url != "") {
       try {
-        final response = await client.get(url);
+        var urlData = Uri.parse(url);
+        final response = await client.get(urlData);
 
         printHelp("status code "+response.statusCode.toString());
 

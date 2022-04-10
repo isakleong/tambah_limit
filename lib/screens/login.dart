@@ -6,6 +6,8 @@ import 'package:http/http.dart' show Client;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+// import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tambah_limit/models/resultModel.dart';
 import 'package:tambah_limit/models/userModel.dart';
@@ -29,7 +31,7 @@ class Login extends StatefulWidget {
 
 
 class LoginState extends State<Login> {
-  static const platform = const MethodChannel("connectionTest");
+  String version = "";
 
   bool unlockPassword = true;
   bool loginLoading = false;
@@ -82,6 +84,11 @@ class LoginState extends State<Login> {
     super.didChangeDependencies();
     final SharedPreferences sharedPreferences = await _sharedPreferences;
     await sharedPreferences.setString("fcmToken", fcmToken);
+
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      version = packageInfo.version;
+    });
   }
   
   @override
@@ -184,7 +191,7 @@ class LoginState extends State<Login> {
                           alignment: Alignment.bottomRight,
                           child: Theme(
                             data: Theme.of(context).copyWith(canvasColor: Colors.transparent),
-                            child: TextView("v"+config.apkVersion, 3, color: config.grayColor),
+                            child: TextView("v"+version, 3, color: config.grayColor),
                           ),
                         ),
                       ),

@@ -1647,14 +1647,17 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       final SharedPreferences sharedPreferences = await _sharedPreferences;
       String user_code = sharedPreferences.getString('user_code');
 
-      Result result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${customerIdController.text}","user_code":"${user_code}"}');
+      final kodeCustomerData = encryptData(customerIdController.text);
+      final userCodeData = encryptData(user_code);
+
+      printHelp("kodeCustomerData "+kodeCustomerData);
+      printHelp("userCodeData "+userCodeData);
+
+      Result result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData"}');
 
       Navigator.of(context).pop();
 
       if(result_.success == 1){
-        // final products = jsonDecode(result.data.toString());
-        // products[0]["Name"]
-
         setState(() {
           resultLimit = result_;
           customerIdController.clear();
