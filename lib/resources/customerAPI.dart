@@ -11,13 +11,14 @@ class CustomerAPI {
 
   Future<Result> getBlockInfo(final context, {String parameter=""}) async {
     Result result;
-    String getBlockInfoSuccess = "";
-    Customer customer;
     String url = "";
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    String url_address_1 = config.baseUrl + "/" + "getBlockCoba.php" + (parameter == "" ? "" : "?" + parameter);
-    String url_address_2 = config.baseUrlAlt + "/" + "getBlockCoba.php" + (parameter == "" ? "" : "?" + parameter);
+    // String url_address_1 = config.baseUrl + "/" + "getBlockData.php" + (parameter == "" ? "" : "?" + parameter);
+    // String url_address_2 = config.baseUrlAlt + "/" + "getBlockData.php" + (parameter == "" ? "" : "?" + parameter);
+
+    String url_address_1 = config.baseUrl + "/" + "tesIP.php";
+    String url_address_2 = config.baseUrlAlt + "/" + "tesIP.php";
 
     try {
 		  final conn_1 = await ConnectionTest(url_address_1, context);
@@ -26,7 +27,6 @@ class CustomerAPI {
       }
 	  } on SocketException {
       isUrlAddress_1 = false;
-      getBlockInfoSuccess = "Gagal terhubung dengan server";
       result = new Result(success: -1, message: "Gagal terhubung dengan server");
     }
 
@@ -40,7 +40,6 @@ class CustomerAPI {
         }
       } on SocketException {
         isUrlAddress_2 = false;
-        getBlockInfoSuccess = "Gagal terhubung dengan server";
         result = new Result(success: -1, message: "Gagal terhubung dengan server");
       }
     }
@@ -49,7 +48,6 @@ class CustomerAPI {
     }
 
     if(url != "") {
-
       //finalize
       // final request = new Request('GET', Uri.parse(url))..followRedirects = false;
       // final response = await client.send(request).timeout(
@@ -69,48 +67,33 @@ class CustomerAPI {
       try {
         var urlData = Uri.parse(url);
         final response = await client.get(urlData);
+        final responseData = decryptData(response.body.toString());
 
-        printHelp("status code "+response.statusCode.toString());
-
-        printHelp("cek body "+response.body);
-
-        if(response.body.toString() != "false" && response.body.toString() != "otoritas") {
-          var parsedJson = jsonDecode(response.body);
-          customer = Customer.fromJson(parsedJson[0]);
-
-          if(customer.No_ != ""){
-            getBlockInfoSuccess = "OK";
-          }
-          result = new Result(success: 1, message: "OK", data: response.body.toString());
-
+        if(responseData != "false" && responseData != "otoritas") {
+          result = new Result(success: 1, message: "OK", data: responseData);
         } else {
-          if(response.body.toString() == "false") {
-            getBlockInfoSuccess = "Data Customer tidak ditemukan";
+          if(responseData == "false") {
             result = new Result(success: 0, message: "Data Customer tidak ditemukan");
-          } else if(response.body.toString()== "otoritas") {
+          } else if(responseData == "otoritas") {
             result = new Result(success: 0, message: "Anda tidak mempunyai otoritas untuk melihat status blocked pelanggan ini");
+          } else {
+            result = new Result(success: 0, message: responseData);
           }
         }
-
       } catch (e) {
-        getBlockInfoSuccess = "Gagal terhubung dengan server";
-        result = new Result(success: -1, message: "Gagal terhubung dengan server");
+        result = new Result(success: -1, message: e);
         print(e);
       }
-
     } else {
-      getBlockInfoSuccess = "Gagal terhubung dengan server";
       result = new Result(success: -1, message: "Gagal terhubung dengan server");
     }
 
     return result;
-
   }
 
   Future<Result> getLimit(final context, {String parameter=""}) async {
     Result result;
     String url = "";
-    Customer customer;
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
     //http://192.168.10.213/dbrudie-2-0-0/getLimit.php?json={ "user_code" : "isak", "kode_customer" : "01A01010001" }
@@ -131,7 +114,7 @@ class CustomerAPI {
     }
 
     if(isUrlAddress_1) {
-      url = config.baseUrl + "/" + "getLimitNew.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrl + "/" + "getLimitData.php" + (parameter == "" ? "" : "?" + parameter);
     } else {
       try {
         final conn_2 = await ConnectionTest(url_address_2, context);
@@ -144,11 +127,10 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = config.baseUrlAlt + "/" + "getLimitNew.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrlAlt + "/" + "getLimitData.php" + (parameter == "" ? "" : "?" + parameter);
     }
 
     if(url != "") {
-
       var response;
       try {
         var urlData = Uri.parse(url);
@@ -158,17 +140,11 @@ class CustomerAPI {
         printHelp("cmon "+response.body.toString());
         if(responseData != "false" && responseData != "otoritas") {
           if(!responseData.contains("corporate")) {
-            printHelp("masuk sini ");
-            var parsedJson = jsonDecode(responseData);
-
-            customer = Customer.fromJson(parsedJson[0]);
             result = new Result(success: 1, message: "OK", data: responseData);
-
           } else {
               var str_split = responseData.split('|');
               result = new Result(success: 0, message: "Customer ini memiliki kode corporate " + str_split[1] + ". Proses tambah limit akan dilanjutkan menggunakan kode corporate tersebut", data: str_split[1]); 
           }
-          
         } else {
           if(responseData == "false") {
             result = new Result(success: 0, message: "Data Customer tidak ditemukan");
@@ -176,13 +152,10 @@ class CustomerAPI {
             result = new Result(success: 0, message: "Anda tidak mempunyai otoritas untuk merubah limit pada pelanggan ini");
           }
         }
-          
       } catch (e) {
-        printHelp("masuk sini catch");
-        result = new Result(success: -1, message: "Gagal terhubung dengan server");
+        result = new Result(success: -1, message: e);
         print(e);
       }
-
     } else {
       result = new Result(success: -1, message: "Gagal terhubung dengan server");
     }
@@ -193,7 +166,6 @@ class CustomerAPI {
   Future<Result> getLimitGabungan(final context, {String parameter=""}) async {
     Result result;
     String url = "";
-    Customer customer;
 
     bool isUrlAddress_1 = false, isUrlAddress_2 = false;
     http://192.168.10.213/dbrudie-2-0-0/getLimit.php?json={ "user_code" : "isak", "kode_customer" : "01A01010001" }
@@ -214,7 +186,7 @@ class CustomerAPI {
     }
 
     if(isUrlAddress_1) {
-      url = config.baseUrl + "/" + "getLimitGabunganCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrl + "/" + "getLimitGabunganData.php" + (parameter == "" ? "" : "?" + parameter);
     } else {
       try {
         final conn_2 = await ConnectionTest(url_address_2, context);
@@ -227,33 +199,28 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = config.baseUrlAlt + "/" + "getLimitGabunganCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrlAlt + "/" + "getLimitGabunganData.php" + (parameter == "" ? "" : "?" + parameter);
     }
 
     if(url != "") {
       try {
         var urlData = Uri.parse(url);
         final response = await client.get(urlData);
+        final responseData = decryptData(response.body.toString());
 
-        printHelp("status code "+response.statusCode.toString());
-        printHelp("cek body "+response.body);
-
-        if(response.body.toString() != "false" && response.body.toString() != "otoritas") {
-          var parsedJson = jsonDecode(response.body);
-
-          customer = Customer.fromJson(parsedJson[0]);
-          result = new Result(success: 1, message: "OK", data: response.body.toString());
+        if(responseData != "false" && responseData != "otoritas") {
+          result = new Result(success: 1, message: "OK", data: responseData);
 
         } else {
-          if(response.body.toString() == "false") {
+          if(responseData == "false") {
             result = new Result(success: 0, message: "Data Customer Gabungan tidak ditemukan");
-          } else if(response.body.toString() == "otoritas") {
+          } else if(responseData == "otoritas") {
             result = new Result(success: 0, message: "Anda tidak mempunyai otoritas untuk merubah limit pada pelanggan gabungan ini");
           }  
         }
 
       } catch (e) {
-        result = new Result(success: -1, message: "Gagal terhubung dengan server");
+        result = new Result(success: -1, message: e);
         print(e);
       }
 
@@ -285,7 +252,7 @@ class CustomerAPI {
     }
 
     if(isUrlAddress_1) {
-      url = config.baseUrl + "/" + "updateBlockCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrl + "/" + "updateBlockData.php" + (parameter == "" ? "" : "?" + parameter);
     } else {
       try {
         final conn_2 = await ConnectionTest(url_address_2, context);
@@ -298,7 +265,7 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = config.baseUrlAlt + "/" + "updateBlockCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrlAlt + "/" + "updateBlockData.php" + (parameter == "" ? "" : "?" + parameter);
     }
 
     if(url != "") {
@@ -306,12 +273,14 @@ class CustomerAPI {
       try {
         var urlData = Uri.parse(url);
         final response = await client.get(urlData);
+        final responseData = decryptData(response.body.toString());
 
-        printHelp("status code "+response.statusCode.toString());
-
-        if(response.body.toString() != "false") {
-          result = new Result(success: 1, message: "Ubah status Blocked berhasil");
-
+        if(responseData != "false") {
+          if(responseData.toLowerCase().contains("connection")) {
+            result = new Result(success: 1, message: responseData);
+          } else {
+            result = new Result(success: 1, message: "Ubah status Blocked berhasil");
+          }
         } else {
           result = new Result(success: 0, message: "Gagal terhubung dengan server");
         }

@@ -1650,9 +1650,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       final kodeCustomerData = encryptData(customerIdController.text);
       final userCodeData = encryptData(user_code);
 
-      printHelp("kodeCustomerData "+kodeCustomerData);
-      printHelp("userCodeData "+userCodeData);
-
       Result result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData"}');
 
       Navigator.of(context).pop();
@@ -1761,7 +1758,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       final SharedPreferences sharedPreferences = await _sharedPreferences;
       String user_login = sharedPreferences.getString('get_user_login');
 
-      Result result_ = await customerAPI.getBlockInfo(context, parameter: 'json={"kode_customer":"${customerIdBlockedController.text}","user_code":"${user_login}"}');
+      final kodeCustomerData = encryptData(customerIdBlockedController.text);
+      final userLoginData = encryptData(user_login);
+
+      Result result_ = await customerAPI.getBlockInfo(context, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userLoginData"}');
 
       Navigator.of(context).pop();
 
@@ -1773,8 +1773,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           resultBlocked = result_;
           selectedRadio = -1;
         });
-
-        // showBlockInfoDetail(config);
       } else {
         Alert(
           context: context,
