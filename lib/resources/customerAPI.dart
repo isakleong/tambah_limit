@@ -327,7 +327,7 @@ class CustomerAPI {
     }
 
     if(isUrlAddress_1) {
-      url = config.baseUrl + "/" + "addRequestLimitCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrl + "/" + "addRequestLimitData.php" + (parameter == "" ? "" : "?" + parameter);
     } else {
       try {
         final conn_2 = await ConnectionTest(url_address_2, context);
@@ -341,27 +341,28 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = config.baseUrlAlt + "/" + "addRequestLimitCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrlAlt + "/" + "addRequestLimitData.php" + (parameter == "" ? "" : "?" + parameter);
     }
 
     if(url != "") {
       try {
         var urlData = Uri.parse(url);
         final response = await client.get(urlData);
+        final responseData = decryptData(response.body.toString());
 
-        printHelp("status code "+response.statusCode.toString());
-
-        printHelp("cek body "+response.body);
-
-        if(response.body.toString() == "success") {
+        if(responseData == "success") {
           isAddRequestLimitSuccess = "OK";
         
         } else {
-          isAddRequestLimitSuccess = "ACC permintaan limit ini telah diajukan sebelumnya\n\nMohon menunggu permintaan limit ini di-review oleh Sales Director";
+          if(responseData.toLowerCase().contains("connection")) {
+            isAddRequestLimitSuccess = responseData;
+          } else {
+            isAddRequestLimitSuccess = "ACC permintaan limit ini telah diajukan sebelumnya\n\nMohon menunggu permintaan limit ini di-review oleh Sales Director";
+          }
         }
 
       } catch (e) {
-        isAddRequestLimitSuccess = "Gagal terhubung dengan server";
+        isAddRequestLimitSuccess = e;
         print(e);
       }
 
@@ -395,7 +396,7 @@ class CustomerAPI {
     }
 
     if(isUrlAddress_1) {
-      url = config.baseUrl + "/" + "addRequestLimitGCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrl + "/" + "addRequestLimitGData.php" + (parameter == "" ? "" : "?" + parameter);
     } else {
       try {
         final conn_2 = await ConnectionTest(url_address_2, context);
@@ -409,27 +410,28 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = config.baseUrlAlt + "/" + "addRequestLimitGCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrlAlt + "/" + "addRequestLimitGData.php" + (parameter == "" ? "" : "?" + parameter);
     }
 
     if(url != "") {
       try {
         var urlData = Uri.parse(url);
         final response = await client.get(urlData);
+        final responseData = decryptData(response.body.toString());
 
-        printHelp("status code "+response.statusCode.toString());
-
-        printHelp("cek body "+response.body);
-
-        if(response.body.toString() == "success") {
+        if(responseData == "success") {
           isAddRequestLimitSuccess = "OK";
         
         } else {
-          isAddRequestLimitSuccess = "Gagal terhubung dengan server";
+          if(responseData.toLowerCase().contains("connection")) {
+            isAddRequestLimitSuccess = responseData;
+          } else {
+            isAddRequestLimitSuccess = "ACC permintaan limit ini telah diajukan sebelumnya\n\nMohon menunggu permintaan limit ini di-review terlebih dahulu";
+          }
         }
 
       } catch (e) {
-        isAddRequestLimitSuccess = "Gagal terhubung dengan server";
+        isAddRequestLimitSuccess = e;
         print(e);
       }
 
@@ -464,9 +466,9 @@ class CustomerAPI {
 
     if(isUrlAddress_1) {
       if(command == 1) {
-        url = config.baseUrl + "/" + "updateLimitCRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
+        url = config.baseUrl + "/" + "updateLimitCRequestData.php" + (parameter == "" ? "" : "?" + parameter);
       } else {
-        url = config.baseUrl + "/" + "rejectLimitCRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
+        url = config.baseUrl + "/" + "rejectLimitCRequestData.php" + (parameter == "" ? "" : "?" + parameter);
       }
     } else {
       try {
@@ -482,9 +484,9 @@ class CustomerAPI {
     }
     if(isUrlAddress_2){
       if(command == 1) {
-        url = config.baseUrlAlt + "/" + "updateLimitCRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
+        url = config.baseUrlAlt + "/" + "updateLimitCRequestData.php" + (parameter == "" ? "" : "?" + parameter);
       } else {
-        url = config.baseUrlAlt + "/" + "rejectLimitCRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
+        url = config.baseUrlAlt + "/" + "rejectLimitCRequestData.php" + (parameter == "" ? "" : "?" + parameter);
       }
     }
 
@@ -493,19 +495,20 @@ class CustomerAPI {
         try {
           var urlData = Uri.parse(url);
           final response = await client.get(urlData);
+          final responseData = decryptData(response.body.toString());
 
-          printHelp("status code "+response.statusCode.toString());
-
-          printHelp("cek body "+response.body);
-
-          if(response.body.toString() == "success") {
+          if(responseData == "success") {
             isChangeLimitSuccess = "OK";
           } else {
-            isChangeLimitSuccess = "Limit tidak boleh melebihi " + response.body.toString();
+            if(responseData.toLowerCase().contains("connection")) {
+              isChangeLimitSuccess = responseData;
+            } else {
+              isChangeLimitSuccess = "Limit tidak boleh melebihi " + response.body.toString();
+            }
           }
 
         } catch (e) {
-          isChangeLimitSuccess = "Gagal terhubung dengan server";
+          isChangeLimitSuccess = e;
           printHelp(e);
         }
 
@@ -513,16 +516,15 @@ class CustomerAPI {
         try {
           var urlData = Uri.parse(url);
           final response = await client.get(urlData);
+          final responseData = decryptData(response.body.toString());
 
-          printHelp("status code "+response.statusCode.toString());
-
-          printHelp("cek body "+response.body);
-
-          if(response.body.toString() == "success") {
+          if(responseData == "success") {
             isChangeLimitSuccess = "OK";
+          } else {
+            isChangeLimitSuccess = responseData;
           }
         } catch (e) {
-          isChangeLimitSuccess = "Gagal terhubung dengan server";
+          isChangeLimitSuccess = e;
           printHelp(e);
         }
       }
@@ -558,9 +560,9 @@ class CustomerAPI {
 
     if(isUrlAddress_1) {
       if(command == 1) {
-        url = config.baseUrl + "/" + "updateLimitRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
+        url = config.baseUrl + "/" + "updateLimitRequestData.php" + (parameter == "" ? "" : "?" + parameter);
       } else {
-        url = config.baseUrl + "/" + "rejectLimitRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
+        url = config.baseUrl + "/" + "rejectLimitRequestData.php" + (parameter == "" ? "" : "?" + parameter);
       }
     } else {
       try {
@@ -576,9 +578,9 @@ class CustomerAPI {
     }
     if(isUrlAddress_2){
       if(command == 1) {
-        url = config.baseUrlAlt + "/" + "updateLimitRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
+        url = config.baseUrlAlt + "/" + "updateLimitRequestData.php" + (parameter == "" ? "" : "?" + parameter);
       } else {
-        url = config.baseUrlAlt + "/" + "rejectLimitRequestCoba.php" + (parameter == "" ? "" : "?" + parameter);
+        url = config.baseUrlAlt + "/" + "rejectLimitRequestData.php" + (parameter == "" ? "" : "?" + parameter);
       }
     }
 
@@ -587,19 +589,20 @@ class CustomerAPI {
         try {
           var urlData = Uri.parse(url);
           final response = await client.get(urlData);
+          final responseData = decryptData(response.body.toString());
 
-          printHelp("status code "+response.statusCode.toString());
-
-          printHelp("cek body "+response.body);
-
-          if(response.body.toString() == "success") {
+          if(responseData == "success") {
             isChangeLimitSuccess = "OK";
           } else {
-            isChangeLimitSuccess = "Limit tidak boleh melebihi " + response.body.toString();
+            if(responseData.toLowerCase().contains("connection")) {
+              isChangeLimitSuccess = responseData;
+            } else {
+              isChangeLimitSuccess = "Limit tidak boleh melebihi " + response.body.toString();
+            }
           }
 
         } catch (e) {
-          isChangeLimitSuccess = "Gagal terhubung dengan server";
+          isChangeLimitSuccess = e;
           print(e);
         }
 
@@ -607,17 +610,16 @@ class CustomerAPI {
         try {
           var urlData = Uri.parse(url);
           final response = await client.get(urlData);
+          final responseData = decryptData(response.body.toString());
 
-          printHelp("status code "+response.statusCode.toString());
-
-          printHelp("cek body "+response.body);
-
-          if(response.body.toString() == "success") {
+          if(responseData == "success") {
             isChangeLimitSuccess = "OK";
+          } else {
+            isChangeLimitSuccess = responseData;
           }
 
         } catch (e) {
-          isChangeLimitSuccess = "Gagal terhubung dengan server";
+          isChangeLimitSuccess = e;
           print(e);
         }
       }
@@ -652,7 +654,7 @@ class CustomerAPI {
     }
 
     if(isUrlAddress_1) {
-      url = config.baseUrl + "/" + "updateLimitCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrl + "/" + "updateLimitData.php" + (parameter == "" ? "" : "?" + parameter);
     } else {
       try {
         final conn_2 = await ConnectionTest(url_address_2, context);
@@ -666,28 +668,27 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = config.baseUrlAlt + "/" + "updateLimitCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrlAlt + "/" + "updateLimitData.php" + (parameter == "" ? "" : "?" + parameter);
     }
 
     if(url != "") {
       try {
         var urlData = Uri.parse(url);
         final response = await client.get(urlData);
+        final responseData = decryptData(response.body.toString());
 
-        printHelp("status code "+response.statusCode.toString());
-
-        printHelp("cek body "+response.body);
-
-        if(response.body.toString() == "success") {
+        if(responseData == "success") {
           isChangeLimitSuccess = "OK";
-        } else if(response.body.toString() == "false") {
+        } else if(responseData == "false") {
           isChangeLimitSuccess = "Limit tidak boleh dibawah NOL";
+        } else if(responseData.toLowerCase().contains("connection")) {
+          isChangeLimitSuccess = responseData;
         } else {
           isChangeLimitSuccess = "Limit tidak boleh melebihi " + response.body.toString();
         }
 
       } catch (e) {
-        isChangeLimitSuccess = "Gagal terhubung dengan server";
+        isChangeLimitSuccess = e;
         print(e);
       }
 
@@ -721,7 +722,7 @@ class CustomerAPI {
     }
 
     if(isUrlAddress_1) {
-      url = config.baseUrl + "/" + "updateLimitGabunganCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrl + "/" + "updateLimitGabunganData.php" + (parameter == "" ? "" : "?" + parameter);
     } else {
       try {
         final conn_2 = await ConnectionTest(url_address_2, context);
@@ -735,28 +736,27 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = config.baseUrlAlt + "/" + "updateLimitGabunganCoba.php" + (parameter == "" ? "" : "?" + parameter);
+      url = config.baseUrlAlt + "/" + "updateLimitGabunganData.php" + (parameter == "" ? "" : "?" + parameter);
     }
 
     if(url != "") {
       try {
         var urlData = Uri.parse(url);
         final response = await client.get(urlData);
+        final responseData = decryptData(response.body.toString());
 
-        printHelp("status code "+response.statusCode.toString());
-
-        printHelp("cek body "+response.body);
-
-        if(response.body.toString() == "success") {
+        if(responseData == "success") {
           isChangeLimitSuccess = "OK";
-        } else if(response.body.toString() == "false") {
+        } else if(responseData == "false") {
           isChangeLimitSuccess = "Limit tidak boleh dibawah NOL";
+        } else if(responseData.toLowerCase().contains("connection")){
+          isChangeLimitSuccess = responseData;
         } else {
           isChangeLimitSuccess = "Limit tidak boleh melebihi " + response.body.toString();
         }
 
       } catch (e) {
-        isChangeLimitSuccess = "Gagal terhubung dengan server";
+        isChangeLimitSuccess = e;
         print(e);
       }
 

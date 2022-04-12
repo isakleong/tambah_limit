@@ -2045,9 +2045,20 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     String getChangeLimit = "";
 
     if(command == 1) {
-      getChangeLimit = await customerAPI.updateLimitGabunganRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['corporate_code']}","user_code":"$user_code_request","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}","old_limit":"${resultObject[0]["old_limit"]}","user_login":"$user_code","id":"${widget.id}"}');
+      final userLoginData = encryptData(user_code);
+      final userCodeRequestData = encryptData(user_code_request);
+      final kodeCustomerData = encryptData(resultObject[0]['corporate_code'].toString());
+      final oldLimitData = encryptData(resultObject[0]['old_limit'].toString());
+      final limitBaruData = encryptData(limitRequestController.text.replaceAll(new RegExp('\\.'),''));
+      final idData = encryptData(widget.id.toString());
+
+      getChangeLimit = await customerAPI.updateLimitGabunganRequest(context, command: command, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeRequestData","limit_baru":"$limitBaruData","old_limit":"$oldLimitData","user_login":"$userLoginData","id":"$idData"}');
     } else {
-      getChangeLimit = await customerAPI.updateLimitGabunganRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['corporate_code']}","user_code":"$user_code_request","id":"${widget.id}"}');
+      final userCodeRequestData = encryptData(user_code_request);
+      final kodeCustomerData = encryptData(resultObject[0]['corporate_code'].toString());
+      final idData = encryptData(widget.id.toString());
+
+      getChangeLimit = await customerAPI.updateLimitGabunganRequest(context, command: command, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeRequestData","id":"$idData"}');
     }
 
     Navigator.of(context).pop();
@@ -2137,7 +2148,14 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    String getRequestLimit = await customerAPI.addRequestLimit(context, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"${prefs.getString('user_code')}","nama_cust":"${resultObject[0]['Name']}","id_approval":"${widget.id.toString()}","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}","limit_dmd_baru":"${limitDMDController.text.replaceAll(new RegExp('\\.'),'')}"}');
+    final userCodeData = encryptData(prefs.getString('user_code'));
+    final kodeCustomerData = encryptData(resultObject[0]['No_'].toString());
+    final namaCustomerData = encryptData(resultObject[0]['Name'].toString());
+    final limitBaruData = encryptData(limitRequestController.text.replaceAll(new RegExp('\\.'),''));
+    final limitDMDData = encryptData(limitDMDController.text.replaceAll(new RegExp('\\.'),''));
+    final idApprovalData = encryptData(widget.id.toString());
+
+    String getRequestLimit = await customerAPI.addRequestLimit(context, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData","nama_cust":"$namaCustomerData","id_approval":"$idApprovalData","limit_baru":"$limitBaruData","limit_dmd_baru":"$limitDMDData"}');
 
     Navigator.of(context).pop();
 
@@ -2186,7 +2204,13 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
 
     //var obj = {"kode_customerc": $$('#corporate_code').val(),"corporate_name":$$('#corporate_name').val(), "limit_baru": limit_baru.replace(/\./g,''), "user_code": localStorage.getItem('user_code'), "old_limit": localStorage.getItem('old_limitc')};
 
-    String getRequestLimit = await customerAPI.addRequestLimitGabungan(context, parameter: 'json={"kode_customerc":"${resultObject[0]['corporate_code']}","user_code":"${prefs.getString('user_code')}","corporate_name":"${resultObject[0]['corporate_name']}","old_limit":"${resultObject[0]['old_limit']}","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}"}');
+    final userCodeData = encryptData(prefs.getString('user_code'));
+    final kodeCustomerData = encryptData(resultObject[0]['corporate_code'].toString());
+    final namaCustomerData = encryptData(resultObject[0]['corporate_name'].toString());
+    final oldLimitData = encryptData(resultObject[0]['old_limit'].toString());
+    final limitBaruData = encryptData(limitRequestController.text.replaceAll(new RegExp('\\.'),''));
+
+    String getRequestLimit = await customerAPI.addRequestLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData","corporate_name":"$namaCustomerData","old_limit":"$oldLimitData","limit_baru":"$limitBaruData"}');
 
     Navigator.of(context).pop();
 
@@ -2247,9 +2271,20 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     // printHelp("cek params id "+widget.id.toString());
 
     if(command == 1) {
-      getChangeLimit = await customerAPI.updateLimitRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"$user_code_request","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}","limit_dmd_baru":"${limitDMDController.text.replaceAll(new RegExp('\\.'),'')}","user_login":"$user_code","id":"${widget.id}"}');
+      final userLoginData = encryptData(user_code);
+      final userCodeRequestData = encryptData(user_code_request);
+      final kodeCustomerData = encryptData(resultObject[0]['No_'].toString());
+      final limitDMDBaruData = encryptData(limitDMDController.text.replaceAll(new RegExp('\\.'),''));
+      final limitBaruData = encryptData(limitRequestController.text.replaceAll(new RegExp('\\.'),''));
+      final idData = encryptData(widget.id.toString());
+
+      getChangeLimit = await customerAPI.updateLimitRequest(context, command: command, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeRequestData","limit_baru":"$limitBaruData","limit_dmd_baru":"$limitDMDBaruData","user_login":"$userLoginData","id":"$idData"}');
     } else {
-      getChangeLimit = await customerAPI.updateLimitRequest(context, command: command, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"$user_code_request","id":"${widget.id}"}');
+      final userCodeRequestData = encryptData(user_code_request);
+      final kodeCustomerData = encryptData(resultObject[0]['No_'].toString());
+      final idData = encryptData(widget.id.toString());
+
+      getChangeLimit = await customerAPI.updateLimitRequest(context, command: command, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeRequestData","id":"$idData"}');
     }
 
     Navigator.of(context).pop();

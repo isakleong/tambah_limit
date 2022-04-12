@@ -127,40 +127,40 @@ class LimitHistoryAPI {
         var parsedJson = jsonDecode(responseData);
 
         if(responseData != "false") {
-          // limitHistory = LimitHistory.fromJson(response.body);
-
-          // if(limitHistory.customer_code != ""){
-          //   printHelp("masuk sini 2 "+limitHistory.customer_code);
-          //   getLimitRequestHistorySuccess = "OK";
-          // }
-
-          result = new Result(success: 1, message: "OK", data: parsedJson);
-
-          // final parsedJson = jsonDecode(response.body);
-          // result = Result.fromJson(parsedJson);
-          result.data.map((item) {
-              limitHistoryList.add(LimitHistory.fromJson(item));
-            }).toList();
-
-          // var resultObject = jsonDecode(result.data.toString());
-          // limitHistoryList.add(LimitHistory.fromJson(parsedJson))
-
-          // if (result.success == 1) {
-          //   if (result.data[0] != null) {
-          //     result.data[0].map((item) {
-          //       limitHistoryList.add(LimitHistory.fromJson(item));
-          //     }).toList();
-          //   }
-          // }
-
-        } else {
           if(responseData.toLowerCase().contains("connection")) {
             getLimitRequestHistorySuccess = "Data tidak ditemukan";
             result = new Result(success: 0, message: responseData);
           } else {
-            getLimitRequestHistorySuccess = "Data tidak ditemukan";
-            result = new Result(success: 0, message: "Data tidak ditemukan");
+            // limitHistory = LimitHistory.fromJson(response.body);
+
+            // if(limitHistory.customer_code != ""){
+            //   printHelp("masuk sini 2 "+limitHistory.customer_code);
+            //   getLimitRequestHistorySuccess = "OK";
+            // }
+
+            result = new Result(success: 1, message: "OK", data: parsedJson);
+
+            // final parsedJson = jsonDecode(response.body);
+            // result = Result.fromJson(parsedJson);
+            result.data.map((item) {
+                limitHistoryList.add(LimitHistory.fromJson(item));
+              }).toList();
+
+            // var resultObject = jsonDecode(result.data.toString());
+            // limitHistoryList.add(LimitHistory.fromJson(parsedJson))
+
+            // if (result.success == 1) {
+            //   if (result.data[0] != null) {
+            //     result.data[0].map((item) {
+            //       limitHistoryList.add(LimitHistory.fromJson(item));
+            //     }).toList();
+            //   }
+            // }
           }
+
+        } else {
+          getLimitRequestHistorySuccess = "Data tidak ditemukan";
+          result = new Result(success: 0, message: "Data tidak ditemukan");
         }
 
       } catch (e) {

@@ -1763,9 +1763,18 @@ class AddLimitDetailState extends State<AddLimitDetail> {
     // var obj = {"kode_customer": $$('#kode_cust').val(),"nama_cust":$$('#nama_cust').val(), "limit_baru": limit_baru, "user_code": localStorage.getItem('user_code'), "old_limit": localStorage.getItem('old_limit'), "piutang": piutang, "limit_dmd_lama": limit_dmd_lama, "limit_dmd_baru": limit_dmd_baru};
     // currencyFormatter.format(int.parse(resultObject[0]["Limit"]))
 
+    final userCodeData = encryptData(prefs.getString('user_code'));
+    final kodeCustomerData = encryptData(resultObject[0]['No_'].toString());
+    final namaCustomerData = encryptData(resultObject[0]['Name'].toString());
+    final limitBaruData = encryptData(limitRequestController.text.replaceAll(new RegExp('\\.'),''));
+    final oldLimitData = encryptData(resultObject[0]['Limit'].toString());
+    final piutangData = encryptData(resultObject[10]['piutang'].toString());
+    final limitDMDLamaData = encryptData(prefs.getInt('limit_dmd').toString());
+    final limitDMDBaruData = encryptData(limitDMDController.text.replaceAll(new RegExp('\\.'),''));
+
     String getChangeLimit = await customerAPI.changeLimit(context,
         parameter:
-            'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"${prefs.getString('user_code')}","nama_cust":"${resultObject[0]['Name']}","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}","old_limit":"${resultObject[0]['Limit']}","piutang":${resultObject[10]['piutang']},"limit_dmd_lama":"${prefs.getInt('limit_dmd')}","limit_dmd_baru":"${limitDMDController.text.replaceAll(new RegExp('\\.'),'')}"}');
+            'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData","nama_cust":"$namaCustomerData","limit_baru":"$limitBaruData","old_limit":"$oldLimitData","piutang":$piutangData,"limit_dmd_lama":"$limitDMDLamaData","limit_dmd_baru":"$limitDMDBaruData"}');
 
     Navigator.of(context).pop();
 
@@ -1804,7 +1813,13 @@ class AddLimitDetailState extends State<AddLimitDetail> {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    String getRequestLimit = await customerAPI.addRequestLimit(context, parameter: 'json={"kode_customer":"${resultObject[0]['No_']}","user_code":"${prefs.getString('user_code')}","nama_cust":"${resultObject[0]['Name']}","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}","limit_dmd_baru":"${limitDMDController.text.replaceAll(new RegExp('\\.'),'')}"}');
+    final userCodeData = encryptData(prefs.getString('user_code'));
+    final kodeCustomerData = encryptData(resultObject[0]['No_'].toString());
+    final namaCustomerData = encryptData(resultObject[0]['Name'].toString());
+    final limitBaruData = encryptData(limitRequestController.text.replaceAll(new RegExp('\\.'),''));
+    final limitDMDData = encryptData(limitDMDController.text.replaceAll(new RegExp('\\.'),''));
+
+    String getRequestLimit = await customerAPI.addRequestLimit(context, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData","nama_cust":"$namaCustomerData","limit_baru":"$limitBaruData","limit_dmd_baru":"$limitDMDData"}');
 
     Navigator.of(context).pop();
 

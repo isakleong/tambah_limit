@@ -102,7 +102,10 @@ class AddLimitCorporateState extends State<AddLimitCorporate> {
       final SharedPreferences sharedPreferences = await _sharedPreferences;
       String user_code = sharedPreferences.getString('user_code');
 
-      Result result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${customerIdController.text}","user_code":"${user_code}"}');
+      final userCodeData = encryptData(user_code);
+      final kodeCustomerData = encryptData(customerIdController.text);
+
+      Result result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData"}');
 
       Navigator.of(context).pop();
 

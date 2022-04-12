@@ -338,7 +338,13 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    String getChangeLimit = await customerAPI.changeLimitGabungan(context, parameter: 'json={"kode_customerc":"${resultObject[0]['corporate_code']}","user_code":"${prefs.getString('user_code')}","corporate_name":"${resultObject[0]['corporate_name']}","old_limit":"${resultObject[0]['old_limit']}","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}"}');
+    final userCodeData = encryptData(prefs.getString('user_code'));
+    final kodeCustomerData = encryptData(resultObject[0]['corporate_code'].toString());
+    final namaCustomerData = encryptData(resultObject[0]['corporate_name'].toString());
+    final limitBaruData = encryptData(limitRequestController.text.replaceAll(new RegExp('\\.'),''));
+    final oldLimitData = encryptData(resultObject[0]['old_limit'].toString());
+
+    String getChangeLimit = await customerAPI.changeLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData","corporate_name":"$namaCustomerData","old_limit":"$oldLimitData","limit_baru":"$limitBaruData"}');
 
     Navigator.of(context).pop();
 
@@ -385,7 +391,13 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
 
     //var obj = {"kode_customerc": $$('#corporate_code').val(),"corporate_name":$$('#corporate_name').val(), "limit_baru": limit_baru.replace(/\./g,''), "user_code": localStorage.getItem('user_code'), "old_limit": localStorage.getItem('old_limitc')};
 
-    String getRequestLimit = await customerAPI.addRequestLimitGabungan(context, parameter: 'json={"kode_customerc":"${resultObject[0]['corporate_code']}","user_code":"${prefs.getString('user_code')}","corporate_name":"${resultObject[0]['corporate_name']}","old_limit":"${resultObject[0]['old_limit']}","limit_baru":"${limitRequestController.text.replaceAll(new RegExp('\\.'),'')}"}');
+    final userCodeData = encryptData(prefs.getString('user_code'));
+    final kodeCustomerData = encryptData(resultObject[0]['corporate_code'].toString());
+    final namaCustomerData = encryptData(resultObject[0]['corporate_name'].toString());
+    final oldLimitData = encryptData(resultObject[0]['old_limit'].toString());
+    final limitBaruData = encryptData(limitRequestController.text.replaceAll(new RegExp('\\.'),''));
+
+    String getRequestLimit = await customerAPI.addRequestLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData","corporate_name":"$namaCustomerData","old_limit":"$oldLimitData","limit_baru":"$limitBaruData"}');
 
     Navigator.of(context).pop();
 

@@ -1203,7 +1203,10 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
     if(tempLimitHistory.customer_code.length > 11) {
       Alert(context: context, loading: true, disableBackButton: true);
 
-      result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${tempLimitHistory.customer_code}","user_code":"$user_login"}');
+      final userCodeData = encryptData(user_login);
+      final kodeCustomerData = encryptData(tempLimitHistory.customer_code);
+
+      result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData"}');
 
       final SharedPreferences sharedPreferences = await _sharedPreferences;
       await sharedPreferences.setInt("request_limit", int.parse(tempLimitHistory.limit));
@@ -1245,7 +1248,10 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
     } else {
       Alert(context: context, loading: true, disableBackButton: true);
 
-      result_ = await customerAPI.getLimit(context, parameter: 'json={"guest_mode":"true","kode_customer":"${tempLimitHistory.customer_code}","user_code":"$user_login"}');
+      final userCodeData = encryptData(user_login);
+      final kodeCustomerData = encryptData(tempLimitHistory.customer_code);
+
+      result_ = await customerAPI.getLimit(context, parameter: 'json={"guest_mode":"true","kode_customer":"$kodeCustomerData","user_code":"$userCodeData"}');
 
       final SharedPreferences sharedPreferences = await _sharedPreferences;
       await sharedPreferences.setInt("request_limit", int.parse(tempLimitHistory.limit));
