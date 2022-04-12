@@ -70,14 +70,16 @@ class CustomerAPI {
         final responseData = decryptData(response.body.toString());
 
         if(responseData != "false" && responseData != "otoritas") {
-          result = new Result(success: 1, message: "OK", data: responseData);
+          if(responseData.toLowerCase().contains("connection")) {
+            result = new Result(success: 0, message: responseData);
+          } else {
+            result = new Result(success: 1, message: "OK", data: responseData);
+          }
         } else {
           if(responseData == "false") {
             result = new Result(success: 0, message: "Data Customer tidak ditemukan");
           } else if(responseData == "otoritas") {
             result = new Result(success: 0, message: "Anda tidak mempunyai otoritas untuk melihat status blocked pelanggan ini");
-          } else {
-            result = new Result(success: 0, message: responseData);
           }
         }
       } catch (e) {
@@ -137,13 +139,16 @@ class CustomerAPI {
         response = await client.get(urlData);
         final responseData = decryptData(response.body.toString());
 
-        printHelp("cmon "+response.body.toString());
         if(responseData != "false" && responseData != "otoritas") {
-          if(!responseData.contains("corporate")) {
-            result = new Result(success: 1, message: "OK", data: responseData);
+          if(responseData.toLowerCase().contains("connection")) {
+            result = new Result(success: 0, message: responseData);
           } else {
-              var str_split = responseData.split('|');
-              result = new Result(success: 0, message: "Customer ini memiliki kode corporate " + str_split[1] + ". Proses tambah limit akan dilanjutkan menggunakan kode corporate tersebut", data: str_split[1]); 
+            if(!responseData.contains("corporate")) {
+              result = new Result(success: 1, message: "OK", data: responseData);
+            } else {
+                var str_split = responseData.split('|');
+                result = new Result(success: 0, message: "Customer ini memiliki kode corporate " + str_split[1] + ". Proses tambah limit akan dilanjutkan menggunakan kode corporate tersebut", data: str_split[1]); 
+            }
           }
         } else {
           if(responseData == "false") {
@@ -209,8 +214,11 @@ class CustomerAPI {
         final responseData = decryptData(response.body.toString());
 
         if(responseData != "false" && responseData != "otoritas") {
-          result = new Result(success: 1, message: "OK", data: responseData);
-
+          if(responseData.toLowerCase().contains("connection")) {
+            result = new Result(success: 0, message: responseData);
+          } else {
+            result = new Result(success: 1, message: "OK", data: responseData);
+          }
         } else {
           if(responseData == "false") {
             result = new Result(success: 0, message: "Data Customer Gabungan tidak ditemukan");
@@ -282,7 +290,7 @@ class CustomerAPI {
             result = new Result(success: 1, message: "Ubah status Blocked berhasil");
           }
         } else {
-          result = new Result(success: 0, message: "Gagal terhubung dengan server");
+          result = new Result(success: 0, message: "Gagal terhubung dengan server"); //not needed
         }
 
       } catch (e) {

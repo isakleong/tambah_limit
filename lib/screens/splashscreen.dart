@@ -651,7 +651,9 @@ class SplashScreenState extends State<SplashScreen> {
       if(sharedPreferences.containsKey("nik")) {
         String nik = sharedPreferences.getString("nik");
 
-        String getAuth = await userAPI.checkAuth(context, parameter: 'json={"nik":"$nik"}');
+        final nikData = encryptData(nik);
+
+        String getAuth = await userAPI.checkAuth(context, parameter: 'json={"nik":"$nikData"}');
 
         if(getAuth.contains("server")) {
           Alert(

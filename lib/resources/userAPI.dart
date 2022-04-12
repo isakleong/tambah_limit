@@ -255,25 +255,22 @@ class UserAPI {
         var urlData = Uri.parse(url);
         final response = await client.get(urlData);
         final responseData = decryptData(response.body.toString());
-        
-        var parsedJson = jsonDecode(responseData);
 
         if(responseData != "false") {
-          user = User.fromJson(parsedJson[0]);
-
-          if(user.Id != ""){
-            isGetPasswordSuccess = "OK";
-            await saveToLocalStorage(context, user);
-          } 
-
-        } else {
           if(responseData.toLowerCase().contains("connection")) {
             isGetPasswordSuccess = responseData;
-          } else {
-            isGetPasswordSuccess = "Password Lama Salah";
-          }
-        }
+          } else{
+            var parsedJson = jsonDecode(responseData);
+            user = User.fromJson(parsedJson[0]);
 
+            if(user.Id != ""){
+              isGetPasswordSuccess = "OK";
+              await saveToLocalStorage(context, user);
+            }
+          }
+        } else {
+          isGetPasswordSuccess = "Password Lama Salah";
+        }
        } catch (e) {
          isGetPasswordSuccess = e;
        }

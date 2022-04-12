@@ -162,7 +162,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           if(message.data['customer_code'].toString().length > 11) {
             Alert(context: context, loading: true, disableBackButton: true);
 
-            result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+            final userCodeData = encryptData(message.data['user_code']);
+            final kodeCustomerData = encryptData(message.data['customer_code']);
+
+            result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData"}');
             
             final SharedPreferences sharedPreferences = await _sharedPreferences;
             await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -178,7 +181,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           } else {
             Alert(context: context, loading: true, disableBackButton: true);
 
-            result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+            final userCodeData = encryptData(message.data['user_code']);
+            final kodeCustomerData = encryptData(message.data['customer_code']);
+
+            result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData"}');
 
             final SharedPreferences sharedPreferences = await _sharedPreferences;
             await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -204,7 +210,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           if(message.data['customer_code'].toString().length > 11) {
             Alert(context: context, loading: true, disableBackButton: true);
 
-            result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+            final userCodeData = encryptData(message.data['user_code']);
+            final kodeCustomerData = encryptData(message.data['customer_code']);
+
+            result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData"}');
             
             final SharedPreferences sharedPreferences = await _sharedPreferences;
             await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -220,7 +229,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           } else {
             Alert(context: context, loading: true, disableBackButton: true);
 
-            result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+            final userCodeData = encryptData(message.data['user_code']);
+            final kodeCustomerData = encryptData(message.data['customer_code']);
+
+            result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData"}');
 
             final SharedPreferences sharedPreferences = await _sharedPreferences;
             await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -247,7 +259,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           if(message.data['customer_code'].toString().length > 11) {
             Alert(context: context, loading: true, disableBackButton: true);
 
-            result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+            final userCodeData = encryptData(message.data['user_code']);
+            final kodeCustomerData = encryptData(message.data['customer_code']);
+
+            result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData"}');
             
             final SharedPreferences sharedPreferences = await _sharedPreferences;
             await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -263,7 +278,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           } else {
             Alert(context: context, loading: true, disableBackButton: true);
 
-            result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"${message.data['user_code']}"}');
+            final userCodeData = encryptData(message.data['user_code']);
+            final kodeCustomerData = encryptData(message.data['customer_code']);
+
+            result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData"}');
 
             final SharedPreferences sharedPreferences = await _sharedPreferences;
             await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -315,7 +333,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       if(message.data['customer_code'].toString().length > 11) {
         Alert(context: context, loading: true, disableBackButton: true);
 
-        result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"$user_login"}');
+        final userCodeData = encryptData(user_login);
+        final kodeCustomerData = encryptData(message.data['customer_code']);
+
+        result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData"}');
         
         final SharedPreferences sharedPreferences = await _sharedPreferences;
         await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -331,7 +352,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       } else {
         Alert(context: context, loading: true, disableBackButton: true);
 
-        result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"$user_login"}');
+        final userCodeData = encryptData(user_login);
+        final kodeCustomerData = encryptData(message.data['customer_code']);
+
+        result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData"}');
 
         final SharedPreferences sharedPreferences = await _sharedPreferences;
         await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -356,7 +380,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       if(message.data['customer_code'].toString().length > 11) {
         Alert(context: context, loading: true, disableBackButton: true);
 
-        result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"$user_login"}');
+        final userCodeData = encryptData(user_login);
+        final kodeCustomerData = encryptData(message.data['customer_code']);
+
+        result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData"}');
         
         final SharedPreferences sharedPreferences = await _sharedPreferences;
         await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -371,9 +398,11 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
         );
       } else {
         Alert(context: context, loading: true, disableBackButton: true);
-        printHelp("cek masuk sini ");
 
-        result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"$user_login"}');
+        final userCodeData = encryptData(user_login);
+        final kodeCustomerData = encryptData(message.data['customer_code']);
+
+        result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData"}');
 
         final SharedPreferences sharedPreferences = await _sharedPreferences;
         await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -399,7 +428,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
         if(message.data['customer_code'].toString().length > 11) {
           Alert(context: context, loading: true, disableBackButton: true);
 
-          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"$user_login"}');
+          final userCodeData = encryptData(user_login);
+          final kodeCustomerData = encryptData(message.data['customer_code']);
+
+          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData"}');
           
           final SharedPreferences sharedPreferences = await _sharedPreferences;
           await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -415,7 +447,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
         } else {
           Alert(context: context, loading: true, disableBackButton: true);
 
-          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"$user_login"}');
+          final userCodeData = encryptData(user_login);
+          final kodeCustomerData = encryptData(message.data['customer_code']);
+
+          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData"}');
 
           final SharedPreferences sharedPreferences = await _sharedPreferences;
           await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -478,8 +513,11 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
                         if(message.data['customer_code'].toString().length > 11) {
                           Alert(context: context, loading: true, disableBackButton: true);
-                          
-                          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"$user_login"}');
+
+                          final userCodeData = encryptData(user_login);
+                          final kodeCustomerData = encryptData(message.data['customer_code']);
+
+                          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData"}');
                           
                           final SharedPreferences sharedPreferences = await _sharedPreferences;
                           await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -502,7 +540,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                           printHelp("message user code "+message.data['user_code']);
                           printHelp("message limit "+message.data['limit']);
 
-                          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"$user_login"}');
+                          final userCodeData = encryptData(user_login);
+                          final kodeCustomerData = encryptData(message.data['customer_code']);
+
+                          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData"}');
 
                           final SharedPreferences sharedPreferences = await _sharedPreferences;
                           await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -524,8 +565,11 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
                         if(message.data['customer_code'].toString().length > 11) {
                           Alert(context: context, loading: true, disableBackButton: true);
-                          
-                          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"$user_login"}');
+
+                          final userCodeData = encryptData(user_login);
+                          final kodeCustomerData = encryptData(message.data['customer_code']);
+
+                          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData"}');
                           
                           final SharedPreferences sharedPreferences = await _sharedPreferences;
                           await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -543,7 +587,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                         } else {
                           Alert(context: context, loading: true, disableBackButton: true);
 
-                          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"$user_login"}');
+                          final userCodeData = encryptData(user_login);
+                          final kodeCustomerData = encryptData(message.data['customer_code']);
+
+                          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData"}');
 
                           final SharedPreferences sharedPreferences = await _sharedPreferences;
                           await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -566,8 +613,11 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
                         if(message.data['customer_code'].toString().length > 11) {
                           Alert(context: context, loading: true, disableBackButton: true);
-                          
-                          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${message.data['customer_code']}","user_code":"$user_login"}');
+
+                          final userCodeData = encryptData(user_login);
+                          final kodeCustomerData = encryptData(message.data['customer_code']);
+
+                          result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData"}');
                           
                           final SharedPreferences sharedPreferences = await _sharedPreferences;
                           await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -585,7 +635,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                         } else {
                           Alert(context: context, loading: true, disableBackButton: true);
 
-                          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"${message.data['customer_code']}","user_code":"$user_login"}');
+                          final userCodeData = encryptData(user_login);
+                          final kodeCustomerData = encryptData(message.data['customer_code']);
+
+                          result_ = await customerAPI.getLimit(context, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData"}');
 
                           final SharedPreferences sharedPreferences = await _sharedPreferences;
                           await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
@@ -727,7 +780,9 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
       String nik = sharedPreferences.getString("nik");
 
-      String getAuth = await userAPI.checkAuth(context, parameter: 'json={"nik":"$nik"}');
+      final nikData = encryptData(nik);
+
+      String getAuth = await userAPI.checkAuth(context, parameter: 'json={"nik":"$nikData"}');
 
       Navigator.of(context, rootNavigator: true).pop();
 
@@ -1529,7 +1584,12 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     var block_lama = resultObject[0]["blocked"];
     var block_baru = selectedRadio;
 
-    Result result_ = await customerAPI.updateBlock(context, parameter: 'json={"kode_customer":"${customerIdBlockedController.text}","user_code":"${user_login}","block_lama":${block_lama},"block_baru":${block_baru}}');
+    final userCodeData = encryptData(user_login);
+    final kodeCustomerData = encryptData(customerIdBlockedController.text);
+    final blockLamaData = encryptData(block_lama);
+    final blockBaruData = encryptData(block_baru.toString());
+
+    Result result_ = await customerAPI.updateBlock(context, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData","block_lama":$blockLamaData,"block_baru":$blockBaruData}');
 
     Navigator.of(context).pop();
 
@@ -1584,9 +1644,15 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
       Result result_;
       if(customerCorporateId != "") {
-        result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"$customerCorporateId","user_code":"${user_code}"}');
+        final userCodeData = encryptData(user_code);
+        final kodeCustomerData = encryptData(customerCorporateId);
+
+        result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData"}');
       } else {
-        result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"${customerIdController.text}","user_code":"${user_code}"}');
+        final userCodeData = encryptData(user_code);
+        final kodeCustomerData = encryptData(customerIdController.text);
+
+        result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData"}');
       }
 
       Navigator.of(context).pop();
@@ -1685,7 +1751,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
                   Alert(context: context, loading: true, disableBackButton: true);
 
-                  Result detailResult = await customerAPI.getLimit(context, parameter: 'json={"guest_mode":"true","kode_customer":"${customerIdController.text}","user_code":"${user_code}"}');
+                  final userCodeData = encryptData(user_code);
+                  final kodeCustomerData = encryptData(customerIdController.text);
+
+                  Result detailResult = await customerAPI.getLimit(context, parameter: 'json={"guest_mode":"true","kode_customer":"$kodeCustomerData","user_code":"$userCodeData"}');
 
                   Navigator.of(context).pop();
 
@@ -1866,18 +1935,20 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     Alert(context: context, loading: true, disableBackButton: true);
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String coba1 = "${newPasswordController.text}";
-      String coba2 = "${prefs.getString('user_code')}";
-      printHelp("coba 1 "+ coba1);
-      printHelp("coba 2 "+ coba2);
 
-    String getOldPassword = await userAPI.getPassword(context, parameter: 'user_code=${prefs.getString('user_code')}&old_pass=${oldPasswordController.text}');
+    final userCodeData = encryptData(prefs.getString('user_code'));
+    final oldPasswordData = encryptData(oldPasswordController.text);
+
+    String getOldPassword = await userAPI.getPassword(context, parameter: 'user_code=$userCodeData&old_pass=$oldPasswordData');
 
     Navigator.of(context).pop();
 
     if(getOldPassword == "OK"){
 
-      String getChangePassword = await userAPI.changePassword(context, parameter: 'json={"new_pass":"${newPasswordController.text}","user_code":"${prefs.getString('user_code')}"}');
+      final newPasswordData = encryptData(newPasswordController.text);
+      final usercodeData = encryptData(prefs.getString('user_code'));
+
+      String getChangePassword = await userAPI.changePassword(context, parameter: 'json={"new_pass":"$newPasswordData","user_code":"$usercodeData"}');
 
 
       if(getChangePassword == "OK"){

@@ -247,7 +247,10 @@ class ProfileState extends State<Profile> {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    String getOldPassword = await userAPI.getPassword(context, parameter: 'user_code=${prefs.getString('user_code')}&old_pass=${oldPasswordController.text}');
+    final userCodeData = encryptData(prefs.getString('user_code'));
+    final oldPasswordData = encryptData(oldPasswordController.text);
+
+    String getOldPassword = await userAPI.getPassword(context, parameter: 'user_code=$userCodeData&old_pass=$oldPasswordData');
 
     Navigator.of(context).pop();
 
