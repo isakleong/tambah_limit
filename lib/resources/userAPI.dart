@@ -56,14 +56,20 @@ class UserAPI {
         final response = await client.get(urlData);
         final responseData = decryptData(response.body.toString());
 
-        if(responseData != "false") {
+        if(responseData == "success") {
           if(responseData.toLowerCase().contains("connection")) {
             isAuthorized = responseData;
           } else {
             isAuthorized = "OK";
           }
         } else {
-          isAuthorized = "Anda tidak lagi memiliki izin untuk menggunakan aplikasi ini";
+          if(responseData == "autolimit") {
+            isAuthorized = "Cabang Anda tidak lagi memiliki izin untuk menggunakan aplikasi ini. Untuk menaikkan limit dapat menggunakan Program Utility NAV";
+          } else if(responseData == "restricted") {
+            isAuthorized = "Cabang Anda tidak lagi memiliki izin untuk menggunakan aplikasi ini";
+          } else {
+            isAuthorized = "Anda tidak lagi memiliki izin untuk menggunakan aplikasi ini";
+          }
         }
       } catch (e) {
         isAuthorized = e;

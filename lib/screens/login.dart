@@ -6,8 +6,7 @@ import 'package:http/http.dart' show Client;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-// import 'package:package_info_plus/package_info_plus.dart';
-// import 'package:package_info_plus/package_info_plus.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tambah_limit/models/resultModel.dart';
 import 'package:tambah_limit/models/userModel.dart';
@@ -85,10 +84,10 @@ class LoginState extends State<Login> {
     final SharedPreferences sharedPreferences = await _sharedPreferences;
     await sharedPreferences.setString("fcmToken", fcmToken);
 
-    // PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    // setState(() {
-    //   version = packageInfo.version;
-    // });
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      version = packageInfo.version;
+    });
   }
   
   @override

@@ -1,12 +1,20 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:bottom_bar_with_sheet/bottom_bar_with_sheet.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:lottie/lottie.dart';
+import 'package:ota_update/ota_update.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tambah_limit/models/resultModel.dart';
@@ -107,6 +115,15 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   bool checkModulePrivilegeLoading = true;
 
   bool isAlertShowing = false;
+
+  String getCheckVersion = "";
+  bool isLoadingVersion = false;
+  bool isDownloadNewVersion = false;
+  bool isRetryDownload = false;
+  StateSetter _setState;
+  double progressValue = 0.0;
+  String progressText = "";
+  bool isPermissionPermanentlyDenied = false;
 
   void _selectedTab(int index) {
     setState(() {
@@ -305,6 +322,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     super.dispose();
   }
 
+  Timer timer;
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
@@ -691,6 +709,312 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     super.initState();
   }
 
+  doCheckVersion() async {
+    setState(() {
+      isLoadingVersion = true;
+    });
+    
+    //get apk version
+    String checkVersion = await getVersion(context);
+
+    setState(() {
+      isLoadingVersion = false;
+    });
+
+    if(checkVersion == "OK") {
+      String apkVersion = "";
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      apkVersion = packageInfo.version;
+      if(getCheckVersion != apkVersion) {
+        Alert(
+          context: context,
+          title: "Info,",
+          content: Text("Terdapat pembaruan versi aplikasi. Otomatis mengunduh pembaruan aplikasi setelah tekan OK"),
+          cancel: false,
+          type: "warning",
+          defaultAction: () async {
+            preparingNewVersion();
+          }
+        );
+      } else {
+        printHelp("masuk sini ya");
+      }
+    } else {
+      Alert(
+        context: context,
+        title: "Maaf,",
+        content: Text(checkVersion),
+        cancel: false,
+        type: "error",
+        errorBtnTitle: "Coba Lagi",
+        defaultAction: () {
+          doCheckVersion();
+        }
+      );
+    }
+  }
+
+  Future<String> getVersion(final context, {String parameter=""}) async {
+    Client client = Client();
+    String url = "";
+
+    bool isUrlAddress_1 = false, isUrlAddress_2 = false;
+    String isGetVersionSuccess = "";
+    String url_address_1 = config.baseUrl + "/" + "getVersion.php" + (parameter == "" ? "" : "?" + parameter);
+    String url_address_2 = config.baseUrlAlt + "/" + "getVersion.php" + (parameter == "" ? "" : "?" + parameter);
+
+    try {
+		  final conn_1 = await ConnectionTest(url_address_1, context);
+      printHelp("GET STATUS 1 "+conn_1);
+      if(conn_1 == "OK"){
+        isUrlAddress_1 = true;
+      }
+	  } on SocketException {
+      isUrlAddress_1 = false;
+      isGetVersionSuccess = "Gagal terhubung dengan server";
+    }
+
+    if(isUrlAddress_1) {
+      url = url_address_1;
+    } else {
+      try {
+        final conn_2 = await ConnectionTest(url_address_2, context);
+        printHelp("GET STATUS 2 "+conn_2);
+        if(conn_2 == "OK"){
+          isUrlAddress_2 = true;
+        }
+      } on SocketException {
+        isUrlAddress_2 = false;
+        isGetVersionSuccess = "Gagal terhubung dengan server";
+      }
+    }
+    if(isUrlAddress_2){
+      url = url_address_2;
+    }
+
+    var response;
+    if(url != "") {
+      try {
+        var urlData = Uri.parse(url);
+        response = await client.get(urlData);
+
+        if(response.body.toString() != "false") {
+          isGetVersionSuccess = "OK";
+          setState(() {
+            getCheckVersion = response.body.toString();
+          });
+        } else {
+          isGetVersionSuccess = "Gagal terhubung dengan server";
+        }
+      } catch (e) {
+        isGetVersionSuccess = "Gagal terhubung dengan server";
+        printHelp(e);
+      }
+    } else {
+      isGetVersionSuccess = "Gagal terhubung dengan server";
+    }
+
+    return isGetVersionSuccess;
+  }
+
+  void preparingNewVersion() {
+    setState(() {
+      isLoadingVersion = false;
+      isDownloadNewVersion = true;
+    });
+    // downloadNewVersion();
+    timer = Timer.periodic(Duration(seconds: 5), (Timer t) => isInternet());
+    downloadApps();
+    showDialog (
+      context: context,
+      barrierDismissible: false,
+      builder: (context){
+        return WillPopScope(
+          onWillPop: () async {
+            return false;
+          },
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(7.5)),
+            ),
+            content: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+              _setState = setState;
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Center(
+                    child: CircularPercentIndicator(
+                      radius: 120.0,
+                      lineWidth: 13.0,
+                      animation: false,
+                      percent: progressValue,
+                      center: Text("${progressText}%", style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                      footer: Padding(
+                        padding: EdgeInsets.only(top: 10),
+                        child: Column(
+                          children: [
+                            Text("Mengunduh pembaruan aplikasi", style: new TextStyle(fontWeight: FontWeight.bold)),
+                            Visibility(
+                              // maintainSize: true, 
+                              // maintainAnimation: true,
+                              // maintainState: true,
+                              visible: isRetryDownload,
+                              child: Container(
+                                margin: EdgeInsets.only(top: 15),
+                                width: MediaQuery.of(context).size.width,
+                                child: Button(
+                                  // loading: loginLoading,
+                                  backgroundColor: config.darkOpacityBlueColor,
+                                  child: TextView("Coba Lagi", 3, color: Colors.white),
+                                  onTap: () {
+                                    downloadApps();
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      circularStrokeCap: CircularStrokeCap.round,
+                      progressColor: config.primaryColor,
+                    ),
+                  ),
+                ],
+              );
+            }),
+          )
+        );
+      }
+    );
+  }
+
+  Future<bool> isInternet() async {
+    printHelp("isinternet");
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile) {
+      // connected to mobile network
+      if (await DataConnectionChecker().hasConnection) {
+        // mobile data detected & internet connection confirmed.
+        return true;
+      } else {
+        // mobile data detected but no internet connection found.
+        _setState(() {
+          isRetryDownload = true;
+        });
+        return false;
+      }
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      // connected to wifi network
+      if (await DataConnectionChecker().hasConnection) {
+        // wifi detected & internet connection confirmed.
+        return true;
+      } else {
+        // wifi detected but no internet connection found.
+        _setState(() {
+          isRetryDownload = true;
+        });
+        return false;
+      }
+    } else {
+      // neither mobile data or wifi detected, not internet connection found.
+      _setState(() {
+        isRetryDownload = true;
+      });
+      return false;
+    }
+  }
+
+  Future<void> downloadApps() async {
+    setState(() {
+      isRetryDownload = false;
+    });
+
+    String url = "";
+
+    bool isUrlAddress_1 = false, isUrlAddress_2 = false;
+    String url_address_1 = config.baseUrl + "/" + config.apkName+".apk";
+    String url_address_2 = config.baseUrlAlt + "/" + config.apkName+".apk";
+
+    try {
+		  final conn_1 = await ConnectionTest(url_address_1, context);
+      printHelp("GET STATUS 1 apps "+conn_1);
+      if(conn_1 == "OK"){
+        isUrlAddress_1 = true;
+      }
+	  } on SocketException {
+      isUrlAddress_1 = false;
+    }
+
+    if(isUrlAddress_1) {
+      url = url_address_1;
+    } else {
+      try {
+        final conn_2 = await ConnectionTest(url_address_2, context);
+        printHelp("GET STATUS 2 "+conn_2);
+        if(conn_2 == "OK"){
+          isUrlAddress_2 = true;
+        }
+      } on SocketException {
+        isUrlAddress_2 = false;
+      }
+    }
+    if(isUrlAddress_2){
+      url = url_address_2;
+    }
+
+    if(url != "") {
+      final isPermissionStatusGranted = await checkAppsPermission();
+      Client client = Client();
+
+      if(isPermissionStatusGranted) {
+        try {
+          OtaUpdate().execute(
+            url,
+            destinationFilename: config.apkName+".apk"
+          ).listen(
+            (OtaEvent event) async{
+              _setState(() {
+                  progressValue = double.parse(event.value)/100;
+                  progressText = event.value;
+              });
+            }, onDone: () => timer.cancel()
+          );
+        } catch (e) {
+            print('Failed to make OTA update. Details: $e');
+            _setState(() {
+              isRetryDownload = true;
+            });
+        }
+      }
+
+    } else {
+      //gagal terhubung
+      _setState(() {
+        isRetryDownload = true;
+      });
+    }
+  }
+
+  Future<bool> checkAppsPermission() async {
+    setState(() {
+      isPermissionPermanentlyDenied = false;
+    });
+    var status = await Permission.storage.request();
+
+    if(status != PermissionStatus.granted) {
+      if(status == PermissionStatus.denied) {
+        setState(() {
+          isPermissionPermanentlyDenied = true;
+        });
+      } else {
+        openAppSettings();
+        return status == PermissionStatus.granted;
+      }
+    }
+    return status == PermissionStatus.granted;
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     super.didChangeAppLifecycleState(state);
@@ -699,65 +1023,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.resumed:
         printHelp("resumed");
-        
-        // final SharedPreferences sharedPreferences = await _sharedPreferences;
-        // if(sharedPreferences.containsKey("nik")) {
-        //   Alert(context: context, loading: true, disableBackButton: true);
-
-        //   String nik = sharedPreferences.getString("nik");
-
-        //   String getAuth = await userAPI.checkAuth(context, parameter: 'json={"nik":"$nik"}');
-
-        //   Navigator.of(context).pop();
-
-        //   if(getAuth.contains("server")) {
-        //     Alert(
-        //       context: context,
-        //       title: "Maaf,",
-        //       content: Text(getAuth),
-        //       cancel: false,
-        //       type: "error",
-        //       errorBtnTitle: "Coba Lagi",
-        //       disableBackButton: true,
-        //       defaultAction: () {
-        //         retryAuth();
-        //       }
-        //     );
-        //   } else {
-        //     if(getAuth == "OK") {
-        //       //welcome back
-        //       printHelp("HMMMM");
-        //     } else {
-        //       Alert(
-        //         context: context,
-        //         title: "Maaf,",
-        //         content: Text(getAuth),
-        //         cancel: false,
-        //         type: "error",
-        //         // disableBackButton: true,
-        //         defaultAction: () async {
-        //           SharedPreferences prefs = await SharedPreferences.getInstance();
-        //           await prefs.remove("limit_dmd");
-        //           await prefs.remove("request_limit");
-        //           await prefs.remove("user_code_request");
-        //           await prefs.remove("user_code");
-        //           await prefs.remove("max_limit");
-        //           await prefs.remove("fcmToken");
-        //           await prefs.remove("get_user_login");
-        //           await prefs.remove("nik");
-        //           await prefs.remove("module_privilege");
-        //           await FirebaseMessaging.instance.deleteToken();
-        //           await prefs.clear();
-        //           Navigator.pushReplacementNamed(
-        //             context,
-        //             "login",
-        //           );
-        //         }
-        //       );
-        //     }
-        //   } 
-        // }
-
+        await doCheckVersion();
         retryAuth();
 
         break;

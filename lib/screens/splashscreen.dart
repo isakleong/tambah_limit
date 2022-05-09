@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:ota_update/ota_update.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 // import 'package:open_file/open_file.dart';
 // import 'package:ota_update/ota_update.dart';
 import 'package:path_provider/path_provider.dart';
@@ -151,105 +152,6 @@ class SplashScreenState extends State<SplashScreen> {
   }
 
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
-
-  Future<void> isReadyToInstall() async {
-    setState(() {
-      toInstall = false;
-    });
-
-    int downloadedSize = 0;
-    int apkSize = 0;
-
-    String url = "";
-    bool isUrlAddress_1 = false, isUrlAddress_2 = false;
-    String url_address_1 = config.baseUrl + "/" + config.apkName+".apk";
-    String url_address_2 = config.baseUrlAlt + "/" + config.apkName+".apk";
-
-    try {
-		  final conn_1 = await ConnectionTest(url_address_1, context);
-      printHelp("GET STATUS 1 "+conn_1);
-      if(conn_1 == "OK"){
-        isUrlAddress_1 = true;
-      }
-	  } on SocketException {
-      isUrlAddress_1 = false;
-      // isGetVersionSuccess = "Gagal terhubung dengan server";
-    }
-
-    if(isUrlAddress_1) {
-      url = url_address_1;
-    } else {
-      try {
-        final conn_2 = await ConnectionTest(url_address_2, context);
-        printHelp("GET STATUS 2 "+conn_2);
-        if(conn_2 == "OK"){
-          isUrlAddress_2 = true;
-        }
-      } on SocketException {
-        isUrlAddress_2 = false;
-        // isGetVersionSuccess = "Gagal terhubung dengan server";
-      }
-    }
-    if(isUrlAddress_2){
-      url = url_address_2;
-    }
-
-    if(url != "") {
-      Client client = Client();
-
-      
-      try {
-        String downloadPath = await getFilePath(config.apkName+".apk");
-
-        printHelp("download path "+downloadPath);
-        printHelp("url download "+ url);
-
-        final request = new Request('HEAD', Uri.parse(url))..followRedirects = false;
-        final response = await client.send(request).timeout(
-          Duration(seconds: 5),
-            onTimeout: () {
-              return null;
-            },
-        );
-        printHelp("full header "+response.headers.toString());
-        printHelp("content length "+response.headers['content-length'].toString());
-
-        apkSize = int.parse(response.headers['content-length'].toString());
-        
-        String path = '';
-        String filename = config.apkName + ".apk";
-        Directory dir = await getExternalStorageDirectory();
-        path = '${dir.path}/$filename';
-
-        if(FileSystemEntity.typeSync(path) != FileSystemEntityType.notFound){
-          var file = File(path);
-          downloadedSize = file.lengthSync();
-        }
-
-        if(apkSize == downloadedSize) {
-          setState(() {
-            toInstall = true;
-          });
-        }
-
-      } catch (e) {
-        print(e);
-      }
-
-    } else {
-      Alert(
-        context: context,
-        title: "Maaf,",
-        content: Text("Gagal terhubung dengan server"),
-        cancel: false,
-        type: "error",
-        errorBtnTitle: "Coba Lagi",
-        defaultAction: () {
-          getAppsReady();
-        }
-      );
-    }
-  }
 
   Future<bool> isInternet() async {
     printHelp("isinternet");
@@ -440,22 +342,20 @@ class SplashScreenState extends State<SplashScreen> {
     });
 
     if(checkVersion == "OK") {
-      await isReadyToInstall();
-      if(getCheckVersion != config.apkVersion) {
-        if(!toInstall) {
-          printHelp("getcheckversion "+getCheckVersion);
-          printHelp("apkVersion "+config.apkVersion);
-          Alert(
-            context: context,
-            title: "Info,",
-            content: Text("Terdapat pembaruan versi aplikasi. Otomatis mengunduh pembaruan aplikasi setelah tekan OK"),
-            cancel: false,
-            type: "warning",
-            defaultAction: () {
-              preparingNewVersion();
-            }
-          );   
-        }       
+      String apkVersion = "";
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      apkVersion = packageInfo.version;
+      if(getCheckVersion != apkVersion) {
+        Alert(
+          context: context,
+          title: "Info,",
+          content: Text("Terdapat pembaruan versi aplikasi. Otomatis mengunduh pembaruan aplikasi setelah tekan OK"),
+          cancel: false,
+          type: "warning",
+          defaultAction: () async {
+            preparingNewVersion();
+          }
+        );
       } else {
         startTimer();
       }
