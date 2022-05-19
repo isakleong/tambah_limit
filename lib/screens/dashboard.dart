@@ -2017,12 +2017,16 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
                   Alert(context: context, loading: true, disableBackButton: true);
 
+                  bool guest = true;
+                  final guestModeData = encryptData(guest.toString());
                   final userCodeData = encryptData(user_code);
                   final kodeCustomerData = encryptData(customerIdController.text);
 
-                  Result detailResult = await customerAPI.getLimit(context, parameter: 'json={"guest_mode":"true","kode_customer":"$kodeCustomerData","user_code":"$userCodeData"}');
+                  Result detailResult = await customerAPI.getLimit(context, parameter: 'json={"guest_mode":"$guestModeData","kode_customer":"$kodeCustomerData","user_code":"$userCodeData"}');
 
                   Navigator.of(context).pop();
+
+                  printHelp(detailResult.success);
 
                   if(detailResult.success == 1){
                     setState(() {

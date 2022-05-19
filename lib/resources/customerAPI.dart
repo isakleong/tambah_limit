@@ -158,7 +158,7 @@ class CustomerAPI {
           }
         }
       } catch (e) {
-        result = new Result(success: -1, message: e);
+        result = new Result(success: -1, message: e.toString());
         print(e);
       }
     } else {

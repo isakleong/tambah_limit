@@ -75,7 +75,6 @@ class AddLimitDetailState extends State<AddLimitDetail> {
     callMode = widget.callMode;
     if(widget.guestMode != null) {
       guestMode = widget.guestMode;
-      printHelp("GUEST MODE "+guestMode.toString());
     }
 
     final _resultObject = jsonDecode(result.data.toString());
