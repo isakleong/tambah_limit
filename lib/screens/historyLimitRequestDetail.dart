@@ -155,7 +155,9 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
         limitRequestApprovalMessage = "";
       });
 
-      String getLimitRequestApprovalStatus = await limitHistoryAPI.getLimitRequestApprovalStatus(context, parameter: 'json={"id_approval":"${widget.id.toString()}"}');
+      final idData = encryptData(widget.id.toString());
+
+      String getLimitRequestApprovalStatus = await limitHistoryAPI.getLimitRequestApprovalStatus(context, parameter: 'json={"id_approval":"${idData}"}');
 
       try {
         if(int.parse(getLimitRequestApprovalStatus) > 0) {
@@ -195,7 +197,9 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
         limitRequestApprovalMessage = "";
       });
 
-      String getLimitRequestApprovalStatus = await limitHistoryAPI.getLimitRequestApprovalStatus(context, parameter: 'json={"id":"${widget.id.toString()}"}');
+      final idData = encryptData(widget.id.toString());
+
+      String getLimitRequestApprovalStatus = await limitHistoryAPI.getLimitRequestApprovalStatus(context, parameter: 'json={"id":"${idData}"}');
 
       try {
         if(getLimitRequestApprovalStatus != null) {

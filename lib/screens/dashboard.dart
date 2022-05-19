@@ -127,17 +127,23 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   void _selectedTab(int index) {
     setState(() {
-      if(index == 0){
+      if(bottomNavigationBarList[index].label.toLowerCase().contains("limit")) {
         dashboardTitle = "Tambah Limit";
+      } else if(bottomNavigationBarList[index].label.toLowerCase().contains("riwayat")) {
+        dashboardTitle = "Riwayat Permintaan Limit";
+      } else if(bottomNavigationBarList[index].label.toLowerCase().contains("blocked")) {
+        dashboardTitle = "Ubah Status Blocked";
+      } else if(bottomNavigationBarList[index].label.toLowerCase().contains("password")) {
+        dashboardTitle = "Ubah Password";
+      }
 
+      if(index == 0){
         customerIdBlockedController.clear();
         oldPasswordController.clear();
         confirmPasswordController.clear();
         newPasswordController.clear();
         resultBlocked = null;
       } else if(index == 1) {
-        dashboardTitle = "Riwayat Permintaan Limit";
-
         customerIdController.clear();
         customerIdBlockedController.clear();
         oldPasswordController.clear();
@@ -145,15 +151,11 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
         newPasswordController.clear();
         resultBlocked = null;
       } else if(index == 2) {
-        dashboardTitle = "Ubah Status Blocked";
-
         customerIdController.clear();
         oldPasswordController.clear();
         confirmPasswordController.clear();
         newPasswordController.clear();
       } else if(index == 3) {
-        dashboardTitle = "Ubah Password";
-
         customerIdController.clear();
         customerIdBlockedController.clear();
         resultBlocked = null;

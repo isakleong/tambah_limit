@@ -928,12 +928,14 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
     final SharedPreferences sharedPreferences = await _sharedPreferences;
     String user_code = sharedPreferences.getString('user_code');
 
+    final userCodeData = encryptData(user_code);
+
     if(type == 1) {
       setState(() {
         requestLimitHistoryListLoading = true;
       });
 
-      requestLimitHistoryList = await limitHistoryAPI.getLimitRequestHistoryList(context, type, parameter: 'json={"user_code":"${user_code}"}');
+      requestLimitHistoryList = await limitHistoryAPI.getLimitRequestHistoryList(context, type, parameter: 'json={"user_code":"${userCodeData}"}');
 
       setState(() {
         requestLimitHistoryList = requestLimitHistoryList;
@@ -944,7 +946,7 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
         approvedLimitHistoryListLoading = true;
       });
 
-      approvedLimitHistoryList = await limitHistoryAPI.getLimitRequestHistoryList(context, type, parameter: 'json={"user_code":"${user_code}"}');
+      approvedLimitHistoryList = await limitHistoryAPI.getLimitRequestHistoryList(context, type, parameter: 'json={"user_code":"${userCodeData}"}');
 
       setState(() {
         approvedLimitHistoryList = approvedLimitHistoryList;
@@ -955,7 +957,7 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
         rejectedLimitHistoryListLoading = true;
       });
 
-      rejectedLimitHistoryList = await limitHistoryAPI.getLimitRequestHistoryList(context, type, parameter: 'json={"user_code":"${user_code}"}');
+      rejectedLimitHistoryList = await limitHistoryAPI.getLimitRequestHistoryList(context, type, parameter: 'json={"user_code":"${userCodeData}"}');
 
       setState(() {
         rejectedLimitHistoryList = rejectedLimitHistoryList;

@@ -255,8 +255,9 @@ class ProfileState extends State<Profile> {
     Navigator.of(context).pop();
 
     if(getOldPassword == "OK"){
+      final userCodeData = encryptData(prefs.getString("user_code"));
 
-      String getChangePassword = await userAPI.changePassword(context, parameter: 'json={"new_pass":"${newPasswordController.text}","user_code":"${prefs.getString('user_code')}"}');
+      String getChangePassword = await userAPI.changePassword(context, parameter: 'json={"new_pass":"${newPasswordController.text}","user_code":"${userCodeData}"}');
 
       if(getChangePassword == "OK"){
         Alert(
