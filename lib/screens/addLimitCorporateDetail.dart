@@ -340,11 +340,11 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
 
     final userCodeData = encryptData(prefs.getString('user_code'));
     final kodeCustomerData = encryptData(resultObject[0]['corporate_code'].toString());
-    final namaCustomerData = encryptData(resultObject[0]['corporate_name'].toString());
+    // final namaCustomerData = encryptData(resultObject[0]['corporate_name'].toString());
     final limitBaruData = encryptData(limitRequestController.text.replaceAll(new RegExp('\\.'),''));
     final oldLimitData = encryptData(resultObject[0]['old_limit'].toString());
 
-    String getChangeLimit = await customerAPI.changeLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData","corporate_name":"$namaCustomerData","old_limit":"$oldLimitData","limit_baru":"$limitBaruData"}');
+    String getChangeLimit = await customerAPI.changeLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData","old_limit":"$oldLimitData","limit_baru":"$limitBaruData"}');
 
     Navigator.of(context).pop();
 
@@ -393,7 +393,8 @@ class AddLimitCorporateDetailState extends State<AddLimitCorporateDetail> {
 
     final userCodeData = encryptData(prefs.getString('user_code'));
     final kodeCustomerData = encryptData(resultObject[0]['corporate_code'].toString());
-    final namaCustomerData = encryptData(resultObject[0]['corporate_name'].toString());
+    var customerNameEncoded = Uri.encodeComponent(resultObject[0]['corporate_name'].toString());
+    final namaCustomerData = encryptData(customerNameEncoded);
     final oldLimitData = encryptData(resultObject[0]['old_limit'].toString());
     final limitBaruData = encryptData(limitRequestController.text.replaceAll(new RegExp('\\.'),''));
 

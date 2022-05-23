@@ -2154,7 +2154,8 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
 
     final userCodeData = encryptData(prefs.getString('user_code'));
     final kodeCustomerData = encryptData(resultObject[0]['No_'].toString());
-    final namaCustomerData = encryptData(resultObject[0]['Name'].toString());
+    var customerNameEncoded = Uri.encodeComponent(resultObject[0]['Name'].toString());
+    final namaCustomerData = encryptData(customerNameEncoded);
     final limitBaruData = encryptData(limitRequestController.text.replaceAll(new RegExp('\\.'),''));
     final limitDMDData = encryptData(limitDMDController.text.replaceAll(new RegExp('\\.'),''));
     final idApprovalData = encryptData(widget.id.toString());
@@ -2210,7 +2211,8 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
 
     final userCodeData = encryptData(prefs.getString('user_code'));
     final kodeCustomerData = encryptData(resultObject[0]['corporate_code'].toString());
-    final namaCustomerData = encryptData(resultObject[0]['corporate_name'].toString());
+    var customerNameEncoded = Uri.encodeComponent(resultObject[0]['corporate_name'].toString());
+    final namaCustomerData = encryptData(customerNameEncoded);
     final oldLimitData = encryptData(resultObject[0]['old_limit'].toString());
     final limitBaruData = encryptData(limitRequestController.text.replaceAll(new RegExp('\\.'),''));
 
