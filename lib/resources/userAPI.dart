@@ -72,8 +72,8 @@ class UserAPI {
           }
         }
       } catch (e) {
-        isAuthorized = e;
-        printHelp(e);
+        isAuthorized = e.toString();
+        printHelp(e.toString());
       }
     } else {
       isAuthorized = "Gagal terhubung dengan server";
@@ -150,8 +150,8 @@ class UserAPI {
           }
         }
       } catch (e) {
-        isLoginSuccess = e;
-        printHelp(e);
+        isLoginSuccess = e.toString();
+        printHelp(e.toString());
       }
     } else {
       isLoginSuccess = "Gagal terhubung dengan server";
@@ -209,8 +209,8 @@ class UserAPI {
         }
 
       } catch (e) {
-        isChangePasswordSuccess = e;
-        printHelp(e);
+        isChangePasswordSuccess = e.toString();
+        printHelp(e.toString());
       }
 
     } else {
@@ -278,7 +278,7 @@ class UserAPI {
           isGetPasswordSuccess = "Password Lama Salah";
         }
        } catch (e) {
-         isGetPasswordSuccess = e;
+         isGetPasswordSuccess = e.toString();
        }
 
     } else {

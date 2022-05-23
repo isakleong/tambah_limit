@@ -83,8 +83,8 @@ class CustomerAPI {
           }
         }
       } catch (e) {
-        result = new Result(success: -1, message: e);
-        print(e);
+        result = new Result(success: -1, message: e.toString());
+        print(e.toString());
       }
     } else {
       result = new Result(success: -1, message: "Gagal terhubung dengan server");
@@ -159,7 +159,7 @@ class CustomerAPI {
         }
       } catch (e) {
         result = new Result(success: -1, message: e.toString());
-        print(e);
+        print(e.toString());
       }
     } else {
       result = new Result(success: -1, message: "Gagal terhubung dengan server");
@@ -228,8 +228,8 @@ class CustomerAPI {
         }
 
       } catch (e) {
-        result = new Result(success: -1, message: e);
-        print(e);
+        result = new Result(success: -1, message: e.toString());
+        print(e.toString());
       }
 
     } else {
@@ -295,7 +295,7 @@ class CustomerAPI {
 
       } catch (e) {
         result = new Result(success: -1, message: "Gagal terhubung dengan server");
-        print(e);
+        print(e.toString());
       }
 
     } else {
@@ -362,8 +362,8 @@ class CustomerAPI {
         }
 
       } catch (e) {
-        isAddRequestLimitSuccess = e;
-        print(e);
+        isAddRequestLimitSuccess = e.toString();
+        print(e.toString());
       }
 
     } else {
@@ -431,8 +431,8 @@ class CustomerAPI {
         }
 
       } catch (e) {
-        isAddRequestLimitSuccess = e;
-        print(e);
+        isAddRequestLimitSuccess = e.toString();
+        print(e.toString());
       }
 
     } else {
@@ -503,13 +503,13 @@ class CustomerAPI {
             if(responseData.toLowerCase().contains("connection")) {
               isChangeLimitSuccess = responseData;
             } else {
-              isChangeLimitSuccess = "Limit tidak boleh melebihi " + response.body.toString();
+              isChangeLimitSuccess = "Limit tidak boleh melebihi " + responseData;
             }
           }
 
         } catch (e) {
-          isChangeLimitSuccess = e;
-          printHelp(e);
+          isChangeLimitSuccess = e.toString();
+          printHelp(e.toString());
         }
 
       } else {
@@ -597,13 +597,13 @@ class CustomerAPI {
             if(responseData.toLowerCase().contains("connection")) {
               isChangeLimitSuccess = responseData;
             } else {
-              isChangeLimitSuccess = "Limit tidak boleh melebihi " + response.body.toString();
+              isChangeLimitSuccess = "Limit tidak boleh melebihi " + responseData;
             }
           }
 
         } catch (e) {
-          isChangeLimitSuccess = e;
-          print(e);
+          isChangeLimitSuccess = e.toString();
+          print(e.toString());
         }
 
       } else {
@@ -672,10 +672,13 @@ class CustomerAPI {
     }
 
     if(url != "") {
+      print("url sent "+url);
       try {
         var urlData = Uri.parse(url);
         final response = await client.get(urlData);
         final responseData = decryptData(response.body.toString());
+
+        print("get data "+responseData);
 
         if(responseData == "success") {
           isChangeLimitSuccess = "OK";
@@ -684,12 +687,12 @@ class CustomerAPI {
         } else if(responseData.toLowerCase().contains("connection")) {
           isChangeLimitSuccess = responseData;
         } else {
-          isChangeLimitSuccess = "Limit tidak boleh melebihi " + response.body.toString();
+          isChangeLimitSuccess = "Limit tidak boleh melebihi " + responseData;
         }
 
       } catch (e) {
-        isChangeLimitSuccess = e;
-        print(e);
+        isChangeLimitSuccess = e.toString();
+        print(e.toString());
       }
 
     } else {
@@ -752,12 +755,12 @@ class CustomerAPI {
         } else if(responseData.toLowerCase().contains("connection")){
           isChangeLimitSuccess = responseData;
         } else {
-          isChangeLimitSuccess = "Limit tidak boleh melebihi " + response.body.toString();
+          isChangeLimitSuccess = "Limit tidak boleh melebihi " + responseData;
         }
 
       } catch (e) {
-        isChangeLimitSuccess = e;
-        print(e);
+        isChangeLimitSuccess = e.toString();
+        print(e.toString());
       }
 
     } else {

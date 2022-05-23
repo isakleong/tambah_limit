@@ -1764,6 +1764,7 @@ class AddLimitDetailState extends State<AddLimitDetail> {
 
     final userCodeData = encryptData(prefs.getString('user_code'));
     final kodeCustomerData = encryptData(resultObject[0]['No_'].toString());
+    // resultObject[0]['Name'] = "F & R";
     // final namaCustomerData = encryptData(resultObject[0]['Name'].toString());
     final limitBaruData = encryptData(limitRequestController.text.replaceAll(new RegExp('\\.'),''));
     final oldLimitData = encryptData(resultObject[0]['Limit'].toString());
@@ -1771,9 +1772,13 @@ class AddLimitDetailState extends State<AddLimitDetail> {
     final limitDMDLamaData = encryptData(prefs.getInt('limit_dmd').toString());
     final limitDMDBaruData = encryptData(limitDMDController.text.replaceAll(new RegExp('\\.'),''));
 
+    // 16c01010002
+    // 07080100538
+    // 12345
+
     String getChangeLimit = await customerAPI.changeLimit(context,
         parameter:
-            'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData","limit_baru":"$limitBaruData","old_limit":"$oldLimitData","piutang":$piutangData,"limit_dmd_lama":"$limitDMDLamaData","limit_dmd_baru":"$limitDMDBaruData"}');
+            'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData","limit_baru":"$limitBaruData","old_limit":"$oldLimitData","piutang":"$piutangData","limit_dmd_lama":"$limitDMDLamaData","limit_dmd_baru":"$limitDMDBaruData"}');
 
     Navigator.of(context).pop();
 
