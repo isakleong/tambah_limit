@@ -31,7 +31,7 @@ class CustomerAPI {
     }
 
     if(isUrlAddress_1) {
-      url = url_address_1;
+      url = config.baseUrl + "/" + "getBlockData.php" + (parameter == "" ? "" : "?" + parameter);
     } else {
       try {
         final conn_2 = await ConnectionTest(url_address_2, context);
@@ -44,7 +44,7 @@ class CustomerAPI {
       }
     }
     if(isUrlAddress_2){
-      url = url_address_2;
+      url = config.baseUrlAlt + "/" + "getBlockData.php" + (parameter == "" ? "" : "?" + parameter);
     }
 
     if(url != "") {

@@ -160,20 +160,25 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
       String getLimitRequestApprovalStatus = await limitHistoryAPI.getLimitRequestApprovalStatus(context, parameter: 'json={"id_approval":"${idData}"}');
 
       try {
-        if(int.parse(getLimitRequestApprovalStatus) > 0) {
-          isLimitRequestApprovalExist = true;
-          limitRequestApprovalMessage = "Menunggu persetujuan Sales Director";
-        } else {
-            isLimitRequestApprovalExist = false;
-        }
+        limitRequestApprovalMessage = getLimitRequestApprovalStatus;
 
-        if((pageType == 1 || pageType == 4) && !isNeedApproval && user_code_request.toLowerCase() == user_login.toLowerCase()) {
-          isLimitRequestApprovalExist = true;
-          limitRequestApprovalMessage = "Menunggu persetujuan Sales Director";
-        }
+        // if(int.parse(getLimitRequestApprovalStatus) > 0) {
+        //   printHelp("TROUGH THIS");
+        //   isLimitRequestApprovalExist = true;
+        //   limitRequestApprovalMessage = "Menunggu persetujuan Sales Director 1";
+        // } else {
+        //     isLimitRequestApprovalExist = false;
+        // }
+        // // zxzx
+        // if((pageType == 1 || pageType == 4) && !isNeedApproval && user_code_request.toLowerCase() == user_login.toLowerCase()) {
+        //   printHelp("getLimitRequestApprovalStatus "+getLimitRequestApprovalStatus);
+        //   printHelp("id_approval "+widget.id.toString());
+        //   isLimitRequestApprovalExist = true;
+        //   limitRequestApprovalMessage = "Menunggu persetujuan Sales Director 2";
+        // }
       } catch (e) {
         isLimitRequestApprovalExist = true;
-        limitRequestApprovalMessage = "Menunggu persetujuan Sales Director";
+        limitRequestApprovalMessage = "Menunggu persetujuan Sales Director 3";
         Alert(
           context: context,
           title: "Maaf,",
@@ -206,7 +211,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
           isLimitRequestApprovalExist = true;
           var jsonObject = json.decode(getLimitRequestApprovalStatus);
           final dateTime = DateTime.parse(jsonObject['date'].toString()); 
-          final dateFormat = DateFormat('dd-MM-yyyy HH:m:s');
+          final dateFormat = DateFormat('dd-MM-yyyy HH:mm:ss');
           final dateApproval = dateFormat.format(dateTime);
           print(dateApproval);
           
@@ -1511,241 +1516,243 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
         ),
         body: Container(
           margin: EdgeInsets.symmetric(vertical: 20, horizontal: 5),
-          child: Form(
-            key: _HistoryLimitFormKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Visibility(
-                  visible: isLimitRequestApprovalExist,
-                  child: Card(
-                    color: config.lightOpactityBlueColor,
-                    margin: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                    elevation: 3,
-                    child: ListTile(
-                      leading: Icon(Icons.notifications, color:config.darkOpacityBlueColor),
-                      title: Container(
-                        child: TextView(limitRequestApprovalMessage, 3, color: config.darkOpacityBlueColor),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _HistoryLimitFormKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Visibility(
+                    visible: isLimitRequestApprovalExist,
+                    child: Card(
+                      color: config.lightOpactityBlueColor,
+                      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                      elevation: 3,
+                      child: ListTile(
+                        leading: Icon(Icons.notifications, color:config.darkOpacityBlueColor),
+                        title: Container(
+                          child: TextView(limitRequestApprovalMessage, 3, color: config.darkOpacityBlueColor),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  child: TextFormField(
+                    enabled: false,
+                    decoration: new InputDecoration(
+                      hintStyle: TextStyle(
+                        color: Colors.black
+                      ),
+                      labelStyle: TextStyle(
+                        color: Colors.black
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelText: "Kode Corporate",
+                      hintText: resultObject[0]["corporate_code"],
+                      icon: Icon(Icons.bookmark, color: config.grayColor),
+                      disabledBorder: OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(
+                          5.0,
+                        ),
+                        borderSide: BorderSide(
+                          color: config.grayColor,
+                          width: 1.5,
+                        ),
                       ),
                     ),
                   ),
                 ),
                 Container(
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                child: TextFormField(
-                  enabled: false,
-                  decoration: new InputDecoration(
-                    hintStyle: TextStyle(
-                      color: Colors.black
-                    ),
-                    labelStyle: TextStyle(
-                      color: Colors.black
-                    ),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    labelText: "Kode Corporate",
-                    hintText: resultObject[0]["corporate_code"],
-                    icon: Icon(Icons.bookmark, color: config.grayColor),
-                    disabledBorder: OutlineInputBorder(
-                      borderRadius: new BorderRadius.circular(
-                        5.0,
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  child: TextFormField(
+                    enabled: false,
+                    decoration: new InputDecoration(
+                      hintStyle: TextStyle(
+                        color: Colors.black
                       ),
-                      borderSide: BorderSide(
-                        color: config.grayColor,
-                        width: 1.5,
+                      labelStyle: TextStyle(
+                        color: Colors.black
                       ),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                child: TextFormField(
-                  enabled: false,
-                  decoration: new InputDecoration(
-                    hintStyle: TextStyle(
-                      color: Colors.black
-                    ),
-                    labelStyle: TextStyle(
-                      color: Colors.black
-                    ),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    labelText: "Nama Corporate",
-                    hintText: resultObject[0]["corporate_name"],
-                    icon: Icon(Icons.person, color: config.grayColor),
-                    disabledBorder: OutlineInputBorder(
-                      borderRadius: new BorderRadius.circular(
-                        5.0,
-                      ),
-                      borderSide: BorderSide(
-                        color: config.grayColor,
-                        width: 1.5,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                child: TextFormField(
-                  enabled: false,
-                  decoration: new InputDecoration(
-                    hintStyle: TextStyle(
-                      color: Colors.black
-                    ),
-                    labelStyle: TextStyle(
-                      color: Colors.black
-                    ),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    labelText: "Induk Pelanggan",
-                    hintText: resultObject[0]["head_customer"],
-                    icon: Icon(Icons.group, color: config.grayColor),
-                    disabledBorder: OutlineInputBorder(
-                      borderRadius: new BorderRadius.circular(
-                        5.0,
-                      ),
-                      borderSide: BorderSide(
-                        color: config.grayColor,
-                        width: 1.5,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                child: TextFormField(
-                  enabled: false,
-                  decoration: new InputDecoration(
-                    hintStyle: TextStyle(color: Colors.black),
-                    labelStyle: TextStyle(color: Colors.black),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    labelText: "Piutang",
-                    hintText: currencyFormatter.format(resultObject[0]["piutang"]),
-                    icon: TextView("Rp ", 4, color: config.grayColor),
-                    disabledBorder: OutlineInputBorder(
-                      borderRadius: new BorderRadius.circular(
-                        5.0,
-                      ),
-                      borderSide: BorderSide(
-                        color: config.grayColor,
-                        width: 1.5,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                child: TextFormField(
-                  enabled: false,
-                  decoration: new InputDecoration(
-                    hintStyle: TextStyle(
-                      color: Colors.black
-                    ),
-                    labelStyle: TextStyle(
-                      color: Colors.black
-                    ),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    labelText: "Limit Saat Ini",
-                    hintText: currencyFormatter.format(int.parse(resultObject[0]["old_limit"])),
-                    icon: TextView("Rp ", 4, color: config.grayColor),
-                    disabledBorder: OutlineInputBorder(
-                      borderRadius: new BorderRadius.circular(
-                        5.0,
-                      ),
-                      borderSide: BorderSide(
-                        color: config.grayColor,
-                        width: 1.5,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                child: TextFormField(
-                  style: TextStyle(color: Colors.black),
-                  inputFormatters: <TextInputFormatter>[
-                    CurrencyTextInputFormatter(
-                      locale: 'IDR',
-                      decimalDigits: 0,
-                      symbol: '',
-                    ),
-                  ],
-                  keyboardType: TextInputType.number,
-                  enabled: false,
-                  controller: limitRequestController,
-                  decoration: new InputDecoration(
-                    hintStyle: TextStyle(
-                      color: Colors.black
-                    ),
-                    labelStyle: TextStyle(
-                      color: Colors.black
-                    ),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    labelText: "Limit Yang Diajukan",
-                    icon: TextView("Rp ", 4, color: config.grayColor),
-                    disabledBorder: OutlineInputBorder(
-                        borderRadius: new BorderRadius.circular(5.0,),
-                        borderSide: BorderSide(color: config.grayColor, width: 1.5,),
-                    ),
-                  ),
-                ),
-              ),
-              (pageType == 1 || pageType == 4) && isNeedApproval && user_code_request.toLowerCase() != user_login.toLowerCase() ?
-              IntrinsicHeight(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                        child: Button(
-                          key: Key("submit"),
-                          loading: acceptLimitRequestLoading,
-                          backgroundColor: isLimitRequestApprovalExist ? config.grayNonActiveColor : config.darkOpacityBlueColor,
-                          child: user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ? TextView("acc (sales director)", 3, caps: true, align: TextAlign.center) : TextView("terima", 3, caps: true, align: TextAlign.center),
-                          onTap: () {
-                            if(!isLimitRequestApprovalExist) {
-                              user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ?
-                              updateLimitGabunganRequest(-1)
-                              :
-                              updateLimitGabunganRequest(1);
-                            }
-                          },
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelText: "Nama Corporate",
+                      hintText: resultObject[0]["corporate_name"],
+                      icon: Icon(Icons.person, color: config.grayColor),
+                      disabledBorder: OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(
+                          5.0,
+                        ),
+                        borderSide: BorderSide(
+                          color: config.grayColor,
+                          width: 1.5,
                         ),
                       ),
                     ),
-              
-                    Expanded(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                        child: Button(
-                          key: Key("submit"),
-                          loading: rejectLimitRequestLoading,
-                          backgroundColor: isLimitRequestApprovalExist ? config.grayNonActiveColor : config.darkOpacityBlueColor,
-                          child: TextView(
-                            "tolak",
-                            3,
-                            caps: true,
-                            align: TextAlign.center,
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  child: TextFormField(
+                    enabled: false,
+                    decoration: new InputDecoration(
+                      hintStyle: TextStyle(
+                        color: Colors.black
+                      ),
+                      labelStyle: TextStyle(
+                        color: Colors.black
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelText: "Induk Pelanggan",
+                      hintText: resultObject[0]["head_customer"],
+                      icon: Icon(Icons.group, color: config.grayColor),
+                      disabledBorder: OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(
+                          5.0,
+                        ),
+                        borderSide: BorderSide(
+                          color: config.grayColor,
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  child: TextFormField(
+                    enabled: false,
+                    decoration: new InputDecoration(
+                      hintStyle: TextStyle(color: Colors.black),
+                      labelStyle: TextStyle(color: Colors.black),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelText: "Piutang",
+                      hintText: currencyFormatter.format(resultObject[0]["piutang"]),
+                      icon: TextView("Rp ", 4, color: config.grayColor),
+                      disabledBorder: OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(
+                          5.0,
+                        ),
+                        borderSide: BorderSide(
+                          color: config.grayColor,
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  child: TextFormField(
+                    enabled: false,
+                    decoration: new InputDecoration(
+                      hintStyle: TextStyle(
+                        color: Colors.black
+                      ),
+                      labelStyle: TextStyle(
+                        color: Colors.black
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelText: "Limit Saat Ini",
+                      hintText: currencyFormatter.format(int.parse(resultObject[0]["old_limit"])),
+                      icon: TextView("Rp ", 4, color: config.grayColor),
+                      disabledBorder: OutlineInputBorder(
+                        borderRadius: new BorderRadius.circular(
+                          5.0,
+                        ),
+                        borderSide: BorderSide(
+                          color: config.grayColor,
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                  child: TextFormField(
+                    style: TextStyle(color: Colors.black),
+                    inputFormatters: <TextInputFormatter>[
+                      CurrencyTextInputFormatter(
+                        locale: 'IDR',
+                        decimalDigits: 0,
+                        symbol: '',
+                      ),
+                    ],
+                    keyboardType: TextInputType.number,
+                    enabled: false,
+                    controller: limitRequestController,
+                    decoration: new InputDecoration(
+                      hintStyle: TextStyle(
+                        color: Colors.black
+                      ),
+                      labelStyle: TextStyle(
+                        color: Colors.black
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelText: "Limit Yang Diajukan",
+                      icon: TextView("Rp ", 4, color: config.grayColor),
+                      disabledBorder: OutlineInputBorder(
+                          borderRadius: new BorderRadius.circular(5.0,),
+                          borderSide: BorderSide(color: config.grayColor, width: 1.5,),
+                      ),
+                    ),
+                  ),
+                ),
+                (pageType == 1 || pageType == 4) && isNeedApproval && user_code_request.toLowerCase() != user_login.toLowerCase() ?
+                IntrinsicHeight(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                          child: Button(
+                            key: Key("submit"),
+                            loading: acceptLimitRequestLoading,
+                            backgroundColor: isLimitRequestApprovalExist ? config.grayNonActiveColor : config.darkOpacityBlueColor,
+                            child: user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ? TextView("acc (sales director)", 3, caps: true, align: TextAlign.center) : TextView("terima", 3, caps: true, align: TextAlign.center),
+                            onTap: () {
+                              if(!isLimitRequestApprovalExist) {
+                                user_login.toLowerCase().contains("dsd") && user_code_request.toLowerCase().contains("kc") && int.parse(limitRequestController.text.replaceAll(new RegExp('\\.'),'')) > 1500000000 ?
+                                updateLimitGabunganRequest(-1)
+                                :
+                                updateLimitGabunganRequest(1);
+                              }
+                            },
                           ),
-                          onTap: () {
-                            if(!isLimitRequestApprovalExist) {
-                              updateLimitGabunganRequest(0);
-                            }
-                          },
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              )
-              :
-              Container(),
-              ],
+                
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                          child: Button(
+                            key: Key("submit"),
+                            loading: rejectLimitRequestLoading,
+                            backgroundColor: isLimitRequestApprovalExist ? config.grayNonActiveColor : config.darkOpacityBlueColor,
+                            child: TextView(
+                              "tolak",
+                              3,
+                              caps: true,
+                              align: TextAlign.center,
+                            ),
+                            onTap: () {
+                              if(!isLimitRequestApprovalExist) {
+                                updateLimitGabunganRequest(0);
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+                :
+                Container(),
+                ],
+              ),
             ),
           ),
         ),
@@ -2215,8 +2222,9 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     final namaCustomerData = encryptData(customerNameEncoded);
     final oldLimitData = encryptData(resultObject[0]['old_limit'].toString());
     final limitBaruData = encryptData(limitRequestController.text.replaceAll(new RegExp('\\.'),''));
+    final idApprovalData = encryptData(widget.id.toString());
 
-    String getRequestLimit = await customerAPI.addRequestLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData","corporate_name":"$namaCustomerData","old_limit":"$oldLimitData","limit_baru":"$limitBaruData"}');
+    String getRequestLimit = await customerAPI.addRequestLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData","corporate_name":"$namaCustomerData","old_limit":"$oldLimitData","limit_baru":"$limitBaruData","id_approval":"$idApprovalData"}');
 
     Navigator.of(context).pop();
 
@@ -2305,7 +2313,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
           type: "success",
           defaultAction: () {
             if(notificationType == 0) {
-              Navigator.pop(context);  
+              Navigator.pop(context);
             } else {
               Navigator.pop(context);
               Navigator.popAndPushNamed(

@@ -388,6 +388,9 @@ class SplashScreenState extends State<SplashScreen> {
       builder: (context){
         return WillPopScope(
           onWillPop: () async {
+            if(isRetryDownload) {
+              timer.cancel();
+            }
             return false;
           },
           child: AlertDialog(
