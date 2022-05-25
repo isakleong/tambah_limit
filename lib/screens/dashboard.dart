@@ -403,14 +403,20 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
         final userCodeData = encryptData(user_login);
         final kodeCustomerData = encryptData(message.data['customer_code']);
 
+        printHelp("user_login "+user_login);
+        printHelp("kodeCustomerData "+message.data['customer_code']);
+
         result_ = await customerAPI.getLimitGabungan(context, parameter: 'json={"kode_customerc":"$kodeCustomerData","user_code":"$userCodeData"}');
         
         final SharedPreferences sharedPreferences = await _sharedPreferences;
         await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
         await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
+        printHelp("request_limit "+message.data['limit']);
+        printHelp("kodeCustomerData "+message.data['user_code']);
+
         Navigator.of(context).pop();
-        
+
         Navigator.pushNamed(
           context,
           "historyLimitRequestDetail/${message.data['id']}/5/0",

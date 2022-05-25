@@ -419,6 +419,8 @@ class CustomerAPI {
         final response = await client.get(urlData);
         final responseData = decryptData(response.body.toString());
 
+        print("yuhu url "+url);
+
         if(responseData == "success") {
           isAddRequestLimitSuccess = "OK";
         
@@ -619,8 +621,8 @@ class CustomerAPI {
           }
 
         } catch (e) {
-          isChangeLimitSuccess = e;
-          print(e);
+          isChangeLimitSuccess = e.toString();
+          print(e.toString());
         }
       }
 

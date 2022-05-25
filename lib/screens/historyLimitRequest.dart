@@ -1218,23 +1218,29 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
 
       if(result_.success == 1) {
         if(type == 1) {
-          Navigator.pushNamed(
-            context,
-            "historyLimitRequestDetail/${tempLimitHistory.id}/4",
-            arguments: result_,
-          );
+          Timer(Duration(milliseconds: 200), () {
+            Navigator.pushNamed(
+              context,
+              "historyLimitRequestDetail/${tempLimitHistory.id}/4",
+              arguments: result_,
+            );
+          });
         } else if(type == 2) {
-          Navigator.pushNamed(
-            context,
-            "historyLimitRequestDetail/${tempLimitHistory.id}/5",
-            arguments: result_,
-          );
+          Timer(Duration(milliseconds: 200), () {
+            Navigator.pushNamed(
+              context,
+              "historyLimitRequestDetail/${tempLimitHistory.id}/5",
+              arguments: result_,
+            );
+          });
         } else {
-          Navigator.pushNamed(
-            context,
-            "historyLimitRequestDetail/${tempLimitHistory.id}/6",
-            arguments: result_,
-          );
+          Timer(Duration(milliseconds: 200), () {
+            Navigator.pushNamed(
+              context,
+              "historyLimitRequestDetail/${tempLimitHistory.id}/6",
+              arguments: result_,
+            );
+          });
         }
       } else {
         Alert(
@@ -1270,11 +1276,13 @@ class HistoryLimitRequestState extends State<HistoryLimitRequest> {
       Navigator.of(context).pop();
 
       if(result_.success == 1) {
-        Navigator.pushNamed(
-          context,
-          "historyLimitRequestDetail/${tempLimitHistory.id}/$type",
-          arguments: result_,
-        );
+        Timer(Duration(milliseconds: 200), () {
+          Navigator.pushNamed(
+            context,
+            "historyLimitRequestDetail/${tempLimitHistory.id}/$type",
+            arguments: result_,
+          );
+        });
       } else {
         Alert(
           context: context,
