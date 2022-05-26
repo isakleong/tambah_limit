@@ -526,8 +526,8 @@ class CustomerAPI {
             isChangeLimitSuccess = responseData;
           }
         } catch (e) {
-          isChangeLimitSuccess = e;
-          printHelp(e);
+          isChangeLimitSuccess = e.toString();
+          printHelp(e.toString());
         }
       }
 

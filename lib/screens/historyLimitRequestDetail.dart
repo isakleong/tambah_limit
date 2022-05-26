@@ -74,16 +74,25 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     notificationType = widget.notificationType;
   }
 
-  loadData() async {
+  @override
+  void didChangeDependencies() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    setState(() {
+      user_login = prefs.getString("get_user_login");
+    });
+
+    user_code = prefs.getString('user_code');
+
+    if(checkModulePrivilegeLoading) {
+      checkModulePrivilege();
+    }
+
     final _resultObject = jsonDecode(result.data.toString());
-    // printHelp("prints "+widget.mode.toString());
-    // printHelp("prints "+_resultObject[0].toString());
 
     //get limit request approval status
     if(getLimitRequestApprovalStatusLoading) {
-      await getLimitRequestApprovalStatus();
+      getLimitRequestApprovalStatus();
     }
 
     if(pageType > 3){
@@ -127,7 +136,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     }
     
     user_code_request = prefs.getString("user_code_request");
-
+    
     setState(() {
       resultObject = _resultObject;
     });
@@ -135,83 +144,6 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
     if(resultObject[0]["limit_dmd"] != null){
       prefs.setInt("limit_dmd", resultObject[0]["limit_dmd"]);
     }
-
-  }
-
-  @override
-  void didChangeDependencies() async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    setState(() {
-      user_login = prefs.getString("get_user_login");
-    });
-
-    user_code = prefs.getString('user_code');
-
-    if(checkModulePrivilegeLoading) {
-      await checkModulePrivilege();
-    }
-
-    await loadData();
-
-    // final _resultObject = jsonDecode(result.data.toString());
-    // // printHelp("prints "+widget.mode.toString());
-    // // printHelp("prints "+_resultObject[0].toString());
-
-    // //get limit request approval status
-    // if(getLimitRequestApprovalStatusLoading) {
-    //   await getLimitRequestApprovalStatus();
-    // }
-
-    // if(pageType > 3){
-    //   // final _newValue = currencyFormatter.format(_resultObject[0]["old_limit"]).toString();
-    //     limitDMDController.value = TextEditingValue(
-    //       text: _resultObject[0]["old_limit"].toString(),
-    //       selection: TextSelection.fromPosition(
-    //         TextPosition(offset: _resultObject[0]["old_limit"].length),
-    //       ),
-    //     );
-    // } else {
-    //   final _newValue = currencyFormatter.format(_resultObject[0]["limit_dmd"]).toString();
-    //     limitDMDController.value = TextEditingValue(
-    //           text: _newValue,
-    //           selection: TextSelection.fromPosition(
-    //             TextPosition(offset: _newValue.length),
-    //           ),
-    //         );
-    // }
-
-    // if(prefs.containsKey("request_limit")) {
-    //   request_limit = prefs.getInt("request_limit");
-      
-    //   limitRequestController.value = TextEditingValue(
-    //     text: currencyFormatter.format(request_limit).toString(),
-    //     selection: TextSelection.fromPosition(
-    //       TextPosition(offset: request_limit.toString().length),
-    //     ),
-    //   );
-    // }
-
-    // if(prefs.containsKey("request_limit_dmd")) {
-    //   request_limit_dmd = prefs.getInt("request_limit_dmd");
-
-    //   limitDMDController.value = TextEditingValue(
-    //     text: currencyFormatter.format(request_limit_dmd).toString(),
-    //     selection: TextSelection.fromPosition(
-    //       TextPosition(offset: request_limit_dmd.toString().length),
-    //     ),
-    //   );
-    // }
-    
-    // user_code_request = prefs.getString("user_code_request");
-    
-    // setState(() {
-    //   resultObject = _resultObject;
-    // });
-    
-    // if(resultObject[0]["limit_dmd"] != null){
-    //   prefs.setInt("limit_dmd", resultObject[0]["limit_dmd"]);
-    // }
     
   }
 
@@ -223,17 +155,21 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
         limitRequestApprovalMessage = "";
       });
 
-      // Alert(context: context, loading: true, disableBackButton: true);
+      Alert(context: context, loading: true, disableBackButton: true);
 
       final idData = encryptData(widget.id.toString());
       final userLoginData = encryptData(user_login);
 
       String getLimitRequestApprovalStatus = await limitHistoryAPI.getLimitRequestApprovalStatus(context, parameter: 'json={"id_approval":"$idData","user_login":"$userLoginData"}');
 
-      // Navigator.of(context).pop();
+      Navigator.of(context).pop();
 
       try {
-        print("id "+widget.id.toString());
+        // print("id "+widget.id.toString());
+        // print("status "+getLimitRequestApprovalStatus);
+        // print("need "+isNeedApproval.toString());
+        // print("uid req "+user_code_request);
+        
         if(getLimitRequestApprovalStatus == "") {
           isLimitRequestApprovalExist = false;
         } else {
@@ -247,7 +183,7 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
         // } else {
         //     isLimitRequestApprovalExist = false;
         // }
-
+        // //zxzx
         // if((pageType == 1 || pageType == 4) && !isNeedApproval && user_code_request.toLowerCase() == user_login.toLowerCase()) {
         //   isLimitRequestApprovalExist = true;
         //   limitRequestApprovalMessage = "Menunggu persetujuan Sales Director";
@@ -280,11 +216,13 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
 
       final idData = encryptData(widget.id.toString());
 
-      // Alert(context: context, loading: true, disableBackButton: true);
+      Alert(context: context, loading: true, disableBackButton: true);
 
       String getLimitRequestApprovalStatus = await limitHistoryAPI.getLimitRequestApprovalStatus(context, parameter: 'json={"id":"${idData}"}');
 
-      // Navigator.of(context).pop();
+      print("well 2");
+
+      Navigator.of(context).pop();
 
       try {
         if(getLimitRequestApprovalStatus != null) {
@@ -1782,7 +1720,8 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                     ),
                   ),
                 ),
-                !isLimitRequestApprovalExist ?
+                //!isLimitRequestApprovalExist && isNeedApproval ?
+                (pageType == 1 || pageType == 4) && isNeedApproval && user_code_request.toLowerCase() != user_login.toLowerCase() ?
                 IntrinsicHeight(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -2045,7 +1984,8 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
                     ),
                   ),
                 ),
-                !isLimitRequestApprovalExist ?
+                //!isLimitRequestApprovalExist && isNeedApproval ?
+                (pageType == 1 || pageType == 4) && isNeedApproval && user_code_request.toLowerCase() != user_login.toLowerCase() ?
                 IntrinsicHeight(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -2205,6 +2145,14 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
               );
             }
           }
+        );
+      } else {
+        Alert(
+          context: context,
+          title: "Maaf,",
+          content: Text(getChangeLimit),
+          cancel: false,
+          type: "error"
         );
       }
     }
@@ -2434,6 +2382,14 @@ class HistoryLimitRequestDetailState extends State<HistoryLimitRequestDetail> {
               );
             }
           }
+        );
+      } else {
+        Alert(
+          context: context,
+          title: "Maaf,",
+          content: Text(getChangeLimit),
+          cancel: false,
+          type: "error"
         );
       }
     }

@@ -125,6 +125,9 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   String progressText = "";
   bool isPermissionPermanentlyDenied = false;
 
+  //fix conflict onresume notification and retryauth function (after see history page, pop out to dashboard)
+  bool onResumeNotification = false;
+
   void _selectedTab(int index) {
     setState(() {
       if(bottomNavigationBarList[index].label.toLowerCase().contains("limit")) {
@@ -339,6 +342,9 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
     //handling onbackground notification
     FirebaseMessaging.onMessageOpenedApp.listen((message) async {
+      setState(() {
+        onResumeNotification = true;
+      });
       printHelp("MASUK ONRESUME NOTIFICATION");
       Result result_;
 
@@ -412,9 +418,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
         await sharedPreferences.setInt("request_limit", int.parse(message.data['limit']));
         await sharedPreferences.setString("user_code_request", message.data['user_code']);
 
-        printHelp("request_limit "+message.data['limit']);
-        printHelp("kodeCustomerData "+message.data['user_code']);
-
         Navigator.of(context).pop();
 
         Navigator.pushNamed(
@@ -471,6 +474,15 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
             arguments: result_,
           );
         } else {
+          // String getAuth = await retryAuth();
+
+          // if(getAuth == "OK") {
+            
+
+          // } else {
+
+          // }
+
           Alert(context: context, loading: true, disableBackButton: true);
 
           final userCodeData = encryptData(user_login);
@@ -490,6 +502,8 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
             "historyLimitRequestDetail/${message.data['id']}/3/0",
             arguments: result_,
           );
+
+          
         }
       }
       
@@ -1031,9 +1045,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.resumed:
         printHelp("resumed");
-        await doCheckVersion();
-        retryAuth();
-
+        if(!onResumeNotification) {
+          await doCheckVersion();
+          retryAuth();
+        }
         break;
       case AppLifecycleState.inactive:
         printHelp("inactive");
@@ -1049,6 +1064,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   retryAuth() async {
     final SharedPreferences sharedPreferences = await _sharedPreferences;
+    String getAuth = "";
     if(sharedPreferences.containsKey("nik")) {
       Alert(context: context, loading: true, disableBackButton: true);
 
@@ -1056,7 +1072,9 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
       final nikData = encryptData(nik);
 
-      String getAuth = await userAPI.checkAuth(context, parameter: 'json={"nik":"$nikData"}');
+      getAuth = await userAPI.checkAuth(context, parameter: 'json={"nik":"$nikData"}');
+
+      printHelp("GETAUTH "+getAuth);
 
       Navigator.of(context, rootNavigator: true).pop();
 
@@ -1110,6 +1128,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
         }
       } 
     }
+    return getAuth;
   }
 
   @override
