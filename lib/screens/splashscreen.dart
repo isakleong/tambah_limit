@@ -274,20 +274,59 @@ class SplashScreenState extends State<SplashScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Hero(
-                tag: "logo",
-                child: Visibility(
-                  maintainSize: !isDownloadNewVersion, 
-                  maintainAnimation: !isDownloadNewVersion,
-                  maintainState: !isDownloadNewVersion,
-                  visible: !isDownloadNewVersion,
-                  child: InkWell(
+              AnimatedContainer(
+                duration: Duration(milliseconds: 250),
+                child: InkWell(
                     child: Image.asset(
                       "assets/illustration/logo.png", alignment: Alignment.center, fit: BoxFit.contain,
                     ),
                   ),
-                ),
               ),
+              // Hero(
+              //   tag: "logo",
+              //   child: Visibility(
+              //     maintainSize: !isDownloadNewVersion, 
+              //     maintainAnimation: !isDownloadNewVersion,
+              //     maintainState: !isDownloadNewVersion,
+              //     visible: !isDownloadNewVersion,
+              //     child: InkWell(
+              //       child: Image.asset(
+              //         "assets/illustration/logo.png", alignment: Alignment.center, fit: BoxFit.contain,
+              //       ),
+              //     ),
+              //   ),
+              //   flightShuttleBuilder: (_,
+              //       Animation<double> animation,
+              //       HeroFlightDirection flightDirection,
+              //       BuildContext fromHeroContext,
+              //       BuildContext toHeroContext) {
+              //       return AnimatedBuilder(
+              //           animation: animation,
+              //           child: Visibility(
+              //             maintainSize: !isDownloadNewVersion, 
+              //             maintainAnimation: !isDownloadNewVersion,
+              //             maintainState: !isDownloadNewVersion,
+              //             visible: !isDownloadNewVersion,
+              //             child: InkWell(
+              //               child: Image.asset(
+              //                 "assets/illustration/logo.png", alignment: Alignment.center, fit: BoxFit.contain,
+              //               ),
+              //             ),
+              //           ),
+              //           builder: (_, _child) {
+              //               return DefaultTextStyle.merge(
+              //                   child: _child,
+              //                   style: TextStyle.lerp(DefaultTextStyle
+              //                       .of(fromHeroContext)
+              //                       .style, DefaultTextStyle
+              //                       .of(toHeroContext)
+              //                       .style, flightDirection == HeroFlightDirection.pop ? 1 - animation.value :
+              //                               animation.value),
+              //               );
+              //           },
+              //       );
+              //   },
+              // ),
               SizedBox(height: 100),
               Center(
                 child: Visibility(

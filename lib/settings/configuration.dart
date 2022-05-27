@@ -8,8 +8,8 @@ class Configuration extends InheritedWidget {
   }) : super(key: key, child: child);
 
   String ip_public = "103.76.27.110";
-  String ip_public_alt = "192.168.10.216";
-  // String ip_public_alt = "apps.tirtakencana.com";
+  // String ip_public_alt = "192.168.10.216";
+  String ip_public_alt = "apps.tirtakencana.com";
   // String ip_port = "80" ;
   String serverName = "dbrudie-2-0-0-dev";
   String apkName = "Tambah Limit";

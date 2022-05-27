@@ -115,14 +115,47 @@ class LoginState extends State<Login> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Hero(
-                        tag: 'logo',
+                      AnimatedContainer(
+                        duration: Duration(milliseconds: 250),
                         child: Container(
                           width: 220,
                           height: 220,
                           child: Image.asset("assets/illustration/logo.png", alignment: Alignment.center, fit: BoxFit.contain),
                         ),
                       ),
+                      // Hero(
+                      //   flightShuttleBuilder: (_,
+                      //       Animation<double> animation,
+                      //       HeroFlightDirection flightDirection,
+                      //       BuildContext fromHeroContext,
+                      //       BuildContext toHeroContext) {
+                      //       return AnimatedBuilder(
+                      //           animation: animation,
+                      //           child: Container(
+                      //             width: 220,
+                      //             height: 220,
+                      //             child: Image.asset("assets/illustration/logo.png", alignment: Alignment.center, fit: BoxFit.contain),
+                      //           ),
+                      //           builder: (_, _child) {
+                      //               return DefaultTextStyle.merge(
+                      //                   child: _child,
+                      //                   style: TextStyle.lerp(DefaultTextStyle
+                      //                       .of(fromHeroContext)
+                      //                       .style, DefaultTextStyle
+                      //                       .of(toHeroContext)
+                      //                       .style, flightDirection == HeroFlightDirection.pop ? 1 - animation.value :
+                      //                               animation.value),
+                      //               );
+                      //           },
+                      //       );
+                      //   },
+                      //   tag: 'logo',
+                      //   child: Container(
+                      //     width: 220,
+                      //     height: 220,
+                      //     child: Image.asset("assets/illustration/logo.png", alignment: Alignment.center, fit: BoxFit.contain),
+                      //   ),
+                      // ),
                       Container(
                         child: EditText(
                           key: Key("Username"),
