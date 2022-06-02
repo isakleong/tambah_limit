@@ -1766,32 +1766,60 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                               builder: (BuildContext context, StateSetter setState) {
                                 return Column(
                                   mainAxisSize: MainAxisSize.min,
-                                  children: List<Widget>.generate(4, (int index) {
-                                    var typeTitle = "";
-                                    if(index == 0){
-                                      typeTitle = "Not Blocked";
-                                    } else if(index == 1){
-                                      typeTitle = "Blocked Ship";
-                                    } else if(index == 2){
-                                      typeTitle = "Blocked Invoice";
-                                    } else if(index == 3){
-                                      typeTitle = "Blocked All";
-                                    }
-                                    return ListTile(
-                                      title: Text('${typeTitle}'),
-                                      leading: Radio(
-                                        value: index,
-                                        groupValue: selectedRadio,
-                                        onChanged: (int value) {
-                                          setState((){
-                                            selectedRadio = value;
-                                            blockedTypeSelected = typeTitle;
-                                            Navigator.of(context, rootNavigator: true).pop();
-                                          } );
+                                  children: [
+                                    Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: List<Widget>.generate(4, (int index) {
+                                        var typeTitle = "";
+                                        if(index == 0){
+                                          typeTitle = "Not Blocked";
+                                        } else if(index == 1){
+                                          typeTitle = "Blocked Ship";
+                                        } else if(index == 2){
+                                          typeTitle = "Blocked Invoice";
+                                        } else if(index == 3){
+                                          typeTitle = "Blocked All";
+                                        }
+                                        return RadioListTile(
+                                          title: Text('${typeTitle}'),
+                                          value: index,
+                                          groupValue: selectedRadio,
+                                          onChanged: (int value) {
+                                              setState((){
+                                              selectedRadio = value;
+                                              blockedTypeSelected = typeTitle;
+                                              // Navigator.of(context, rootNavigator: true).pop();
+                                            } );
+                                          },
+                                        );
+                                        // return ListTile(
+                                        //   title: Text('${typeTitle}'),
+                                        //   leading: Radio(
+                                        //     value: index,
+                                        //     groupValue: selectedRadio,
+                                        //     onChanged: (int value) {
+                                        //       setState((){
+                                        //         selectedRadio = value;
+                                        //         blockedTypeSelected = typeTitle;
+                                        //         Navigator.of(context, rootNavigator: true).pop();
+                                        //       } );
+                                        //     },
+                                        //   ),
+                                        // );
+                                      }),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Container(
+                                      width: double.infinity,
+                                      child: Button(
+                                        backgroundColor: config.darkOpacityBlueColor,
+                                        child: TextView("OK", 3, color: Colors.white),
+                                        onTap: () {
+                                          Navigator.of(context, rootNavigator: true).pop();
                                         },
                                       ),
-                                    );
-                                  }),
+                                    ),
+                                  ],
                                 );
                               },
                             ),
