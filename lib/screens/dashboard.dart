@@ -1910,7 +1910,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     final blockLamaData = encryptData(block_lama.toString());
     final blockBaruData = encryptData(block_baru.toString());
 
-    Result result_ = await customerAPI.updateBlock(context, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData","block_lama":$blockLamaData,"block_baru":$blockBaruData}');
+    Result result_ = await customerAPI.updateBlock(context, parameter: 'json={"kode_customer":"$kodeCustomerData","user_code":"$userCodeData","block_lama":"$blockLamaData","block_baru":"$blockBaruData"}');
 
     Navigator.of(context).pop();
 

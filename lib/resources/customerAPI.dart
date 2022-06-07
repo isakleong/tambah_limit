@@ -277,7 +277,6 @@ class CustomerAPI {
     }
 
     if(url != "") {
-
       try {
         var urlData = Uri.parse(url);
         final response = await client.get(urlData);
