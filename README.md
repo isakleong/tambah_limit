@@ -21,5 +21,7 @@ TambahLimit is an app that helps users (Sales Director, Deputy Sales Director an
 - Major change:
     - Encrypt API data.
     - Rename backend file name (from Coba to Data).
+- Minor change:
+    - Fix bug add limit for customers whose names contain special characters
 - Patch change:
     - Fix bug glitch on hero animation.
